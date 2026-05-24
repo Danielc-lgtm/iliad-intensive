@@ -31,12 +31,12 @@ Each module's `edits/` folder contains three interfaces the author uses to drive
 
 ### 1. Markdown mirror (`<project-name>.md`)
 
-A structured markdown view of the LaTeX project (sections, slides, blocks, bullets, image placeholders). The author may add inline edit markers using `<!-- EDIT: description of change -->` after any line. When processing:
+A structured markdown view of the LaTeX project (sections, slides, blocks, bullets, image placeholders). The author may add inline edit markers using `<div>description of change</div>` after any line (HTML `<div>` blocks are the edit marker syntax in this repo). When processing:
 
 - Infer the intended LaTeX change from the marker and surrounding context (these are often low-context; reverse-engineer intent).
 - Apply the change to the corresponding location in the LaTeX project.
 - Compile the project to PDF in `targets/`.
-- Regenerate the markdown mirror from the updated LaTeX (remove processed EDIT markers).
+- Regenerate the markdown mirror from the updated LaTeX (remove processed `<div>` markers).
 
 ### 2. Instructions file (`instructions.md`)
 
@@ -56,7 +56,7 @@ Claude Code writes here whenever facing a design decision, content ambiguity, or
 
 1. `git pull` to get latest changes.
 2. Check all modules' `edits/instructions.md` for new instructions.
-3. Check all markdown mirror files for `<!-- EDIT: ... -->` markers.
+3. Check all markdown mirror files for `<div>...</div>` edit markers.
 4. Check all `edits/choices.md` for answered choices (look for filled-in `**Decision:**` fields).
 5. For each change:
    1. Read relevant sources if needed for context.
