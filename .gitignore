@@ -1,0 +1,17 @@
+# LaTeX build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.synctex.gz
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+
+# Keep main.pdf out of projects/ (the canonical compiled artifact lives in targets/)
+**/projects/**/main.pdf
