@@ -22,4 +22,6 @@ Examples:
   
   - Use the last few slides from the agency_presentation which talks about optimization and thermodynamics to determine the focus of the content.
   
-  - Try to integrate all sources into a coherent theme that is connected, but make sure that the connections you make is rigorous
+  - Try to integrate all sources into a coherent theme that is connected, but make sure that the connections you make is rigorous and precise
+  
+  - You may use "Decision_Theory_CDT_to_UDT_1_1 (1).pdf" from decision theory sources as a minimal baseline for quality 
