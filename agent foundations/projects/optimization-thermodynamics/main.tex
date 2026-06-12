@@ -1,0 +1,488 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% (in)equalities up to additive constants, following Ebtekar & Hutter
+\newcommand{\plt}{\mathrel{\stackrel{+}{<}}}
+\newcommand{\pgt}{\mathrel{\stackrel{+}{>}}}
+\newcommand{\peq}{\mathrel{\stackrel{+}{=}}}
+\newcommand{\E}[1]{\left\langle #1 \right\rangle}
+\newcommand{\kB}{k_{\mathrm{B}}}
+
+\title{Optimization and Thermodynamics \\[1ex]
+{\large From convergent attractors to algorithmic entropy, and what physics charges an embedded agent for steering the world}}
+\author{Lecture notes, Agent Foundations module \\ Iliad Intensive}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+A useful way to characterize powerful agents is that they reliably steer the world into a narrow region of outcome space (one that would be extremely unlikely to arise under any random process). These notes develop this picture in three stages. First, we make ``steering into a narrow region'' precise: following Flint, an optimizing system is a physical system that evolves from a broad basin of attraction toward a small target set, robustly to perturbations; information-theoretically, this is local entropy reduction. Second, we ask what physics says about such processes. The reversibility of microscopic dynamics and the second law of thermodynamics forbid global entropy reduction, so an embedded optimizer must balance its books: we derive the second law from reversibility in a minimal Markov-chain setting, present the Touchette--Lloyd theorem (entropy reduction beyond a blind baseline is paid for in mutual information), and classify the three ways an agent can reduce a subsystem's entropy while respecting information conservation. Third, we confront a conceptual gap: the standard (Gibbs--Shannon) entropy is a function of a subjective probability distribution, treated as exogenous, which makes ``capacity to optimize'' observer-dependent and leaves classical tools inapplicable far from equilibrium. Algorithmic thermodynamics (Ebtekar--Hutter) replaces the subjective distribution with Kolmogorov complexity, yielding a second law for individual states. Under this reframing, an embedded agent's probabilistic knowledge becomes an endogenous, physically encoded quantity: algorithmic mutual information between the agent's memory and the environment, which is precisely the resource the agent spends to optimize. Agents that know more about the world can do more to it, and the exchange rate is set by thermodynamics.
+\end{abstract}
+
+\tableofcontents
+
+\section{Orientation: why thermodynamics belongs in agent foundations}
+
+Agent foundations looks for \emph{robust concepts} (``true names'') for notions like optimization, goals, and world models: concepts that do not break down when subjected to extreme optimization pressure, and that apply to agents we have never observed. These notes are about the true name of \emph{optimization} itself, approached from the descriptive direction: instead of starting from an ideal rational agent's subjective viewpoint, we start from properties of the physical world and ask what kinds of processes can reliably steer it into narrow target configurations, and at what cost.
+
+Thermodynamics enters for two reasons.
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Optimization is local entropy reduction.} An optimizing process concentrates probability mass: many possible initial configurations are funneled into a few target configurations. Reducing uncertainty about a system's configuration is reducing its entropy, and the physics of entropy (the second law, fluctuation theorems, the thermodynamic cost of erasing information) is well developed in frameworks such as stochastic thermodynamics, which hold arbitrarily far from equilibrium. These results directly constrain the shape of any physically embedded optimization process.
+  \item \textbf{Embedded agents pay for knowledge in physical currency.} For a dualistic agent (one standing outside the world, like a player outside a video game), ``what the agent knows'' is a free parameter, a probability distribution written down by the modeler. An embedded agent's knowledge must be physically encoded in its memory. Much of these notes builds up to the following claim: when entropy is defined correctly (algorithmically, rather than relative to a subjective ensemble), an agent's knowledge about its environment becomes an objective, physical quantity (mutual information between memory and environment), and this quantity is exactly the budget the agent can spend on optimization.
+\end{enumerate}
+
+For readers with a physics background, much of the value here is in translation rather than new results: reframing familiar thermodynamic facts in the language of information theory connects them to concepts native to agent foundations, such as world modeling, optimization power, and the physical constraints on embedded agents.
+
+\paragraph{Plan.} Section~\ref{sec:prelim} fixes notation. Section~\ref{sec:optsys} defines optimizing systems and translates the definition into entropy language. Section~\ref{sec:secondlaw} derives the second law from the reversibility of physics and works through a toy model (a heat engine made of biased coins) in which the bookkeeping is fully explicit. Section~\ref{sec:tl} presents the Touchette--Lloyd theorem: bits of optimization require bits of modeling. Section~\ref{sec:threetypes} classifies the three ways an embedded agent can optimize a subsystem. Section~\ref{sec:subjective} explains why the standard definition of entropy is subjective, and why this is a problem for exactly the questions agent foundations cares about. Section~\ref{sec:algo} develops algorithmic thermodynamics: entropy as Kolmogorov complexity, the algorithmic second law, Landauer's principle, and a clean analysis of Maxwell's demon. Section~\ref{sec:embedded} assembles the synthesis: knowledge as an endogenous physical resource. Section~\ref{sec:takeaways} collects takeaways.
+
+\paragraph{Prerequisites.} Basic discrete probability. No statistical mechanics background is assumed; every thermodynamic notion used is defined here, in information-theoretic terms.
+
+\section{Information-theoretic language}
+\label{sec:prelim}
+
+Throughout, $X, Y, \dots$ denote random variables on countable sets, $x, y, \dots$ specific values, and all logarithms are base 2 (entropies are measured in bits).
+
+\begin{definition}[Entropy, mutual information, divergence]
+\label{def:info}
+Let $\mu, \nu$ be probability distributions on a countable set $\mathcal{X}$, and let $X \sim \mu$.
+\begin{itemize}[leftmargin=2em]
+  \item The \emph{Shannon entropy} of $X$ is $H(X) := \sum_{x} \mu(x) \log \frac{1}{\mu(x)}$. It measures the uncertainty in $X$: equivalently, the mean number of bits per sample needed to encode $X$ under the best code matched to $\mu$. The quantity $\log \frac{1}{\mu(x)}$ (the \emph{Shannon codelength} of the individual outcome $x$) will play an important role later.
+  \item The \emph{conditional entropy} is $H(X \mid Y) := H(X,Y) - H(Y)$, the uncertainty remaining in $X$ once $Y$ is known.
+  \item The \emph{mutual information} is
+  \[ I(X;Y) := H(X) + H(Y) - H(X,Y) = H(X) - H(X \mid Y) \;\ge\; 0, \]
+  the number of bits knowing $Y$ saves you about $X$ (and vice versa; it is symmetric).
+  \item The \emph{KL divergence} is $D(\mu \,\|\, \nu) := \sum_x \mu(x) \log \frac{\mu(x)}{\nu(x)} \ge 0$, the coding cost of believing $\nu$ when the truth is $\mu$.
+\end{itemize}
+\end{definition}
+
+We will use one classical inequality.
+
+\begin{lemma}[Log-sum inequality]
+\label{lem:logsum}
+For nonnegative reals $a_1, a_2, \dots$ and $b_1, b_2, \dots$ with $a := \sum_i a_i$ and $b := \sum_i b_i$ finite,
+$\sum_i a_i \log \frac{a_i}{b_i} \ge a \log \frac{a}{b}$.
+\end{lemma}
+
+\section{Optimization as a physical phenomenon}
+\label{sec:optsys}
+
+\subsection{Optimizing systems}
+
+What makes a process an \emph{optimization} process? In computer science, an optimization algorithm searches a feasible region for the minimum of an objective function. In engineering, optimizing means improving an artifact for a purpose. Flint's proposal unifies these by looking at the whole physical system at once, without assuming any separation into an ``optimizer'' and an ``optimized'':
+
+\begin{definition}[Optimizing system, Flint 2020]
+\label{def:optsys}
+An \emph{optimizing system} is a physical system with the property that, from any configuration in a large set (the \emph{basin of attraction}), it tends to evolve toward a small set of \emph{target configurations}, and continues to do so \emph{despite perturbations} during the process.
+\end{definition}
+
+\begin{example}[Computing $\sqrt{2}$ by gradient descent]
+\label{ex:sqrt2}
+A computer runs gradient descent on $y = (x^2 - 2)^2$, updating a \texttt{current\_estimate} variable until it converges to $\sqrt 2$. This program has an unusual property: if you attach a debugger mid-run and overwrite \texttt{current\_estimate} with an arbitrary float, the algorithm still converges to $\sqrt 2$ (the next gradient step simply starts correcting the perturbation). Most code is not like this; overwrite a loop variable in a webserver and it crashes or returns garbage. The system (computer + program) tends from a broad basin (any value of the estimate) to a tiny target set (estimate $= \sqrt 2$), robustly. It is an optimizing system.
+\end{example}
+
+\begin{example}[Ball in a valley; billiard balls]
+A ball rolling in a valley (with friction) reaches the valley floor from any starting point in the valley, even if knocked around mid-roll: a weak but genuine optimizing system. By contrast, billiard balls bouncing on a table are \emph{not} an optimizing system: move one ball mid-trajectory and the final rest configuration is completely different. There is no narrow target set the system returns to.
+\end{example}
+
+\begin{example}[Building a house]
+Humans, raw materials, blueprints, and food, sealed in a chamber: the system tends toward configurations containing a house matching the blueprint. Perturb it (sneak in at night and knock down a wall) and the builders repair the damage. The basin is broad (many initial arrangements of materials), the target set narrow, the tendency robust.
+\end{example}
+
+Flint quantifies optimizing systems along three axes, each of which will matter later:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Robustness.} Along how many dimensions, and against what magnitude of perturbation, does the system keep converging to the target set? Every basin has an outer rim; a perturbation past the rim destroys the tendency (Flint: the optimizing system ``dies'').
+  \item \textbf{Duality.} Can we factor the system into an \emph{engine} of optimization and an \emph{object} of optimization (agent and world)? A robot moving a vase is highly dualistic; a tree growing toward its mature shape is not (no part of the tree is ``the optimizer''). Optimization does not require an agent.
+  \item \textbf{Retargetability.} Can a microscopic perturbation redirect the system toward a \emph{different} target set? Flipping a few bits in the robot's memory retargets it; no microscopic nudge makes the ball roll to a different valley. Retargetability via a small, localized perturbation is a signature of something agent-like: a compact representation of the target.
+\end{itemize}
+
+\subsection{From improbability to entropy}
+
+How much optimization is a given system doing? Yudkowsky's measure: look at the achieved outcome and ask how \emph{improbable} it is, i.e.\ what fraction of configurations would be at least as high in the target ordering if the system evolved at random. Achieving an outcome in the top $2^{-k}$ fraction is $k$ bits of optimization power.
+
+The bits language suggests the translation into entropy, which is the bridge to physics. Model the optimized subsystem's coarse configuration as a random variable: $X$ initially (broad uncertainty over the basin), $Y$ finally. An optimizing system funnels many initial configurations into few target configurations: the distribution of $Y$ is concentrated where that of $X$ was spread out. The natural summary is the \emph{entropy reduction}
+\[
+\Delta H \;:=\; H(X) - H(Y).
+\]
+Two earlier observations now become quantitative. Robust convergence from a \emph{broad} basin means $H(X)$ is large even given the system's tendency; a \emph{narrow} target set means $H(Y)$ is small. And ``would be extremely unlikely to arise under any random process'' means precisely that the target set carries low probability under dynamics without the optimizing tendency; hitting it reliably is a large $\Delta H$.
+
+This reformulation buys us all of thermodynamics as a constraint set on optimization, because thermodynamics is, at bottom, the study of which entropy changes physics permits and what they cost. That is the subject of the rest of these notes.
+
+\begin{remark}
+The translation deliberately drops information: $\Delta H$ does not care \emph{which} narrow region the system steers toward (the goal), only how narrow it is. Expected-utility maximization can be decomposed into an entropy-reduction part and a part that shifts the world's distribution toward a particular desired distribution; these notes study the first part, which is where physics bites.
+\end{remark}
+
+\section{Reversibility and the second law}
+\label{sec:secondlaw}
+
+\subsection{The funneling picture is globally impossible}
+
+Take the convergent-attractor picture literally at the microscopic level and it contradicts known physics. Microscopic dynamics (classical Hamiltonian mechanics; unitary quantum mechanics) are \emph{reversible}: distinct initial microstates evolve to distinct final microstates. The time evolution over any interval is a bijection on microstates. But funneling means many initial states map into the same few target states, a many-to-one map. Therefore:
+
+\begin{quote}
+\emph{No physical process can reduce the entropy of an isolated system at the microscopic level. Optimization, if it happens, is a property of a coarse-grained description of a subsystem, and the information squeezed out of the optimized subsystem must show up somewhere else.}
+\end{quote}
+
+The rest of this section makes both halves of this claim precise: how coarse-graining gives rise to a rigorous second law, and what ``somewhere else'' can mean.
+
+\subsection{Coarse-graining and the second law}
+
+Stochastic thermodynamics replaces the continuous phase space by a partition into discrete cells (a \emph{coarse-graining}), and replaces the deterministic dynamics by the induced transition probabilities between cells: $P(y, x)$ is the fraction of cell $x$ (by phase-space volume, the \emph{Liouville measure}) whose evolution after one time step lies in cell $y$. The key structural assumption is that the coarse-grained trajectory is a \emph{Markov process}: the distribution of the next cell depends only on the current cell, not on the longer past. This Markov property is exactly what fails to hold in the time-reversed direction, and is the source of the arrow of time in this framework; it is rigorously provable for idealized chaotic systems (multibaker maps) and is the standard working assumption for realistic ones.\footnote{Reversibility enters as follows: because the microscopic dynamics preserve phase-space volume (Liouville's theorem), the vector of cell volumes is a \emph{stationary measure} of the Markov chain. If all cells have equal volume (a \emph{mesoscopic} coarse-graining, e.g.\ truncating each particle's position and momentum to finite precision), stationarity of the uniform measure says the columns \emph{and rows} of $P$ sum to 1: $P$ is \emph{doubly stochastic}. Everything below generalizes to unequal cell volumes by measuring entropy relative to the stationary measure; we stick to the doubly stochastic case for clarity.}
+
+\begin{theorem}[Second law for doubly stochastic chains]
+\label{thm:secondlaw}
+Let $P$ be doubly stochastic, i.e.\ $\sum_y P(y,x) = 1$ for all $x$ and $\sum_x P(y,x) = 1$ for all $y$. If $X$ has distribution $\mu$ and $Y$ has distribution $P\mu$ (one step of the chain), then
+\[ H(Y) \;\ge\; H(X). \]
+\end{theorem}
+
+\begin{proof}
+First, one step of the chain cannot increase divergence: for any distributions $\mu, \nu$, applying the log-sum inequality (Lemma~\ref{lem:logsum}) for each $y$ to $a_x = P(y,x)\mu(x)$, $b_x = P(y,x)\nu(x)$ and summing over $y$ gives
+\[
+D(P\mu \,\|\, P\nu) \;\le\; D(\mu \,\|\, \nu).
+\]
+Now take $\nu = \sharp$, the counting measure ($\sharp(x) = 1$ for all $x$; the argument does not require normalization). Double stochasticity says exactly $P\sharp = \sharp$. Since $D(\mu \,\|\, \sharp) = -H(\mu)$, the display becomes $-H(P\mu) \le -H(\mu)$.
+\end{proof}
+
+This is the second law of thermodynamics in its minimal information-theoretic form, and it is worth pausing on what the proof used: only that the coarse-grained dynamics are Markovian with a stationary uniform measure, which in turn came from the \emph{reversibility} (volume preservation) of the underlying physics. Irreversibility at the macro level is a consequence of reversibility at the micro level plus coarse-graining; many-to-one funneling of cells is possible, but only at the price quantified below.
+
+\begin{remark}[What the second law does and does not forbid]
+Theorem~\ref{thm:secondlaw} applies to an isolated system as a whole. It does not forbid a \emph{subsystem's} entropy from falling, and subsystem entropy reduction is exactly what optimization is. The constraint it imposes is a conservation-style bookkeeping requirement: any entropy removed from the optimized subsystem must be compensated by at least as much entropy appearing elsewhere (Section~\ref{sec:threetypes} classifies the possible ``elsewheres''). The second law is also statistical rather than absolute, a point we return to in the algorithmic setting (Section~\ref{sec:algo}), where small fluctuations get exact bounds.
+\end{remark}
+
+\subsection{A fully explicit toy world: the coin engine}
+\label{sec:coins}
+
+Wentworth's ``generalized heat engine'' strips thermodynamics down to a setting where every step of the bookkeeping is visible, with no physics beyond analogy. We will reuse this toy world repeatedly.
+
+\textbf{The world.} Two large pools of independent biased coins: a \emph{cold pool} of $n$ coins, each heads with probability $0.1$ (entropy $\approx 0.47$ bits/coin), and a \emph{hot pool} of $n$ coins, each heads with probability $0.2$ (entropy $\approx 0.72$ bits/coin). Higher heads-probability plays the role of higher temperature.
+
+\textbf{The rules.} We may apply any transformation to the coins, subject to three constraints:
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Reversibility:} every transformation must be invertible (from the final coin state one can reconstruct the initial one). This is the analogue of microscopic reversibility.
+  \item \textbf{Conservation:} transformations must conserve the total number of heads. Heads play the role of energy.
+  \item \textbf{The designer viewpoint:} we must choose the transformation \emph{in advance}, without looking at the coins. This is the position of anyone who designs a machine to operate in an environment they cannot microscopically observe (a refrigerator designer does not know where the air molecules will be; the machine itself can ``observe'' things while running, but the machine is part of the system, so its observations are themselves reversible, conservation-respecting transformations). It is from this designer's perspective that the uncertainty, hence the entropy, is defined, and it is this viewpoint that transfers directly to AIs embedded in their environments.
+\end{enumerate}
+
+\textbf{Extracting work.} Call a coin that is heads with near-certainty a \emph{work coin} (a deterministic, fully known resource, like a charged battery). Extracting work means transforming the pools so that $w$ designated coins are deterministically heads. Reversibility makes this an \emph{information compression} problem: the remaining coins must retain all the information of the initial state (else the map is not invertible), so we must compress the initial entropy into fewer coins, freeing the rest to be set deterministically.
+
+\textbf{No work from a single pool.} Try to extract work from the hot pool alone. Its $n$ coins carry $0.72n$ bits, which compression can pack into $0.72n$ fully random coins. But fully random coins are heads half the time: the compressed coins would contain $\approx 0.36n$ heads, and we only have $0.2n$. Conservation makes the compression impossible. The general statement: the pool's initial distribution is the \emph{maximum-entropy distribution subject to the heads constraint}, and a maxentropic-subject-to-constraint distribution cannot be compressed without violating the constraint. This is the toy version of ``no work from a single heat bath'' (a type-2 perpetual motion machine).
+
+\textbf{Work from two pools.} With both pools ($2n$ coins, $1.19n$ bits, $0.3n$ heads), the joint distribution is \emph{not} maxentropic given the joint constraint (a maxentropic state would spread heads evenly across the pools rather than maintaining two distinct biases). The temperature \emph{difference} is the resource. Setting $w$ coins to heads and making the remaining $2n - w$ coins maxentropic subject to carrying the remaining $0.3n - w$ heads, the entropy budget works out to $w \approx 0.011n$ extractable work coins.
+
+\begin{remark}[What the toy teaches]
+\label{rem:cointeach}
+(i) Under reversibility, you never destroy uncertainty, you only \emph{move it around}: concentrating certainty in one place (the work coins) means concentrating uncertainty elsewhere. (ii) Work extraction, and by Section~\ref{sec:optsys} optimization generally, is a compression problem. (iii) What is or is not extractable depends on the gap between the system's actual entropy and the maximum entropy compatible with its constraints; this gap (\emph{negentropy}) is the fuel. All three lessons survive, sharpened, in the algorithmic setting of Section~\ref{sec:algo}.
+\end{remark}
+
+\section{Steering costs information: the Touchette--Lloyd theorem}
+\label{sec:tl}
+
+The coin engine extracted certainty from a pre-existing statistical disequilibrium, without ever looking at the coins. How much more could it do if it \emph{could} look? This is the question answered by Touchette and Lloyd (2000, 2004), in a result that deserves to be better known in agent foundations: it is one of the few theorems directly linking \emph{amount of optimization} to \emph{amount of world-modeling}.
+
+\subsection{Setup}
+
+One step of environmental dynamics: the environment starts as random variable $X$, an action variable $A$ is chosen, and the environment ends as $Y$, distributed according to dynamics $P(Y \mid X, A)$. The \emph{policy} is the conditional distribution $P(A \mid X)$: how the action responds to the initial state.
+
+\begin{definition}[Blind and sighted policies]
+A policy is \emph{blind} if $A$ is independent of $X$ (equivalently $I(X;A) = 0$), and \emph{sighted} if $I(X;A) > 0$. Blind policies include all deterministic policies (``always do $a_1$'') and all randomizing policies whose randomness is independent of $X$; what they exclude is any flow of information from the environment's state into the action.
+\end{definition}
+
+A policy is evaluated by its entropy reduction $\Delta H = H(X) - H(Y)$. Let
+\[
+\Delta H^{\max}_{\text{blind}} := \max_{P(X),\, \text{blind } P(A)} \Delta H
+\]
+be the best entropy reduction achievable by \emph{any} blind policy from \emph{any} initial distribution: the optimization the dynamics can do ``on their own''. This baseline need not be zero (a contracting dynamics funnels states with no help; the coin engine extracted work blind), which is why it must be subtracted.
+
+\begin{theorem}[Touchette--Lloyd]
+\label{thm:tl}
+For any dynamics, any initial distribution, and any policy,
+\[
+\Delta H \;\le\; \Delta H^{\max}_{\mathrm{blind}} \;+\; I(X;A).
+\]
+\end{theorem}
+
+Every bit of entropy reduction beyond the blind baseline must be paid for by a bit of mutual information between the action and the environment's state. Contrapositively (and this is the selection-theorem reading): if you observe a system reducing entropy by more than any blind policy could, you can \emph{deduce} that it carries at least $\Delta H - \Delta H^{\max}_{\text{blind}}$ bits of mutual information with the environment. Optimization beyond the blind baseline implies modeling.
+
+\subsection{A worked example: the guessing game}
+
+A computer secretly picks a uniformly random 5-bit string $X$. You then submit a string $A$, and the computer outputs
+\[
+Y = f(X, A) = \begin{cases} 00000 & \text{if } A = X, \\ X & \text{otherwise.} \end{cases}
+\]
+Your goal is to minimize $H(Y)$.
+
+\emph{Blind play.} Submitting any fixed string other than $00000$ slightly concentrates the output distribution (the all-zeros outcome absorbs the probability of your guess being right): $H(Y) \approx 4.94$ bits, against the maximum $H(X) = 5$. (Submitting $00000$ itself is the one mistake: then $Y = X$ always and $H(Y) = 5$.)
+
+\emph{Sighted play.} Suppose you are shown the first $k$ bits of $X$ before choosing, and you guess the seen bits followed by all 1s. Each observed bit doubles your chance of matching $X$ exactly, concentrating $Y$ further:
+
+\begin{center}
+\begin{tabular}{lcccccc}
+\toprule
+bits of $X$ observed ($= I(X;A)$) & 0 & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+$H(Y)$ in bits & 4.94 & 4.85 & 4.63 & 4.11 & 2.83 & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+With all five bits, you match $X$ with certainty and force the deterministic output $00000$. Information about the environment converts into steering power, within the budget of Theorem~\ref{thm:tl}.
+
+\begin{example}[Noise-cancelling headphones]
+Earplugs reduce sound entropy at the ear while being completely blind to the incoming sound: a blind policy, and a decent one. Active noise-cancelling headphones \emph{listen} to the source and emit the inverting waveform; their internal state carries high mutual information with the sound, and they achieve entropy reduction (and selective steering, e.g.\ passing voices) that no blind earplug can. The performance gap is bounded by the bits of modeling.
+\end{example}
+
+\begin{remark}[Mutual information is necessary, not sufficient]
+\label{rem:tlcaveat}
+The theorem is an upper bound, not a guarantee. A policy can hold many bits about $X$ and waste them, or use them counterproductively: in the guessing game, the policy ``submit the bitwise NOT of $X$'' has the full 5 bits of mutual information and achieves \emph{zero} entropy reduction (it never matches $X$, performing worse than the optimal blind policy). Modeling enables steering; it does not constitute it.
+\end{remark}
+
+\section{Three types of optimization under information conservation}
+\label{sec:threetypes}
+
+We now assemble the global bookkeeping. Decompose the universe into the agent $A$, the subsystem $S$ the agent is optimizing, and the rest of the environment $E$. Optimization reduces $H(S)$. By the second law (Theorem~\ref{thm:secondlaw} applied to the whole), the joint entropy of $(A, S, E)$ cannot decrease. In what ways can the books be balanced? Daniel C and Ebtekar identify exactly three channels.
+
+\paragraph{Type 1: dump waste heat into the environment.}
+The agent transfers the subsystem's entropy into $E$: $H(S)$ falls while $H(E)$ rises by at least as much. This is the everyday mode of optimization. A refrigerator narrows the distribution of its interior's thermal microstate and exhausts entropy out the back; a builder imposes order on materials while dissipating heat and disorder into the surroundings. In the coin engine, this is moving uncertainty from designated coins into other coins.
+
+\paragraph{Type 2: absorb the entropy into the agent's own memory (measurement).}
+The agent reduces $H(S)$ by \emph{measuring} $S$ and storing the result, moving the entropy into its own memory state. This is how Maxwell's demon works. In the classic setup, a partition with a controllable door divides a gas-filled room; the demon opens the door when a molecule approaches from the left and closes it when one approaches from the right, until all molecules are on the right (entropy of the gas reduced, with no heat dumped anywhere).
+
+Reversibility explains why the demon's memory must fill up. Suppose you find a particle on the right at the end. Two histories could have produced this (it started right and stayed, or started left and was admitted), and the final gas configuration alone cannot distinguish them. Reversibility demands the past be reconstructible from the present; this is possible only if the demon's memory retains a record of each particle's origin. The gas's entropy decrease is matched by the growth of entropy in the demon's memory. The second law survives; the entropy has been relocated, not destroyed.
+
+\paragraph{Type 3: spend pre-existing mutual information.}
+Types 1 and 2 compensate $H(S)$'s decrease with an increase elsewhere. Remarkably, a third option reduces $H(S)$ with \emph{no} increase anywhere: the agent can leverage mutual information it already shares with the subsystem.
+
+Suppose at time $t$ the agent and subsystem share $I(S_t; A_t) > 0$, and (for clean accounting) the environment is independent of both, so the joint entropy decomposes as
+\[
+H(S_t, A_t, E_t) \;=\; H(A_t) + H(S_t) - I(S_t; A_t) + H(E_t).
+\]
+The agent now \emph{erases the copy of the shared information inside $S$}: it applies an interaction (using its side of the correlation as the key) that transforms $S$ so that
+\[
+H(S_{t+1}) = H(S_t) - I(S_t; A_t), \qquad I(S_{t+1}; A_{t+1}) = 0,
+\]
+while leaving the agent's and environment's marginal entropies unchanged. The new joint entropy is
+\[
+H(A_{t+1}) + H(S_{t+1}) + H(E_{t+1}) \;=\; H(A_t) + \big(H(S_t) - I(S_t;A_t)\big) + H(E_t),
+\]
+exactly equal to the old joint entropy. The subsystem's entropy fell by $I(S_t;A_t)$ bits, total entropy is unchanged, and no waste heat was produced. Correlation with the world is a consumable battery for optimization.
+
+This reframes the demon: instead of one measure-and-control step (Type 2), break the interaction into a \emph{copy} step (acquiring mutual information with the gas) followed by a \emph{control} step that spends that mutual information to reduce the room's entropy at no further cost (Type 3). Measurement is the purchase of correlation; steering is its expenditure. The parallel with Touchette--Lloyd (Theorem~\ref{thm:tl}) is exact in spirit: there too, entropy reduction beyond the blind baseline is funded bit-for-bit by $I(X;A)$. We will make the parallel rigorous, for individual states rather than ensembles, in Section~\ref{sec:demon}.
+
+\paragraph{Summary.} An embedded agent can optimize a subsystem by:
+\begin{enumerate}[leftmargin=2em]
+  \item dumping waste entropy into the environment (Type 1),
+  \item absorbing the subsystem's entropy into its memory via measurement (Type 2),
+  \item spending existing mutual information with the subsystem, erasing the subsystem's copy of it (Type 3).
+\end{enumerate}
+
+\section{The trouble with subjective entropy}
+\label{sec:subjective}
+
+\subsection{Entropy is supposed to measure capacity to optimize}
+
+Entropy's job, throughout physics and engineering, is to quantify a system's \emph{capacity to do work}, which by now we can read as: capacity to perform optimization. Consider the demon after a long run of Type 2 optimization. Its memory (say $m$ bits) has absorbed entropy from the gas; the \emph{free memory} remaining (memory size minus the entropy already stored) is the demon's remaining capacity to optimize the room. This capacity ought to be an objective feature of the demon's physical memory state: what the demon can still do should not depend on who is asking.
+
+\subsection{But the standard definitions are relative to a subjective ensemble}
+
+Here is the conceptual gap. In stochastic thermodynamics, the entropy of an \emph{individual} state $x$ is undefined; only a state \emph{together with a distribution} $\mu$ has one. The \emph{stochastic entropy} (Shannon codelength) of $x$ under $\mu$ is\footnote{Relative to a general stationary measure $\pi$ the definition reads $\hat H_\pi(x,\mu) = \log\frac{\pi(x)}{\mu(x)}$; we continue to suppress $\pi$ by taking equal-volume cells.}
+\[
+\hat H(x, \mu) := \log \frac{1}{\mu(x)},
+\]
+and the Gibbs--Shannon entropy $H(\mu)$ is its mean over $X \sim \mu$. The distribution $\mu$ is an \emph{exogenous} input: someone's probabilistic knowledge, supplied from outside the formalism.
+
+For systems at or near equilibrium this is harmless, because there is a canonical choice of $\mu$ and the dependence washes out. The general statement: call $\mu$ a \emph{useful summary} of the actual state $x$ when (1) $\mu$ is \emph{simple} (it has a short description, like ``ideal gas, 300 K, 1 atm''), (2) $\mu$ \emph{concentrates}: $\hat H(X,\mu) \approx H(\mu)$ with high probability (typically by the law of large numbers over many particles), and (3) $x$ is \emph{typical} for $\mu$. Under those three conditions all reasonable entropy notions agree, $H(\mu) \approx \hat H(x, \mu)$, and one can do thermodynamics with macrovariables alone. Equilibrium statistical mechanics lives in this regime, and the traditional Clausius/Boltzmann apparatus (temperature, pressure, chemical composition) is well suited to it.
+
+Far from equilibrium, and above all for \emph{information-bearing} states, each condition can fail, and the subjective gap opens up. Three failure modes, each traceable to one condition:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Complex knowledge (condition 1 fails).} Let $\mu$ be a point mass on one particular intricate configuration $x$ (``I know the exact state''). Then $H(\mu) = 0$, suggesting full capacity to do work, but the description of $\mu$ itself is enormous. The Gibbs--Shannon account treats ``we know $x$'' as a free exogenous fact; physically, that knowledge has to live in some memory, and the formalism is silent about the cost. (The fix, in Section~\ref{sec:algo}: make the knowledge endogenous.)
+  \item \textbf{No concentration (condition 2 fails).} A robot flips a hidden fair coin and accordingly either drains its battery or leaves it full. Under the resulting mixture $\mu$, $H(\mu)$ sits midway, and a free-energy calculation says the robot can do half a charge of work. In reality it can do zero \emph{or} a full charge. $H(\mu)$ only predicts the \emph{mean} work over the ensemble; for this $\mu$, no individual state behaves like the mean.
+  \item \textbf{Atypical states (condition 3 fails).} If the actual $x$ is special in a way $\mu$ does not capture (the gas particles happen to sit in a strongly compressible pattern), then the Shannon code for $\mu$ is the wrong code for $x$, and a calculation based on $\hat H(x,\mu)$ \emph{underestimates} the work a smart enough machine (one running a compression algorithm) can extract from $x$. Taken at face value, the calculation would make that machine look like it violates the second law.
+\end{enumerate}
+
+The demon makes the puzzle vivid. The demon's capacity to do work is supposedly $m$ minus the entropy of its memory, but the entropy of its memory \emph{given what?} If \emph{our} subjective distribution over the demon's memory changes, does the demon's physical ability to perform work change? Obviously the demon's hardware does not care about an external observer's beliefs. Yet the standard formulation makes this capacity observer-relative.
+
+For agent foundations this is not a corner case; it is the central case. The states an embedded optimizer cares about (memories, records, computations in progress, the environment mid-manipulation) are precisely the nonequilibrium, information-bearing states for which no natural exogenous ensemble exists, e.g.\ because they arose from an intricate computation. We need an entropy that is a function of the \emph{individual physical state}.
+
+\section{Algorithmic thermodynamics}
+\label{sec:algo}
+
+Algorithmic thermodynamics (Ebtekar and Hutter, building on Bennett, Zurek, G\'acs, and Levin) supplies exactly this: it keeps the Markovian coarse-graining of Section~\ref{sec:secondlaw} but replaces the subjective ensemble $\mu$ with universal computation. Instead of asking ``how surprising is $x$ under $\mu$?'', it asks ``how hard is $x$ to describe, full stop?''
+
+\subsection{Kolmogorov complexity in five minutes}
+
+Fix a universal computer $U$ (think: a programming language). Every coarse-grained state $x$ is identified with a binary string encoding it.
+
+\begin{definition}[Description complexity]
+The \emph{Kolmogorov complexity} $K(x)$ is the length in bits of the shortest program that outputs $x$ on $U$. The conditional complexity $K(x \mid y)$ is the same with $y$ provided as a free input. The \emph{algorithmic mutual information} is
+\[
+I(x : y) := K(x) + K(y) - K(x, y),
+\]
+the number of bits a description of $y$ saves in describing $x$.\footnote{Technical fine print, recorded once and then suppressed: programs are \emph{self-delimiting} (no valid program is a prefix of another), which makes complexities behave like codelengths (they satisfy the Kraft inequality $\sum_x 2^{-K(x)} \le 1$); and the chain rule $K(x,y) \peq K(y) + K(x \mid y, K(y))$ carries a $K(y)$ in the condition, so some statements below implicitly condition on complexities of the conditioning data. Neither subtlety affects anything at physical scales.}
+\end{definition}
+
+Think of $K(x)$ as \emph{optimal lossless compression}: the shortest self-contained representation from which $x$ can be regenerated. A state of $10^{23}$ particles all sitting in one corner has tiny $K$ (a short loop prints the repeated coordinates); a generic thermalized state has $K$ close to the raw length of its encoding, because there is no pattern to exploit. ``Low entropy'' becomes ``compressible'', as a property of the single state $x$, with no ensemble in sight.
+
+Statements about $K$ hold up to additive constants (the cost of fixed wrapper code); we write $\plt$, $\pgt$, $\peq$ for (in)equalities up to such constants. Three facts make $K$ usable as a physical entropy:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Machine-dependence is physically negligible.} Changing the universal computer changes $K$ by at most the length of an interpreter between the two. Converting via $1 \text{ bit} = \kB \ln 2 \approx 9.57 \times 10^{-24}\,\mathrm{J/K}$: even two languages so distant that translating between them takes 12\,GiB of interpreter would agree on every system's entropy to within $10^{-12}\,\mathrm{J/K}$, far below anything measurable for macroscopic systems.
+  \item \textbf{$K$ agrees with the Shannon picture wherever the latter applies.} For any simply describable distribution $\mu$: $K(x \mid \mu) \plt \log \frac{1}{\mu(x)}$ for \emph{every} $x$ (one can always encode $x$ by its Shannon codeword for $\mu$), with near-equality for all but a $\delta$-fraction of samples (up to $\log \frac 1\delta$ slack). Averaging gives Zurek's relation $H(\mu) \peq \E{K(X \mid \mu)}_{X \sim \mu}$. So under the three conditions of Section~\ref{sec:subjective} (simple, concentrated, typical), $K(x) \approx \hat H(x,\mu) \approx H(\mu)$: algorithmic entropy reproduces Boltzmann and Gibbs--Shannon entropies in their domain of validity. Off that domain, it keeps going: in failure mode 1 it charges for the knowledge ($K(x)$ is large even though $H(\mu) = 0$); in mode 2 it assigns each battery state its own correct value; in mode 3 it credits the hidden structure ($K(x) \ll \hat H(x,\mu)$).
+  \item \textbf{$K$ is uncomputable, and this is a feature.} No algorithm computes $K$, though it can be approximated from above by ever-better compression. Suppose instead we used any entropy-like function $K'$ for which large lower bounds could be verified by some algorithm. Then a short program could search for a state $x$ certified to have huge $K'(x)$ and output it; the same short program can also \emph{erase} $x$ (regenerate it, then reversibly cancel it against the existing copy). A small machine that can both create and destroy ``high-entropy'' states at will is a perpetual-motion machine for $K'$: no second law can hold for any computable entropy. The uncomputability of $K$ is precisely what closes this loophole.
+\end{enumerate}
+
+\subsection{The algorithmic second law}
+
+In the coarse-grained Markov setting of Section~\ref{sec:secondlaw} (equal-volume cells, doubly stochastic, computable dynamics), the algorithmic entropy of the state is simply $K(x)$,\footnote{With unequal cell volumes, G\'acs' definition is $S_\pi(x) = K(x) + \log \pi(x)$, adding the Boltzmann-style volume term; this is the form in which reservoirs and heat enter in Section~\ref{sec:work}.} and it obeys a second law, due in essence to Levin (\emph{conservation of randomness}):
+
+\begin{theorem}[Algorithmic second law, informal statement]
+\label{thm:algsecond}
+Let the coarse-grained state evolve as a computable, doubly stochastic Markov chain, and let $X_s, X_t$ be the states at times $s < t$. Then for every $\delta > 0$, with probability greater than $1 - \delta$,
+\[
+K(X_s) - K(X_t) \;\plt\; K(t - s) + \log \tfrac1\delta .
+\]
+\end{theorem}
+
+Read it as: \emph{the complexity of an isolated system's state almost never decreases by more than a fluctuation allowance}. The two allowance terms are exactly the two known exceptions and are both tiny. The $\log\frac1\delta$ term prices chance fluctuations: tolerating failure probability $\delta = 2^{-1000}$ costs a kilobit, i.e.\ about $10^{-20}\,\mathrm{J/K}$. The $K(t-s)$ term (the complexity of the elapsed time) permits deterministic periodic returns, Poincar\'e recurrence included: a system with an astronomically long cycle revisits low-entropy states only at moments whose timestamps are themselves astronomically complex, so entropy regarded as a function of \emph{simply specified} times still increases. Two further features distinguish this from the ensemble second law (Theorem~\ref{thm:secondlaw}): it holds for each individual trajectory with high probability (not merely on average over an ensemble), and it needs no exogenous initial distribution.
+
+There is also an exact zero-randomness case worth recording, because Section~\ref{sec:demon} uses it constantly: if the dynamics over the interval are \emph{deterministic} (a computable bijection $f$ with a short description, possibly built from a short random seed already counted in the state), then
+\[
+K(f(x)) \peq K(x):
+\]
+deterministic simple dynamics cannot change algorithmic entropy by more than a constant. Substantial entropy \emph{production} requires randomness (in classical physics: the randomness injected by coarse-graining chaotic microdynamics). Note the contrast with the Shannon second law, which is blind to this distinction.
+
+\subsection{Work, heat, and Landauer's principle}
+\label{sec:work}
+
+Coupling the system to a heat reservoir at temperature $T$ (a large subsystem described by macrovariables, exchanging energy) extends the framework to genuine thermodynamics; we state the two results we need, in simplified form.
+
+\textbf{Capacity to do work.} Define the algorithmic free energy $F(x) := E(x) - \kB T \ln 2 \cdot K(x)$, with $E$ the internal energy. Then, with probability $> 1 - \delta$, the work $W$ extractable in a transition satisfies $W \plt F(x) - F(y) + \kB T \ln\frac1\delta$ (an algorithmic counterpart of the Jarzynski/second-law work bounds, here stated per individual state rather than per ensemble). The slogan: \emph{the algorithmic entropy $K(x)$ determines the actual capacity to do work from the specific state $x$; the Gibbs--Shannon entropy $H(\mu)$, by Zurek's relation, is the mean such capacity over $X \sim \mu$, available when $\mu$ itself is known a priori}. This is the resolution of the robot-battery puzzle: $K$ scores each battery state separately; $H(\mu)$ averages them.
+
+\textbf{Landauer's principle, algorithmically.} During any transition $x \to y$ in contact with the reservoir, let $Q$ be the heat emitted into it. Then with probability $> 1 - \delta$,
+\[
+\Delta K + \frac{Q}{\kB T \ln 2} \;\pgt\; -\log \tfrac1\delta, \qquad \Delta K := K(y) - K(x).
+\]
+Erasing data means making the memory's contents simpler ($\Delta K < 0$), and the bound forces a compensating heat emission of $\kB T \ln 2$ per erased bit. This is Landauer's principle, with $K$ giving it an unambiguous meaning for individual memory states: what counts as ``erasure'', hence what must be paid for, is the reduction in the state's description complexity, not in any observer's uncertainty. Two corollaries matter for us. First, a long deterministically generated string (e.g.\ digits of $\pi$) \emph{looks} random but has small $K$; tossing it into a reservoir produces entropy unnecessarily, since a reversible computer could instead uncompute it for free. Second, and conversely: data that is genuinely incompressible can only be cleared by paying heat.
+
+\subsection{Maxwell's demon, exactly}
+\label{sec:demon}
+
+The algorithmic framework makes the demon's analysis a short calculation, with no ad hoc accounting and no need to complete a cycle. Let the demon's memory $C$ and the gas $X$ be jointly coarse-grained; write joint states as pairs. The demon starts with clear memory $0$, the gas in some state $x$.
+
+\textbf{Full measurement, then erasure.} The demon reversibly copies the gas state into memory, then uses the copy as a control to reversibly reset the gas:
+\[
+(0, x) \;\mapsto\; (x, x) \;\mapsto\; (x, 0).
+\]
+Both maps are injective on their domains (hence extendable to bijections) and simply describable, so by the deterministic case of Theorem~\ref{thm:algsecond} the \emph{total} entropy never moves:
+\[
+K(0, x) \;\peq\; K(x, x) \;\peq\; K(x, 0) \;\peq\; K(x).
+\]
+The gas's entropy has dropped to $\peq 0$, and the books balance because the demon's memory now carries $K(x)$. The erasure of the gas was permitted \emph{precisely because a copy existed}: the map ``erase the second slot given that the first slot holds a copy'' is injective. The forbidden step is clearing the \emph{last} copy,
+\[
+(x, 0) \;\mapsto\; (0, 0),
+\]
+which is either not injective (if defined for all $x$) or not simply describable (if hard-wired for one specific complex $x$). To clear its memory the demon must pay: dump $K(x)$ bits into a reservoir as $\kB T \ln 2 \cdot K(x)$ of heat (Landauer, Section~\ref{sec:work}). Szilard's resolution of the paradox falls out of the formalism.
+
+\textbf{Partial measurement: the algorithmic Touchette--Lloyd bound.} Realistic demons measure only a little. Let the demon record a measurement $m(x)$ (any simply describable, possibly random function of the gas state), then drive the gas from $x$ to some new state $y$ using the record as a control:
+\[
+(0, x) \;\mapsto\; (m(x), x) \;\mapsto\; (m(x), y).
+\]
+Applying the algorithmic second law to the joint system, $K(m(x), x) \plt K(m(x), y)$, and expanding both sides with the chain rule\footnote{Up to the $K(\cdot)$-in-the-condition fine print of Section~\ref{sec:algo}.} gives
+\[
+K(x) - I(m(x) : x) \;\plt\; K(y) - I(m(x) : y) \;\le\; K(y),
+\]
+that is:
+\begin{equation}
+\label{eq:algTL}
+K(x) - K(y) \;\plt\; I(m(x) : x).
+\end{equation}
+\emph{The gas can lose at most as much entropy as was measured from it.} Moreover the budget is exactly attainable: if the demon spends the correlation completely and reversibly ($K(m(x),x) \peq K(m(x),y)$ with $I(m(x):y) \peq 0$), then $K(x) - K(y) \peq I(m(x):x)$.
+
+Compare, term by term, with Theorem~\ref{thm:tl}: entropy reduction of the steered system, bounded by mutual information between the controller's record and the system. The Touchette--Lloyd theorem is the ensemble (Shannon) version; \eqref{eq:algTL} is its single-shot, individual-state (algorithmic) counterpart, and it is simultaneously the rigorous form of Type 3 optimization from Section~\ref{sec:threetypes}: the copy step purchases $I(m(x):x)$, the control step spends it. The conditional complexity $K(x \mid m(x)) \peq K(x) - I(m(x):x)$ has a natural reading as the gas's \emph{subjective} entropy from the demon's perspective, contrasted with its objective entropy $K(x)$; optimization power is exactly the wedge between the two.
+
+\section{Knowledge as a physical resource: optimization for embedded agents}
+\label{sec:embedded}
+
+We can now state the synthesis that the preceding machinery supports.
+
+\subsection{From exogenous to endogenous knowledge}
+
+In the Gibbs--Shannon framework, the distribution $\mu$ specifying what the agent knows is an \emph{exogenous} parameter: it lives in the modeler's ledger, not in the world, and entropy (hence capacity to optimize) is defined only relative to it. The lesson of embedded agency is that there is no such ledger: an embedded agent's probabilistic knowledge must be physically encoded in its memory, made of the same stuff as everything else.
+
+Algorithmic thermodynamics is the framework in which this lesson becomes load-bearing rather than merely philosophical. The agent's memory is a physical state $a$; the environment subsystem is a physical state $s$; and ``what the agent knows about the environment'' \emph{is} the algorithmic mutual information $I(a : s) = K(s) - K(s \mid a)$ (up to the usual additive fine print): the number of bits the agent's physical configuration saves in describing the environment's. No exogenous distribution appears. Knowledge has become an objective relation between two physical states, and the results of these notes say it is a \emph{resource}:
+
+\begin{itemize}[leftmargin=2em]
+  \item By the algorithmic Touchette--Lloyd bound \eqref{eq:algTL}, $I(a:s)$ is an upper bound on how far the agent can reduce the environment's entropy beyond what blind dynamics achieve, and the bound is attainable: mutual information is the budget for steering, spendable bit for bit (Type 3), and acquirable by measurement at the price of memory (Type 2) or exportable as waste heat (Type 1).
+  \item An agent with more algorithmic mutual information with its environment can, objectively, perform more optimization. ``Knowing more lets you do more'' becomes a theorem of physics.
+\end{itemize}
+
+\subsection{The three types, sharpened by universal computation}
+
+Re-examining the three optimization channels with algorithmic entropy in hand shows each has a computational refinement; in every case, the relevant resource is the compressibility of an individual state, which the Shannon account cannot see.
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Type 1.} If the would-be waste carries any compressible structure, the agent can compress it (by universal computation) \emph{before} releasing it, emitting fewer bits of entropy into the environment. The compression must happen before the waste thermalizes; mixing with the reservoir destroys the structure irreversibly.
+  \item \textbf{Type 2.} The demon's memory cost for absorbing the gas's state is $K(x)$, not the raw measurement length: compressible observations can be stored compressed, so a given memory performs more optimization. Dually, $K(x)$ is the \emph{minimum} memory that storing $x$ can occupy.
+  \item \textbf{Type 3.} The steering budget is the algorithmic mutual information \eqref{eq:algTL}. If the room's configuration is itself simple ($K(x)$ small), a demon can compute it from a short program, acquiring the needed correlation almost for free.
+\end{itemize}
+
+There is a duality across the three: the complexity $K(x)$ of the optimized subsystem is at once the minimal memory required to optimize it by measurement (Type 2) and the minimal knowledge required to optimize it by correlation (Type 3). What a state costs to clear and what it takes to know are the same number of bits.
+
+\subsection{Dissolving the subjectivity, and the demon's objective capacity}
+
+Return to Section~\ref{sec:subjective}'s puzzle: doesn't the demon's capacity to do work change when \emph{our} beliefs about its memory change? The algorithmic answer dissolves the puzzle in two steps.
+
+First, the demon's capacity is objective. Its remaining capacity to optimize is its free memory: total memory minus the \emph{description complexity} of the memory's current contents. If those contents are compressible, the demon can (in principle, by universal computation) compress them and recover usable space; if they are incompressible, the occupied memory is irreducibly occupied, since freeing it would require physically destroying information. Either way the capacity is a property of the memory's physical configuration, with no reference to anyone's beliefs.
+
+Second, the appearance of subjectivity was tracking something real, just mislocated. When we ``update our subjective distribution'' over the demon's memory, that update is physically represented in \emph{our} brains: we have gained algorithmic mutual information with the demon's memory state. By \eqref{eq:algTL} that mutual information is itself spendable (we could use it to help free the demon's memory via Type 3), which is why the demon's situation genuinely looks different, and is different, \emph{relative to us, the embedded observers}. What standard thermodynamics books as an unexplained change of ensemble, algorithmic thermodynamics books as a physical change in a physical observer. Every ledger is somebody's memory.
+
+\subsection{Back to optimizing systems}
+
+Closing the loop with Section~\ref{sec:optsys}: an optimizing system funnels a broad basin into a narrow target set. We can now read off what its existence requires. The funneling is coarse-grained entropy reduction in a subsystem, so somewhere there must be a matching account: entropy exported as heat (Type 1), records accumulating in some memory-like subsystem (Type 2), or pre-existing correlation being consumed (Type 3). If the system beats its blind baseline, it must contain mutual information with what it steers (Theorem~\ref{thm:tl}, ineq.~\eqref{eq:algTL}): \emph{a sufficiently strong optimizing system necessarily models its environment}, which is the thermodynamic root of the selection-theorem program seeking conditions under which optimization implies agent-like structure (world models being the first ingredient). And the three axes of Definition~\ref{def:optsys}'s aftermath reappear in physical garb: robustness is funneling capacity (how much entropy the system can keep absorbing or exporting), duality asks whether the books are kept in a localized memory subsystem, and retargetability asks whether the target is encoded compactly enough that few bits redirect the whole basin.
+
+\section{Takeaways}
+\label{sec:takeaways}
+
+\begin{itemize}[leftmargin=2em]
+  \item Optimization, descriptively, is robust convergence from a broad basin to a narrow target (an optimizing system), and quantitatively it is local entropy reduction; no agent/environment split is needed to define it.
+  \item Reversibility of microphysics plus coarse-graining yields the second law; global entropy reduction is impossible, so an embedded optimizer can only reduce a subsystem's entropy while balancing the global books.
+  \item There are exactly three balancing channels: waste heat into the environment, measurement into the agent's memory, and expenditure of pre-existing mutual information.
+  \item Entropy reduction beyond what blind dynamics achieve is bounded by the agent's mutual information with the steered system: ensemble version, Touchette--Lloyd ($\Delta H \le \Delta H^{\max}_{\mathrm{blind}} + I(X;A)$); single-state algorithmic version, $K(x) - K(y) \plt I(m(x):x)$. Bits of optimization require bits of modeling.
+  \item Gibbs--Shannon entropy depends on an exogenous subjective ensemble and therefore misprices the very states agents are made of (memories, records, computations); equilibrium thermodynamics is the special regime where a simple, concentrated, typical ensemble exists.
+  \item Algorithmic thermodynamics replaces the ensemble with Kolmogorov complexity: entropy becomes an objective function of the individual state, the second law holds per trajectory up to exactly priced fluctuations ($K(t-s) + \log\frac1\delta$), Landauer's principle bounds the heat cost of erasure per state, and capacity to do work is $K$-determined ($H(\mu)$ is merely its prior-knowledge average, by Zurek's relation).
+  \item For embedded agents, probabilistic knowledge of the environment is endogenous: it is algorithmic mutual information between memory and world, an objective physical relation, and it is the consumable resource that funds optimization. Agents that know more can do more, at an exchange rate fixed by thermodynamics.
+\end{itemize}
+
+\section*{Sources and further reading}
+
+These notes integrate the following sources, in roughly the order their material appears:
+
+\begin{itemize}[leftmargin=2em]
+  \item A.~Flint, \emph{The ground of optimization}, AI Alignment Forum, 2020. (Optimizing systems: basin, target, robustness, duality, retargetability; the examples of Section~\ref{sec:optsys}.)
+  \item E.~Yudkowsky, \emph{Measuring optimization power}, LessWrong, 2008. (Optimization power as improbability of the achieved outcome.)
+  \item J.~Wentworth, \emph{Generalized heat engine}, LessWrong, 2020. (The coin engine of Section~\ref{sec:coins}; designer viewpoint; work extraction as compression.)
+  \item A.~Harwood and A.~Altair, \emph{When bits of optimization imply bits of modeling: the Touchette--Lloyd theorem}, LessWrong, 2025; H.~Touchette and S.~Lloyd, \emph{Information-theoretic approach to the study of control systems}, Physica A 331:140--172, 2004. (Section~\ref{sec:tl}, including the guessing game, the headphone analogy, and Remark~\ref{rem:tlcaveat}.)
+  \item Daniel~C and A.~Ebtekar, \emph{Algorithmic thermodynamics and three types of optimization}, AI Alignment Forum, 2025. (The central source for Sections~\ref{sec:threetypes}, \ref{sec:subjective}, and \ref{sec:embedded}: the three types, entropy as objective optimization capacity, and the embedded-agency synthesis.)
+  \item A.~Ebtekar and M.~Hutter, \emph{Foundations of algorithmic thermodynamics}, Physical Review E, 2025 (arXiv:2308.06927). (The formal backbone of Sections~\ref{sec:secondlaw} and \ref{sec:algo}: Markovian coarse-grainings, G\'acs entropy, randomness conservation and the algorithmic second law, algorithmic Jarzynski/Landauer, the demon analysis, and the ensemble-vs-state comparison of Section~\ref{sec:subjective}.)
+\end{itemize}
+
+For the broader agent-foundations context (reflective stability, embedded agency, selection theorems), see the Agent Foundations slide deck accompanying this module.
+
+\end{document}
