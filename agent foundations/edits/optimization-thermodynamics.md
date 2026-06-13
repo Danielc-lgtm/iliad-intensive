@@ -170,21 +170,18 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 - Term-by-term comparison with Theorem 6.2: ensemble vs single-shot versions; rigorous form of Type 3
 - Objective entropy K(x) vs subjective entropy K(x|m(x)); optimization power as the wedge; subjectivity located, not banished -- the core dissolving-subjectivity payoff
 
-### 8.5 An information engine: compressible strings as fuel
-
-- Negentropy = compressibility m - K(z); memory with zero-padding reserve; fixed compressor with worst-case blowup c
-- Burn / eat / digest cycle; zeros as ancilla bits embedding irreversible operations reversibly (overwrites, error correction, repair); demon's blank memory as ancilla
-- Organism/genome illustration (the YummyAlphabetSoup cycle in prose); starvation on incompressible fuel
-- The inversion: coin engine (Appendix A) needed ensemble knowledge at design time, information engine needs no distributional assumptions
+*(The information-engine subsection was removed per author request; §8 now ends with the demon.)*
 
 ## Section 9: Knowledge as a physical resource: optimization for embedded agents
 
 ### 9.1 From exogenous to endogenous knowledge
 
-- The two frameworks side by side; no ledger exists; knowledge = $I(a:s) =^+ K(s) - K(s|a)$, an objective relation between pieces of matter
-- Subjective beliefs implemented, not eliminated; K(s|a) as the environment's entropy as that agent finds it
-- Three directions certifying the resource claim: algorithmic Touchette-Lloyd (attainable budget), Type-3 consumptiveness, perishability (decay of stale correlation)
-- The slogan: knowledge about the world = capacity to optimize the world beyond blind baselines, as a theorem with fixed exchange rates
+- The two frameworks side by side; no ledger exists; knowledge = $I(a:s) =^+ K(s) - K(s|a)$, an objective relation between pieces of matter; subjective beliefs implemented, not eliminated; K(s|a) as the environment's entropy as that agent finds it
+- **Making the link precise (rigorous, via Shannon coding):** if memory $a$ encodes a computable belief $q$ over environments (recovered from $a$ by an $O(1)$ program), then describing the true state $s$ by its Shannon codeword under $q$ gives $K(s\mid a) \le^+ \log 1/q(s)$ (the pointwise bound behind Zurek's identity); substituting yields $I(a:s) =^+ K(s) - K(s\mid a) \ge^+ K(s) - \log 1/q(s)$
+- Bayesian updating raises $q(s)$ for the true $s$ $\Rightarrow$ codelength $\log 1/q(s)$ falls $\Rightarrow$ residual $K(s\mid a)$ falls $\Rightarrow$ $I(a:s)$ rises; in the certainty limit $K(s\mid a) =^+ 0$ and $I(a:s) =^+ K(s)$. Updating a belief and accumulating physically-encoded mutual information are one process
+- Link to optimization: by the algorithmic Touchette-Lloyd bound, achievable steering $\ge^+ K(s) - \log 1/q(s)$ (environment driven down to residual $\approx \log 1/q(s)$); more probability on the truth = more optimization -- the individual-state form of Touchette-Lloyd (Section 6) and the rigorous content of the Type-3 channel (Section 5)
+- Two further properties: Type-3 consumptiveness; perishability (decay of stale correlation, from the algorithmic second law)
+- The slogan: knowledge about the world = capacity to optimize the world beyond blind baselines, at a fixed (informational) exchange rate
 
 ### 9.2 The three types, sharpened by universal computation
 
@@ -206,7 +203,7 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 
 ## Appendix A: A thermodynamics of biased coins: the generalized heat engine
 
-*(Moved to an appendix per author request; referenced from the main text wherever a concrete blind-policy example helps -- the blind baseline of Section 6, the Type-1 channel of Section 5, and the information engine of Section 8.5. Opens with a short note on its role and that it can be read any time after Section 4.)*
+*(Moved to an appendix per author request; referenced from the main text wherever a concrete blind-policy example helps -- the blind baseline of Section 6 and the Type-1 channel of Section 5. Opens with a short note on its role and that it can be read any time after Section 4.)*
 
 ### A.1 The designer's viewpoint (refrigerator designer; uncertainty moved not reduced; machines observing while running are inside the formalism; transfers to embedded AIs)
 ### A.2 The setup: coins, transformations, and two conservation laws
