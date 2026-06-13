@@ -450,6 +450,21 @@
 }
 
 
+\frame{\frametitle{Optimization  and Thermodynamics}
+	\begin{block}{Why ``knowing more'' formally means ``optimizing more''}
+		{\tiny
+		\begin{itemize}
+			\item Common intuition: an agent that understands its environment better can do more to it. Two bridges make this precise
+			\item \textbf{Beliefs $\to$ mutual information.} If the agent's memory $a$ encodes a belief $q$ over environments, the true state $s$ has a Shannon codeword of length $\approx \log\frac{1}{q(s)}$, so its description given $a$ is short: $K(s \mid a) \leq \log\frac{1}{q(s)}$, hence
+			$$I(a; s) = K(s) - K(s\mid a) \;\geq\; K(s) - \log\tfrac{1}{q(s)}$$
+			\item \textbf{Mutual information $\to$ optimization.} By (the algorithmic) Touchette \& Lloyd, the agent can reduce the environment's entropy by up to $I(a; s)$
+			\item \textbf{Together:} assigning more probability to the \textit{true} environment $\Rightarrow$ shorter description $\Rightarrow$ more mutual information $\Rightarrow$ more optimization. \emph{Knowing more is being able to do more} -- now a theorem, with a fixed exchange rate
+		\end{itemize}
+		}
+	\end{block}
+}
+
+
 \frame{\frametitle{Conclusion}
 	\begin{block}{Conclusion}
 		{\tiny

@@ -66,3 +66,14 @@ Author follow-up: remove the information engine; in "From exogenous to endogenou
 2. **Rigorous endogenous-knowledge derivation.** Added a "Making the link precise" block to §9.1 with the exact chain: assuming the memory $a$ encodes a computable belief $q$ (recovered from $a$ by an $O(1)$ program), the Shannon-codeword bound gives $K(s\mid a)\plt\log 1/q(s)$, hence $I(a:s)\pgt K(s)-\log 1/q(s)$; updating toward the truth raises $q(s)$, shrinks the codelength and the residual $K(s\mid a)$, and raises $I(a:s)$; the algorithmic Touchette-Lloyd bound then converts this into achievable optimization. The one modeling assumption is that the agent's memory *is* (an $O(1)$-encoding of) its belief distribution; everything else is the established codelength bound (§2.3 / §8.2) and the algorithmic TL bound. *If you would rather not assume "memory encodes a computable distribution" and instead want the argument stated for an arbitrary record, the bound weakens to the generic $I(a:s)$ definition; tell me if you prefer that framing.*
 
 **Decision:**
+
+## Choice #7: Fourth-round updates (2026-06 edit session, follow-up 3)
+
+Author follow-up: shorten Flint's *ground of optimization* (use it as a basis for "optimization as entropy reduction", not the centre) and do the same in §9.4; emphasise "knowing more $\to$ more optimization" earlier by combining the belief$\to$MI and MI$\to$optimization bridges and stating the implication up front; in the agency deck, add a concise bullet-form version of the Shannon-codelength justification, combined with the optimization-and-thermodynamics slides. Decisions:
+
+1. **Shortened §3.2/§3.3.** Removed the separate gradient-descent and house *example* boxes (folded into two sentences) and condensed the three-axes subsection from three paragraphs to one. Kept Definition 3.1, the ball-in-valley example box (cross-referenced from §6), and the label `sec:axes`. The unused `ex:sqrt2`/`ex:house` labels were dropped. §3.5 (optimization as entropy reduction) remains the centre.
+2. **Shortened §9.4** similarly: the three-axes mapping is now a brief tail; the section leads with the world-model entailment.
+3. **Reframed §9.1** so the "Making the link precise" block opens with the common intuition, explicitly composes the two bridges into a single inequality, and states the headline implication ("more probability on the truth $\Rightarrow$ more optimization") up front rather than at the end.
+4. **New agency slide** "Optimization and Thermodynamics: why knowing more formally means optimizing more" -- four concise bullets giving the belief$\to$MI Shannon bound and the MI$\to$optimization (Touchette-Lloyd) step, placed with the other optimization-and-thermodynamics slides. Compiles with no overflow (deck now 26 slides).
+
+**Decision:**

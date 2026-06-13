@@ -270,6 +270,15 @@
 - This plays the same role as the mutual information in Touchette & Lloyd: it is the resource an embedded agent can spend to steer the world into narrow target configurations
 - So an agent that *knows more* about its environment can perform *more* optimization -- knowledge is the budget for steering
 
+### Slide: Optimization and Thermodynamics
+
+**Block: Why "knowing more" formally means "optimizing more"**
+
+- Common intuition: an agent that understands its environment better can do more to it. Two bridges make this precise
+- **Beliefs → mutual information.** If the agent's memory $a$ encodes a belief $q$ over environments, the true state $s$ has a Shannon codeword of length $\approx \log\frac{1}{q(s)}$, so $K(s\mid a) \le \log\frac{1}{q(s)}$, hence $I(a;s) = K(s) - K(s\mid a) \ge K(s) - \log\frac{1}{q(s)}$
+- **Mutual information → optimization.** By (the algorithmic) Touchette & Lloyd, the agent can reduce the environment's entropy by up to $I(a;s)$
+- **Together:** assigning more probability to the *true* environment ⇒ shorter description ⇒ more mutual information ⇒ more optimization. *Knowing more is being able to do more* -- now a theorem, with a fixed exchange rate
+
 ### Slide: Conclusion
 
 **Block: Conclusion**

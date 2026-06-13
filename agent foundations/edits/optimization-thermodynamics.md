@@ -40,15 +40,16 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 ### 3.1 Two everyday notions, and the question that links them (CS vs engineering optimization)
 ### 3.2 Optimizing systems
 
+*(Shortened per author request: Flint's material is now a compact intuition-builder for "optimization as entropy reduction" (§3.5), not the centre.)*
+
 - Definition 3.1 (optimizing system, Flint): basin of attraction, target configurations, robustness to perturbation
-- Example 3.2: computing sqrt(2) by gradient descent, with the debugger-overwrite experiment in full
-- Example 3.3: ball in valley (weak but genuine) vs billiard balls and satellite (non-examples)
-- Example 3.4: building a house in a sealed chamber
+- Gradient-descent-computing-sqrt(2) with the debugger-overwrite illustration, plus the sealed-chamber house, compressed to a couple of sentences (the separate sqrt2/house example boxes were removed)
+- Example 3.2 (ball in valley): weak but genuine optimizing system; billiards/satellite as non-examples (kept as the one example box, since it is cross-referenced from §6)
 - Death of an optimizing system = perturbation past the basin rim; tree and forest fire; existential catastrophe in this vocabulary
 
 ### 3.3 Three axes for comparing optimizing systems
 
-- Robustness (self-driving car example), duality (robot+vase vs tree; optimization does not require an agent), retargetability (compact target representation as agent signature)
+- Condensed to one paragraph: robustness (self-driving car), duality (robot+vase vs tree; optimization does not require an agent), retargetability (compact target representation as agent signature)
 
 ### 3.4 Measuring optimization in bits
 
@@ -177,9 +178,11 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 ### 9.1 From exogenous to endogenous knowledge
 
 - The two frameworks side by side; no ledger exists; knowledge = $I(a:s) =^+ K(s) - K(s|a)$, an objective relation between pieces of matter; subjective beliefs implemented, not eliminated; K(s|a) as the environment's entropy as that agent finds it
-- **Making the link precise (rigorous, via Shannon coding):** if memory $a$ encodes a computable belief $q$ over environments (recovered from $a$ by an $O(1)$ program), then describing the true state $s$ by its Shannon codeword under $q$ gives $K(s\mid a) \le^+ \log 1/q(s)$ (the pointwise bound behind Zurek's identity); substituting yields $I(a:s) =^+ K(s) - K(s\mid a) \ge^+ K(s) - \log 1/q(s)$
-- Bayesian updating raises $q(s)$ for the true $s$ $\Rightarrow$ codelength $\log 1/q(s)$ falls $\Rightarrow$ residual $K(s\mid a)$ falls $\Rightarrow$ $I(a:s)$ rises; in the certainty limit $K(s\mid a) =^+ 0$ and $I(a:s) =^+ K(s)$. Updating a belief and accumulating physically-encoded mutual information are one process
-- Link to optimization: by the algorithmic Touchette-Lloyd bound, achievable steering $\ge^+ K(s) - \log 1/q(s)$ (environment driven down to residual $\approx \log 1/q(s)$); more probability on the truth = more optimization -- the individual-state form of Touchette-Lloyd (Section 6) and the rigorous content of the Type-3 channel (Section 5)
+- **"Knowing more is being able to do more," made precise** -- leads with the common intuition and formalizes it by composing two bridges, with the implication stated up front (not deferred to the end):
+  - *Beliefs → mutual information* (Shannon coding): if memory $a$ encodes a computable belief $q$ (recovered by an $O(1)$ program), the Shannon codeword of the true $s$ under $q$ gives $K(s\mid a) \le^+ \log 1/q(s)$, hence $I(a:s) \ge^+ K(s) - \log 1/q(s)$ -- more probability on the truth = more mutual information
+  - *Mutual information → optimization* (algorithmic Touchette-Lloyd): the agent can squeeze up to $I(a:s)$ bits out of the environment, attainably
+  - *Composed:* achievable optimization $\ge^+ K(s) - \log 1/q(s)$, so "more probability on the truth ⇒ more optimization" -- the individual-state form of Touchette-Lloyd (Section 6) and the rigorous Type-3 channel (Section 5)
+- Bayesian learning read physically: updating raises $q(s)$ ⇒ codelength and residual $K(s\mid a)$ fall ⇒ $I(a:s)$ and reachable optimization rise; certainty limit $K(s\mid a) =^+ 0$, $I(a:s) =^+ K(s)$
 - Two further properties: Type-3 consumptiveness; perishability (decay of stale correlation, from the algorithmic second law)
 - The slogan: knowledge about the world = capacity to optimize the world beyond blind baselines, at a fixed (informational) exchange rate
 
@@ -195,7 +198,7 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 
 ### 9.4 Back to optimizing systems
 
-- Funneling requires the three channels; robustness = entropy-disposal capacity; beating the blind baseline forces internal mutual information (calibrated selection-theorem reading: mutual information is a necessary, not sufficient, ingredient of a world model); duality = localized bookkeeping; retargetability = compact rewritable target records
+- Shortened per author request (Flint's axes de-centred). Key payoff: funneling beyond the blind baseline forces internal mutual information -- a necessary (not sufficient) ingredient of a world model, the thermodynamic seed of the selection-theorems program. Flint's three axes then get brief thermodynamic readings: robustness = entropy-disposal capacity; duality = localized bookkeeping; retargetability = compact rewritable target record
 
 ## Section 10: Takeaways
 
