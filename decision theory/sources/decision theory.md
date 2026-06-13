@@ -1,7 +1,5 @@
 # Decision theory
 
-
-
 - Motivation:
   
   - Reflective stability
@@ -24,7 +22,7 @@
     
     - Program-> Proofs about programs
     
-    - Lobian Obstacle
+    - Lobian Obstacle 5 and 10
   
   - Program equilibrium
   
@@ -50,14 +48,6 @@
   
   - Knightian uncertainty
 
-
-
-
-
-
-
-
-
 Exercises:
 
 - Complete class and Lob's theorem
@@ -67,10 +57,6 @@ Exercises:
 - Why might rational agents fail to cooperiate? (Generalize this)
 
 - epsilon fairbot [2412.14570](https://arxiv.org/pdf/2412.14570)
-
-
-
-
 
 Learn more:
 
