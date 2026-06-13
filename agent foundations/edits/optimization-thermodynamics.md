@@ -86,7 +86,7 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 ### 5.3 Type 2: absorb the entropy into the agent's memory (measurement)
 
 - Maxwell's demon told in full; the two-histories reversibility argument for why the memory must fill
-- Memory as exhaustible buffer; clearing memory converts Type 2 to Type 1 (Landauer foreshadowed)
+- Memory as exhaustible buffer; clearing memory ultimately exports the stored entropy to the environment as Type-1 waste (exact bookkeeping deferred to the demon section, §8.4)
 
 ### 5.4 Type 3: spend mutual information you already have
 
@@ -142,6 +142,8 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 
 ## Section 8: Algorithmic thermodynamics
 
+*(The Landauer's-principle subsection and the thermodynamic-costs-of-information-processing subsection were removed per author request. The section's emphasis is now squarely on dissolving the subjectivity problem: K(x) is an objective property of the individual state, the three failure modes of Section 7 are resolved, and the demon's objective-vs-subjective entropy wedge locates rather than banishes subjectivity. The §8 intro and the takeaways now foreground this.)*
+
 ### 8.1 Kolmogorov complexity
 
 - Definition 8.1: K(x), K(x|y), algorithmic mutual information; footnote on self-delimiting programs (Kraft inequality) and chain-rule fine print
@@ -161,27 +163,14 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 - Per-trajectory, no initial distribution; both allowance terms explained with magnitudes (kilobit fluctuations ≈ 10^-20 J/K; Poincare recurrence priced by K(t-s); simply specified times)
 - Corollary 8.3: deterministic simple dynamics cannot change K; entropy production requires randomness; random-bijection picture
 
-### 8.4 Heat, temperature, and Landauer's principle
+### 8.4 Maxwell's demon, exactly
 
-- Heat reservoir, Boltzmann entropy B(E), temperature as marginal exchange rate (k_B T ln 2 joules per bit); footnote tying to unequal-volume coarse-graining
-- Equation (2), algorithmic Landauer: $\Delta K + Q/(k_B T \ln 2) \ge^+ -\log(1/\delta)$; erasure as complexity reduction, observer-free
-- Landauer cost vs EP cost decomposition; misconception 1 (logical irreversibility need not cost heat: uniform-overwrite example); misconception 2 (Landauer costs cancel long-run; energy bill = EP cost; reversible computing)
-
-### 8.5 The thermodynamic costs of information processing
-
-- Randomization (negative Landauer cost; reversible harvest from reservoir vs careless scavenging)
-- Computation (deterministic outputs are pseudo-entropy; uncompute vs thermalize; structure destroyed by mixing)
-- Measurement (reversible copy, undoable; discarded mutual information is entropy production; the K(x,y) three-term decomposition)
-- Unifying principle: negentropy exchanged, hidden, or stored as correlation; all costs are EP costs at machinery/information mismatches
-
-### 8.6 Maxwell's demon, exactly
-
-- Full measurement then erasure: $(0,x) \to (x,x) \to (x,0)$ with all K's $=^+$ K(x); erasure permitted because a copy exists; last-copy clearing forbidden (not injective or not simply describable); the Landauer bill for memory reset; Szilard as a two-line calculation
+- Full measurement then erasure: $(0,x) \to (x,x) \to (x,0)$ with all K's $=^+$ K(x); erasure permitted because a copy exists; last-copy clearing forbidden (not injective or not simply describable); to reset memory the demon must export K(x) bits to the environment as Type-1 waste (stated in informational terms, no heat/joules)
 - Partial measurement: $(0,x) \to (m(x),x) \to (m(x),y)$; full chain-rule derivation of Equation (3), boxed: $K(x) - K(y) \le^+ I(m(x):x)$; attainable with equality when correlation fully and reversibly spent
 - Term-by-term comparison with Theorem 6.2: ensemble vs single-shot versions; rigorous form of Type 3
-- Objective entropy K(x) vs subjective entropy K(x|m(x)); optimization power as the wedge; subjectivity located, not banished
+- Objective entropy K(x) vs subjective entropy K(x|m(x)); optimization power as the wedge; subjectivity located, not banished -- the core dissolving-subjectivity payoff
 
-### 8.7 An information engine: compressible strings as fuel
+### 8.5 An information engine: compressible strings as fuel
 
 - Negentropy = compressibility m - K(z); memory with zero-padding reserve; fixed compressor with worst-case blowup c
 - Burn / eat / digest cycle; zeros as ancilla bits embedding irreversible operations reversibly (overwrites, error correction, repair); demon's blank memory as ancilla

@@ -61,43 +61,21 @@
 }
 
 
-\frame{\frametitle{Robust Concepts (``True Names'')}
-	\begin{block}{Why we need robust concepts}
-		{\tiny
-		\begin{itemize}
-			\item To even state a safety property, we need precise concepts for the things we care about: what the agent is optimising, what its goals are, what it believes about the world
-			\item These concepts must stay meaningful under extreme optimisation pressure and self-modification. A concept that quietly breaks down when an agent becomes much more capable is of little use as the basis for a guarantee
-			\item Agent foundations looks for such robust concepts, sometimes called \textit{``true names''}: characterisations of agency-related notions sharp enough that we can rely on them at high capability
-		\end{itemize}
-		}
-	\end{block}
-    \begin{block}{``True names'' we would like to pin down}
-		{\tiny
-		\begin{itemize}
-			\item \textbf{Optimization}
-			\item \textbf{Goals}
-			\item \textbf{World models}
-            \item \textbf{Embeddedness}
-		\end{itemize}
-		}
-	\end{block}
-}
-
 \frame{\frametitle{Two Pathways of Impact: Modelling vs.\ Implementation}
 	\begin{block}{Modelling}
 		{\tiny
 		\begin{itemize}
-			\item Build an \textit{abstract model} of a highly capable agent and use it to make safety claims -- e.g.\ AIXI, reflective oracles
-			\item The model need not be runnable. Its value is that it lets us reason about how such agents would behave, and in particular it can show \textit{why} a given alignment proposal would fail
+			\item Build an \textit{abstract mathematical model} of an idealised, highly capable agent, and use it to make safety claims about how such an agent would behave
+			\item The model need not be runnable; its value is that it lets us reason about such agents \textit{in advance}, and in particular show \textit{why} a given alignment proposal would fail
 		\end{itemize}
 		}
 	\end{block}
     \begin{block}{Implementation}
 		{\tiny
 		\begin{itemize}
-			\item Develop a theory to the point where it could be turned into an actual algorithm or running system -- the stated aim of work routed through, e.g., UDT or infra-Bayesian physicalism
-			\item On this pathway, researchers often favour \textit{modular} architectures: a cleanly factored world model, a planning/search module, and an explicit representation of the goal, each of which can be inspected and controlled separately (in the spirit of designs like JEPA), rather than one opaque network
-			\item A clean factorisation is what would let us point at ``the goal'' or ``the world model'' and check or edit it -- which is exactly why we want the \textit{true names} above
+			\item Develop a theory to the point where it could be turned into an actual algorithm or running system that we could build and inspect
+			\item On this pathway, researchers often favour \textit{modular} architectures -- a separate, inspectable world model, a planning module, and an explicit representation of the goal -- rather than one opaque network, so that each part can be checked and controlled on its own
+			\item A clean factorisation like this is what would let us point at ``the goal'' or ``the world model'' inside the system and verify or edit it directly
 		\end{itemize}
 		}
 	\end{block}
@@ -115,7 +93,6 @@
 			\item A Dutch book is a combination of such contracts, bought or sold at the agent's own posted prices, that guarantees the agent a net loss regardless of how the world turns out
 			\item An agent whose prices violate the probability axioms executes a \textit{dominated strategy} -- a Dutch book can always be constructed against them, and they can be exploited indefinitely
 			\item \textbf{Key result:} an agent is immune to Dutch books if and only if their betting prices satisfy the axioms of probability -- Bayesianism and Expected utility maximization falls out of the requirement to avoid dominated strategies
-            \item \textbf{Sidenote:} Measuring stick of utility problem
 		\end{itemize}
 		}
 	\end{block}
@@ -136,7 +113,7 @@
         \item \textbf{Clear input \& output channels} between the agent and the environment
         \item The agent is \textbf{``larger'' than the environment}: it can hold a full copy of the game inside its own mind
         \item The agent is \textbf{``outside'' the environment}: it need not reason about itself, only about optimising the environment
-        \item Standard models of agency (EU maximisation, AIXI, most model-based RL) operate under this dualistic, ``large agent'' picture
+        \item Standard idealised models of agency -- an expected-utility maximiser, or any agent that keeps a full internal model of the world and plans within it -- assume this dualistic, ``large agent'' picture
         \item But can we still reason about an agent that is \textit{smaller} than its environment, and contained inside it?
 		\end{itemize}
 		}
@@ -169,7 +146,7 @@
 			\item The environment may contain \textbf{copies of her}, and other equally capable agents that model her while she models them
 			\item She may be \textbf{modified, destroyed, or copied} (by herself or by others) between interaction steps
 			\item Being inside the environment she manipulates, she is also capable of \textbf{self-improvement}
-			\item Dualistic models struggle to represent this. For example, ``AIXI does not believe the universe contains AIXI agents'': it models the environment as something simpler than itself, so it cannot place a copy of itself inside the environment
+			\item Dualistic models struggle to represent this: a model that treats the environment as simpler than the agent itself cannot contain a copy of the agent, so it cannot describe an agent that is part of its own environment
 			\item We would like a theory of consequentialist agency that is consistent with this embedded setting
 		\end{itemize}
 		}

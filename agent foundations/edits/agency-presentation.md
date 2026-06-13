@@ -23,33 +23,18 @@
 - For a sufficiently capable goal-directed agent, the working assumption is that **a property persists only if there is some reason it has to** -- architectures, constraints, and conceptual schemes are all candidates for being optimised away under enough pressure
 - So to guarantee a safety property holds (e.g. "this system does not cause a catastrophe"), it is not enough to instil it once; we need it to be *invariant under self-modification*, and we need to understand what kinds of properties *can* have that invariance
 
-### Slide: Robust Concepts ("True Names")
-
-**Block: Why we need robust concepts**
-
-- To even state a safety property, we need precise concepts for the things we care about: what the agent is optimising, what its goals are, what it believes about the world
-- These concepts must stay meaningful under extreme optimisation pressure and self-modification. A concept that quietly breaks down when an agent becomes much more capable is of little use as the basis for a guarantee
-- Agent foundations looks for such robust concepts, sometimes called *"true names"*: characterisations of agency-related notions sharp enough that we can rely on them at high capability
-
-**Block: "True names" we would like to pin down**
-
-- **Optimization**
-- **Goals**
-- **World models**
-- **Embeddedness**
-
 ### Slide: Two Pathways of Impact: Modelling vs. Implementation
 
 **Block: Modelling**
 
-- Build an *abstract model* of a highly capable agent and use it to make safety claims -- e.g. AIXI, reflective oracles
-- The model need not be runnable. Its value is that it lets us reason about how such agents would behave, and in particular it can show *why* a given alignment proposal would fail
+- Build an *abstract mathematical model* of an idealised, highly capable agent, and use it to make safety claims about how such an agent would behave
+- The model need not be runnable; its value is that it lets us reason about such agents *in advance*, and in particular show *why* a given alignment proposal would fail
 
 **Block: Implementation**
 
-- Develop a theory to the point where it could be turned into an actual algorithm or running system -- the stated aim of work routed through, e.g., UDT or infra-Bayesian physicalism
-- On this pathway, researchers often favour *modular* architectures: a cleanly factored world model, a planning/search module, and an explicit representation of the goal, each of which can be inspected and controlled separately (in the spirit of designs like JEPA), rather than one opaque network
-- A clean factorisation is what would let us point at "the goal" or "the world model" and check or edit it -- which is exactly why we want the *true names* above
+- Develop a theory to the point where it could be turned into an actual algorithm or running system that we could build and inspect
+- On this pathway, researchers often favour *modular* architectures -- a separate, inspectable world model, a planning module, and an explicit representation of the goal -- rather than one opaque network, so that each part can be checked and controlled on its own
+- A clean factorisation like this is what would let us point at "the goal" or "the world model" inside the system and verify or edit it directly
 
 (Distinction following C. Wyeth, *Modeling versus Implementation*.)
 
@@ -65,7 +50,6 @@
 - A Dutch book is a combination of such contracts, bought or sold at the agent's own posted prices, that guarantees the agent a net loss regardless of how the world turns out
 - An agent whose prices violate the probability axioms executes a *dominated strategy* -- a Dutch book can always be constructed against them, and they can be exploited indefinitely
 - **Key result:** an agent is immune to Dutch books if and only if their betting prices satisfy the axioms of probability -- Bayesianism and Expected utility maximization falls out of the requirement to avoid dominated strategies
-- **Sidenote:** Measuring stick of utility problem
 
 ### Slide: Dualistic agents
 
@@ -76,7 +60,7 @@
 - **Clear input & output channels** between the agent and the environment
 - The agent is **"larger" than the environment**: it can hold a full copy of the game inside its own mind
 - The agent is **"outside" the environment**: it need not reason about itself, only about optimising the environment
-- Standard models of agency (EU maximisation, AIXI, most model-based RL) operate under this dualistic, "large agent" picture
+- Standard idealised models of agency -- an expected-utility maximiser, or any agent that keeps a full internal model of the world and plans within it -- assume this dualistic, "large agent" picture
 - But can we still reason about an agent that is *smaller* than its environment, and contained inside it?
 
 ## Section: Embedded agents
@@ -98,7 +82,7 @@
 - The environment may contain **copies of her**, and other equally capable agents that model her while she models them
 - She may be **modified, destroyed, or copied** (by herself or by others) between interaction steps
 - Being inside the environment she manipulates, she is also capable of **self-improvement**
-- Dualistic models struggle to represent this. For example, "AIXI does not believe the universe contains AIXI agents": it models the environment as something simpler than itself, so it cannot place a copy of itself inside the environment
+- Dualistic models struggle to represent this: a model that treats the environment as simpler than the agent itself cannot contain a copy of the agent, so it cannot describe an agent that is part of its own environment
 - We would like a theory of consequentialist agency that is consistent with this embedded setting
 
 ### Slide: Self-Modification and Vingean Reflection
