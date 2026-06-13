@@ -26,3 +26,24 @@ The rewrite includes everything flagged before plus: full coin-engine treatment 
 2. **Full fluctuation-theorem machinery** (Ebtekar-Hutter Theorems 1 and 7, detailed bounds (45)-(46), the algorithmic Jarzynski equality in its exponential form, and the algorithmic free energy $F(x) = E(x) - k_B T \ln 2\, K(x)$): the notes state the tail-bound forms only. Excluded to keep all stated results provable or plausible at the level of rigor the notes establish; the work-capacity story is carried by the Landauer inequality and Zurek's identity instead.
 
 **Decision:**
+
+## Choice #3: Optimization-and-thermodynamics restructure (2026-06 edit session)
+
+The author requested: move the generalized heat engine to an appendix and reference it when needed; epistemically calibrated language (no exaggeration for dramatic effect); move "three types of optimization" to immediately after the second law and link it to Touchette-Lloyd (specifically Type 3); note that Touchette-Lloyd makes no reversibility assumption; otherwise keep existing structure. Decisions made while implementing:
+
+1. **Appendix placement.** The coin-engine section became `\appendix` Appendix A, placed after the Takeaways and before "Sources and further reading". All six prose references to it were reworded from "Section" to "Appendix"; cross-references resolve to "Appendix A". This supersedes the Choice #1 resolution that had it "integrated seamlessly" in the main line. *If you would prefer it placed after Sources, or kept as a numbered final section rather than a lettered appendix, say so.*
+2. **Three types before Touchette-Lloyd.** New section order is §4 second law -> §5 three types -> §6 Touchette-Lloyd -> §7 subjective -> ... The "demon reframed" subsection and the end-of-§5 recap now forward-reference Touchette-Lloyd as the quantification of the Type-3 channel; §6 opens by recalling Type 3 and closes its "coin engine revisited" remark by identifying $I(X;A)$ with the Type-3 budget. The no-reversibility note was added right after the theorem statement, with a sentence on why it is consistent with the reversibility-based second law.
+3. **Calibration pass scope.** I toned down clear dramatic/overclaiming phrases ("the most famous", "astonishingly small", "sharp and beautiful", "beautiful subtlety", "pleasing echo", "the satisfying one", "rotten", "exorcising", "hopelessly below", "absurd"/"absurdity", "flatly contradict", "fantastic shapes", "a striking consequence") and softened the strong "necessarily models its environment" claim to "must contain mutual information ... a necessary (not sufficient) ingredient of a world model". I deliberately left most of the document's voice and vivid-but-accurate metaphors intact rather than sanitising it wholesale. *Flag if you want a heavier or lighter calibration pass.*
+
+**Decision:**
+
+## Choice #4: Agency-presentation edits (2026-06 edit session)
+
+Decisions made on the `<div>`-marked edits where intent had to be reverse-engineered:
+
+1. **Goodhart slide.** "Remove this slide on Goodhart's law" was implemented as: drop the $U=V+X$ proxy-breakdown block, but keep the "true names" framing (it is load-bearing for the rest of the talk), retitling the frame "Robust Concepts (True Names)" with a short motivation block. *If you wanted the entire frame including the true-names list removed, say so.*
+2. **Logical induction "to the end like a footnote".** Implemented as: the computational-uncertainty material (your formalism + diagram + open problems) is now the main content of the logical-uncertainty section; logical induction is condensed to a single end slide titled "Aside: Logical Induction" (criterion kept, construction removed, the Dutch-book analogy demoted to a parenthetical). *If you literally wanted a `\footnote`, or wanted logical induction cut entirely, tell me.*
+3. **Decision-theory slides.** Removed from the deck and saved as a self-contained, compilable copy at `decision theory/sources/decision-theory-slides.tex` (with `bayesnet.png` copied alongside). The Conclusion's decision-theory bullet was kept but reworded to "(treated separately)" so the deck no longer claims to cover DT. *If you would rather the copy live in the `dt-presentation` project, or want the DT bullet dropped from the Conclusion entirely, say so.*
+4. **Embedded-AIXI incorporation.** I folded in the conceptual content (cybernetic model; "large agent" assumptions; the embedded-agency bullets; "AIXI does not believe the universe contains AIXI agents") and kept the existing Alexei/Emmy images, which are the same canonical graphics the AIXI slides borrow. I did not extract additional images from `Embedded_AIXI.pdf`, judging them redundant with Alexei/Emmy. The embedded-agents content was split across two slides to avoid overflow.
+
+**Decision:**
