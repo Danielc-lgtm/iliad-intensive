@@ -77,3 +77,12 @@ Author follow-up: shorten Flint's *ground of optimization* (use it as a basis fo
 4. **New agency slide** "Optimization and Thermodynamics: why knowing more formally means optimizing more" -- four concise bullets giving the belief$\to$MI Shannon bound and the MI$\to$optimization (Touchette-Lloyd) step, placed with the other optimization-and-thermodynamics slides. Compiles with no overflow (deck now 26 slides).
 
 **Decision:**
+
+## Choice #8: Fifth-round updates (2026-06 edit session, follow-up 4)
+
+Author follow-up: in the notes, remove all specifics of Flint's *ground of optimization* and Yudkowsky's definition (including duality and retargetability) and keep only the "optimization = steering reality into a narrow region of configuration space" intuition (as in Wentworth's *Utility Maximization = Description Length Minimization*, Daniel C & Ebtekar's opening, and Altair & Harwood's motivation), propagated throughout; and remove LLM prose/phrasing in favour of plain, precise language (Altair's comprehensiveness, Ebtekar's rigour). Decisions:
+
+1. **§3 collapsed** to two short subsections: "Optimization as steering into a narrow region" (intuition + examples, keeping the ball-in-valley example box because §6 cross-references it) and "Optimization as entropy reduction". Removed Flint's formal optimizing-system definition (`def:optsys`), the three-axes subsection (`sec:axes`, with duality and retargetability), and Yudkowsky's bits-of-optimization-power subsection (`sec:bits`). Propagated the change to the title subtitle, abstract, plan paragraph, §4.2, §9.4, the takeaways, and the Sources entries (Flint/Yudkowsky are now listed as background). Verified no dangling refs to the removed labels.
+2. **De-flowering pass** over the whole document: rewrote section intros, transitions, and signature phrases ("the world does not forget", "watch the attempt fail", "the puzzle lands precisely", "the payoff this section is really after", "the pieces are all on the table", "Set the two frameworks side by side one final time", "quite literally", "tidy duality", "illuminating", etc.) into plain statements. This is a judgement-heavy, comprehensive-but-not-exhaustive pass; the technical content, definitions, proofs, and equations are unchanged. *If specific passages still read as too informal for your taste, point me at them and I'll tighten further.*
+
+**Decision:**

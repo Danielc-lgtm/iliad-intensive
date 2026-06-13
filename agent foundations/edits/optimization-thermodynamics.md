@@ -5,7 +5,9 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 **Title:** Optimization and Thermodynamics
 **Subtitle:** From convergent attractors to algorithmic entropy, and what physics charges an embedded agent for steering the world
 
-**Abstract:** Three-stage development: (1) optimization made precise as optimizing systems (Flint) and translated into local entropy reduction; (2) physical constraints: second law from reversibility, then the three types of optimization under information conservation, then the Touchette-Lloyd theorem (which quantifies the third type); (3) the subjectivity problem of Gibbs-Shannon entropy and its resolution by algorithmic thermodynamics (Ebtekar-Hutter), ending with knowledge as an endogenous physical resource (algorithmic mutual information as the budget for optimization). The generalized heat engine of biased coins is developed as a self-contained appendix and referenced from the main text.
+*(Prose style reworked per author request: LLM-style framing/flourish removed throughout, aiming for plain, precise language in the spirit of Altair & Harwood's comprehensiveness and Ebtekar & Hutter's rigour.)*
+
+**Abstract:** Three-stage development: (1) optimization made precise as steering reality into a narrow region of configuration space, translated into local entropy reduction; (2) physical constraints: second law from reversibility, then the three types of optimization under information conservation, then the Touchette-Lloyd theorem (which quantifies the third type); (3) the subjectivity problem of Gibbs-Shannon entropy and its resolution by algorithmic thermodynamics (Ebtekar-Hutter), ending with knowledge as an endogenous physical resource (algorithmic mutual information as the budget for optimization). The generalized heat engine of biased coins is developed as a self-contained appendix and referenced from the main text.
 
 ## Section 1: Introduction: why thermodynamics belongs in agent foundations
 
@@ -37,29 +39,17 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 
 ## Section 3: What is optimization?
 
-### 3.1 Two everyday notions, and the question that links them (CS vs engineering optimization)
-### 3.2 Optimizing systems
+*(Reworked per author request. Flint's optimizing-system definition, the three axes including duality and retargetability, and Yudkowsky's bits-of-optimization-power formalism were all removed. The section now carries only the "optimization = steering reality into a narrow region of configuration space" intuition -- as in Wentworth's "Utility Maximization = Description Length Minimization", Daniel C & Ebtekar's opening, and Altair & Harwood's motivation -- and its entropy-reduction formalization.)*
 
-*(Shortened per author request: Flint's material is now a compact intuition-builder for "optimization as entropy reduction" (§3.5), not the centre.)*
+### 3.1 Optimization as steering into a narrow region
 
-- Definition 3.1 (optimizing system, Flint): basin of attraction, target configurations, robustness to perturbation
-- Gradient-descent-computing-sqrt(2) with the debugger-overwrite illustration, plus the sealed-chamber house, compressed to a couple of sentences (the separate sqrt2/house example boxes were removed)
-- Example 3.2 (ball in valley): weak but genuine optimizing system; billiards/satellite as non-examples (kept as the one example box, since it is cross-referenced from §6)
-- Death of an optimizing system = perturbation past the basin rim; tree and forest fire; existential catastrophe in this vocabulary
+- An optimization process reliably drives the world into a narrow region of configuration space that undirected dynamics would not produce (thermostat near 20°C, chess engine to checkmate, gradient descent to sqrt(2), team building a house); a statement about the whole system (no agent/environment split) and about a distribution of outcomes (many starting points, few end points)
+- Example 3.1 (ball in valley): many initial states map to one resting state -- optimization with no agent and no goal (kept; cross-referenced from §6)
 
-### 3.3 Three axes for comparing optimizing systems
+### 3.2 Optimization as entropy reduction
 
-- Condensed to one paragraph: robustness (self-driving car), duality (robot+vase vs tree; optimization does not require an agent), retargetability (compact target representation as agent signature)
-
-### 3.4 Measuring optimization in bits
-
-- Yudkowsky's proposal in full prose: rank configurations by preference, ask what fraction would be at least as good at random; fraction $2^{-k}$ = k bits of optimization power
-- Flint vs Yudkowsky: whole closed systems vs patch+mind; robustness vs improbability; complementary readings
-
-### 3.5 Optimization as entropy reduction
-
-- $\Delta H = H(X) - H(Y)$; broad basin = large H(X), narrow target = small H(Y)
-- Remark 3.5: what the translation drops (the goal); Wentworth's decomposition of EU maximization into entropy minimization + distribution shifting
+- $\Delta H = H(X) - H(Y)$ measures the concentration of outcomes; many starting points = large H(X), few end points = small H(Y); a large $\Delta H$ is steering into a narrow region, in bits; "local" because it concerns a chosen subsystem (global entropy reduction is impossible -- next section)
+- Remark (what the measure keeps and drops): records how much outcomes were concentrated, not which region or whether anyone wanted it; Wentworth's split of EU maximization into entropy reduction + shifting the narrow distribution onto a preferred region ("utility maximization = description length minimization")
 
 ## Section 4: Reversibility and the second law
 
@@ -198,7 +188,7 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 
 ### 9.4 Back to optimizing systems
 
-- Shortened per author request (Flint's axes de-centred). Key payoff: funneling beyond the blind baseline forces internal mutual information -- a necessary (not sufficient) ingredient of a world model, the thermodynamic seed of the selection-theorems program. Flint's three axes then get brief thermodynamic readings: robustness = entropy-disposal capacity; duality = localized bookkeeping; retargetability = compact rewritable target record
+- Returns to the §3 question (what does an optimization process entail?). Key payoff: steering beyond the blind baseline forces internal mutual information -- a necessary (not sufficient) ingredient of a world model, a thermodynamic selection theorem. The capacity to keep steering is the entropy-disposal capacity (environment to dump waste into, free memory, stock of correlation). The duality/retargetability axis material was removed with the rest of the Flint specifics
 
 ## Section 10: Takeaways
 
