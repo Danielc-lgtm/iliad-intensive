@@ -1,8 +1,10 @@
-# Optimization and Thermodynamics (lecture notes)
+# Optimization and Thermodynamics, Version 2 (lecture notes)
 
-Article-class lecture notes, fully pedagogical and self-contained. Project: `projects/optimization-thermodynamics/main.tex`. Compiled PDF: `targets/optimization-thermodynamics.pdf`.
+Article-class lecture notes, fully pedagogical and self-contained. Project: `projects/optimization-thermodynamics-v2/main.tex`. Compiled PDF: `targets/optimization-thermodynamics-v2.pdf`.
 
-**Title:** Optimization and Thermodynamics
+**This is V2:** same section structure, theorems, equations, and worked examples as V1, but the prose of every section (Introduction, toolkit, second law, three types, subjective entropy, algorithmic thermodynamics, embedded agency, both appendices) was rewritten in the crisp, intuition-first, signposted, example-led style of the new Section 3, made fully em-dash-free, and run through a critical-correctness pass. The one substantive content change versus V1 is the corrected prediction argument in §3.4 (see that bullet); a redundant footnote in §4.3 was also de-duplicated. V1 (`projects/optimization-thermodynamics/`) is the prior version, with the same §3.4 correction applied.
+
+**Title:** Optimization and Thermodynamics (Version 2, revised exposition)
 **Subtitle:** From convergent attractors to algorithmic entropy, and what physics charges an embedded agent for steering the world
 
 **Abstract:** Three-stage development: (1) optimization made precise as a convergent attractor (a system that, from a broad range of initial conditions and despite perturbations, steers a subsystem into a narrow target set), with the argument that even a pure predictor has an objective, information-theoretic reason to attend to optimizers, so optimization is observer-independent; translated into local entropy reduction; (2) physical constraints: second law from reversibility, then the three types of optimization under information conservation; (3) the subjectivity problem of Gibbs-Shannon entropy and its resolution by algorithmic thermodynamics (Ebtekar-Hutter), ending with knowledge as an endogenous physical resource (algorithmic mutual information as the budget for optimization). The generalized heat engine of biased coins (Appendix A) and the Touchette-Lloyd theorem quantifying the third type (Appendix B) are developed as self-contained appendices and referenced from the main text.
