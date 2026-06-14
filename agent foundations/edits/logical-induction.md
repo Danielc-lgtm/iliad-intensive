@@ -30,14 +30,20 @@ Article-class lecture notes, fully self-contained for a reader with zero backgro
 - Markets: pricing (a program's [0,1] valuation); market = sequence of daily pricings; belief states (the daily spreadsheet)
 - Deductive process and worlds (complete true/false assignments, allowed to be logically wrong)
 - Definition 4.2 (propositional consistency): respects and/or/not but not deeper math; checkable where full consistency is not; tightens as theorems are published
-- Traders: continuous (no-jump) daily orders; efficiently computable = polynomial-time
+- **Trading-strategy formalism at the slides' / paper's level (accurate notation):**
+  - Shares and the price feature $\phi^{*}_{n} := P_n(\phi)$ (price of $\phi$ on day $n$); buying one share = the holding $\phi - \phi^{*}_{n}$ ($1 if true, net the price paid)
+  - Expressible features = continuous functions of the price history (price lookups + arithmetic + capped max), e.g. $\max(0,\phi^{*}_6-\psi^{*}_7)$
+  - Trading strategy = affine combination $T_n = c + \xi_1\phi_1 + \cdots + \xi_k\phi_k$; $T_n[\phi]=$ shares bought (negative=sold), $T_n[1]=c=$ cash received (negative=paid), with $c$ fixed so the trade has value 0 at the day's prices ($T_n=\sum_i\xi_i(\phi_i-\phi^{*}_{i,n})$)
+  - Worked example (LI paper Table 1): $1{+}1{=}2$ at 90¢ buy 4, $1{+}1\ne2$ at 5¢ sell 3, Goldbach at 98¢ sell 1 → pay \$2.47
+  - Why continuity: the self-referential $\chi$ = "true iff my price < 50¢" can't be cleared by a discontinuous rule; continuity guarantees a fair price where the trader abstains
+  - Trader = sequence $(T_1,T_2,\dots)$; holdings $\sum_{i\le n}T_i$ valued linearly in a world $W$: $W(c+a_1\phi_1+\cdots)=c+a_1W(\phi_1)+\cdots$; efficiently computable = polynomial-time
 - Definition 4.3 (exploitation): plausible appraisals $\{W(\sum_{i\le n}T_i): n, W\in\mathrm{PC}(D_n)\}$ bounded below but not above (unlimited return off limited stake); the "1+1=2 priced at 0.50 forever" example; arbitrage between statements whose "or" is provable
 - The one-line intuition (any efficient pattern the prices miss is exploitable); Theorem 4.4 (existence, Garrabrant et al.): a computable logical inductor exists for every deductive process / reasonable theory
 
 ## Section 5: How such a market is built
 
-- Single trader: continuous orders + market sets prices -> a balancing price (Brouwer fixed point, explained)
-- All efficient traders at once: the trading firm runs the first n with budget $2^{-i}$; firm beats the market iff some trader does; price so the firm earns <= $2^{-n}$/day, total <= \$1; computable (brute-force price scan), finite belief state daily; impractical but existence licenses the properties
+- Single trader: orders are expressible (continuous) features + market sets prices -> the "fair prices" where the trader abstains (Brouwer fixed point, explained)
+- All efficient traders at once: because trading strategies are affine combinations they can be summed; the trading firm runs the first n with budget $2^{-i}$ summed into one combined strategy; firm beats the market iff some trader does; price so the firm earns <= $2^{-n}$/day, total <= \$1; computable (brute-force price scan), finite belief state daily; impractical but existence licenses the properties
 
 ## Section 6: What the single criterion forces
 
