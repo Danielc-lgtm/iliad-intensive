@@ -1,0 +1,175 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+
+\title{Descriptive Agent Foundations \\[1ex]
+{\large Selection theorems and the type signature of real agents}}
+\author{Lecture notes, Agent Foundations module \\ Iliad Intensive}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Most of agent foundations is normative: it asks what an ideal, perfectly rational agent ought to look like, and the coherence theorems are its crowning result, telling us that any non-self-defeating agent behaves, from the outside, like an expected utility maximizer. Descriptive agent foundations asks a different and complementary question. Forget the ideal; look at the world. It is full of things we are happy to call agents (bacteria, animals, trading firms, trained neural networks) and full of things we are not (rocks, hurricanes, thermostats at the boundary). What is the actual structure of the agents, and why does that structure, rather than some other, keep getting produced? The organizing tool is the \emph{selection theorem}: a theorem saying that some optimization pressure (natural selection, gradient descent, market competition) operating in some broad class of environments will select for agents with a particular ``type signature,'' a particular shape of world-model, goal, and decision procedure. These notes develop the program in three steps. First, what a type signature even is, and why the coherence theorems are best read as one early, deeply flawed selection theorem. Second, a concrete picture of the type signature we actually expect realistic embedded Bayesian agents to have, which looks nothing like the textbook lookup table over all possible worlds: it is a sparse, factored, lazily-evaluated causal model built out of latent variables, with goals attached to those latents rather than to raw sensory data. Third, the wishlist of selection theorems the program would like to prove (that modularity, natural abstractions, explicit goals, subagent structure, and internal search are selected for) together with the crucial methodological move of caring about \emph{broad and robust} optima rather than merely high ones, because selection processes can only reach designs surrounded by other decent designs. Throughout, the contrast with the normative strand is the point: coherence theorems are representational (how an agent can be described), while selection theorems aim to be mechanistic (what agents are made of and why), and bridging the two is much of the path to understanding, and aligning, the agents we are about to build.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction: two directions on agency}
+\label{sec:intro}
+
+There are two ways to come at the question ``what is an agent,'' and agent foundations needs both.
+
+The normative way starts from an ideal. Posit a perfectly rational decision-maker, ask what consistency forces upon it, and prove the coherence theorems: a non-dominated agent must act like an expected utility maximizer with a probability distribution and a utility function. This is powerful and robust, and it is the subject of the consequentialist-foundations notes. But it is silent about the actual furniture of real minds, because it is a statement about behavior viewed from outside, not about machinery. It tells you the shadow any effective agent casts, not what is casting it.
+
+The descriptive way starts from the world. Low-level physical reality, as far as we can tell, is something like a vast causal network of microscopic interactions, with no agents written into the base layer; it does not come pre-labeled with goals or beliefs or decision procedures, and it has no built-in ``clouds'' or ``strange loops.'' And yet, reliably, chunks of this agent-free substrate organize themselves into things with goals, beliefs, and decision procedures. Bacteria chase nutrients, animals model their surroundings, firms pursue profit, trained networks minimize loss in ways that look increasingly like planning. Descriptive agent foundations asks: given an arbitrary physical system, from a bacterium to a neural network to a future AI, how would we identify its goals, its world-model, and its decision-making structure? And, going deeper, why do agents with certain structures arise in the first place, rather than some other structure or none at all?
+
+The methodological signature of the descriptive program is that it works \emph{bottom-up}. Rather than starting from ideal principles and asking what an agent should do, it starts from properties of the world (selection pressures, resource bounds, the modular and noisy character of real environments) and asks what kinds of agent-like structure those pressures will tend to produce. The central formal object is the \emph{selection theorem}, which is the descriptive program's analogue of the coherence theorem: where coherence theorems characterize the ideal, selection theorems aim to characterize what actually gets selected for.
+
+We proceed as follows. Section~\ref{sec:typesig} introduces the notion of an agent's type signature, the three-part question (representation, interfaces, embedding) that a complete account must answer, and the compact functional shape we expect. Section~\ref{sec:selthm} defines selection theorems, reads the coherence theorems as a first (badly assumption-laden) example, catalogues other known instances, and lays out the research program for finding more. Section~\ref{sec:picture} fills in the type signature we actually expect, the realistic picture of an embedded Bayesian agent as a sparse, lazy, latent-variable causal model. Section~\ref{sec:wishlist} surveys the selection theorems the program hopes to prove and the pivotal idea of broad and robust optima. Section~\ref{sec:takeaways} draws the morals and the connections back to the rest of the module. The only prerequisites are familiarity with probability, a passing acquaintance with Bayesian networks, and the coherence-theorem picture from the consequentialist-foundations notes.
+
+\section{The type signature of an agent}
+\label{sec:typesig}
+
+Before asking what gets selected for, we need to be able to say \emph{what} an agent is in a way precise enough to be the conclusion of a theorem. Wentworth's framing is to ask for an agent's \emph{type signature}, by analogy with the type signature of a function in programming, which specifies the shape of its inputs and outputs without fixing its implementation. For an agent the question splits into three.
+
+\begin{definition}[Type signature of an agent]
+\label{def:typesig}
+To give the \emph{type signature} of a class of agents is to answer three questions.
+\emph{Representation:} what data structures represent the agent's components (its world-model, its goals, its decision procedure), and what are those components?
+\emph{Interfaces:} what are the inputs and outputs of each component, and how do the components connect to one another and to the environment?
+\emph{Embedding:} how does this abstract data structure relate to the low-level physical system that actually implements the agent?
+\end{definition}
+
+A useful piece of shorthand for the functional shape we expect is the type $((A \to B) \to A)$. Here $A$ is the agent's possible actions and $B$ the outcomes those actions produce, so $(A \to B)$ is a \emph{model} mapping actions to their consequences, and an agent is something of type $((A \to B) \to A)$: it takes such a model as input and returns an action, presumably one its model rates well. This is only a sketch of a signature (it elides uncertainty, observation, and much else), but it makes vivid what the descriptive program is after. The deep question is how this abstract type manifests in physical systems: which chunks of the agent-free causal substrate ``abstract into'' something with an agent-like type signature, and why.
+
+The three questions are not idle taxonomy; they are exactly the things we need answered to do alignment. What represents a goal, a utility function or something else, and does it take whole world-states or only observable outcomes as input? What represents a world-model, a probability distribution or something more structured, and how does it correspond to the actual world? Does a given system even \emph{have} a cleanly separable goal and world-model, or are they tangled together? Does it optimize within a model of the world, or directly over the world? And how do any of these abstract components map onto the weights of a network or the biochemistry of a cell? A selection theorem is valuable precisely when it pins down some part of this signature for the agents a given pressure produces.
+
+\section{Selection theorems}
+\label{sec:selthm}
+
+\subsection{What a selection theorem is}
+
+\begin{definition}[Selection theorem]
+\label{def:selthm}
+A \emph{selection theorem} tells us something about the type signature, or the properties, of the agents that will be selected for (by some optimization process such as natural selection, machine learning training, or economic profitability) within some broad class of environments.
+\end{definition}
+
+A selection theorem need not mention selection explicitly. It might instead characterize the optima of some objective, or the broad optima, or the optima under a particular kind of pressure, and leave it to us to note that selection processes climb toward such optima. What makes it a selection theorem is that it connects an \emph{environmental pressure} to an \emph{agent type signature}: it says ``in environments like this, the things that do well have structure like that.'' The appeal of the framing, in Wentworth's telling, is that it offers a large ``surface area'' of concrete, attackable subproblems unified by a common shape, so that many researchers can work on different theorems without redundancy and newcomers need relatively little ramp-up to contribute.
+
+\subsection{Coherence theorems as a (flawed) selection theorem}
+
+The cleanest way to understand the genre is to notice that we already have one example, and that staring at its defects tells us what better ones would need. The coherence theorems are a selection theorem. Read as such, their content is: among agents subject to a resource pressure (do not throw away money, or whatever plays money's role), the non-dominated ones have a definite type signature. The \emph{representation} is a utility function together with a probability distribution. The \emph{interfaces} are that utility and probability take bet-outcomes as inputs, the agent outputs whichever action maximizes expected utility, and observations update the distribution by Bayes' rule. The \emph{embedding} is purely behavioral: the utility function and distribution are tied to the physical system only through the requirement that the system's choices match what they prescribe.
+
+This is genuinely a selection theorem, and it is also a cautionary one, because its assumptions are visibly too strong for any real agent. To get the clean conclusion, the coherence theorems must assume the agent's preferences are \emph{static} (they do not change), \emph{complete} (it has a definite preference between every pair of options), and that its choices are \emph{path-independent} (history does not matter, only the current options). Real agents, humans most obviously, violate all three: preferences drift, many pairs of options are simply incomparable, and what we will accept depends on how we got here. So the coherence theorems, as a selection theorem, have the right \emph{form} (pressure in, type signature out) but the wrong \emph{assumptions and conclusion} for the agents we care about. The descriptive program's bet is that better selection theorems, built on more realistic assumptions about internal state, incomplete preferences, and physical embedding, would yield more accurate type signatures, and that those are exactly what we need to understand human values, inner agents, and value drift, which are core problems of alignment.
+
+\subsection{Other known selection theorems}
+
+The coherence theorems are not alone, and the existing examples already illustrate how varied the genre is. The \emph{Good Regulator theorem} (and Wentworth's repaired \emph{Gooder Regulator} version) characterizes conditions under which an agent that successfully regulates a system must contain a model of that system, a result directly about when world-models are selected for. The \emph{Kelly criterion} shows that an agent repeatedly betting a fraction of its wealth, selected to dominate in the long run, behaves as though maximizing expected log wealth, a case where a selection pressure (long-run growth) pins down a specific decision rule. The \emph{subagents argument} shows that once an agent has internal state, the coherence-style conclusion changes shape: such an agent's revealed goals look like Pareto-optimality across \emph{several} utility functions, as if it were a committee of subagents, rather than maximization of a single one. Each of these addresses some slice of the type signature, and together they sketch what a mature theory would look like: a library of results connecting recognizable environmental pressures to recognizable pieces of agent structure.
+
+\subsection{The research program}
+
+How does one find new selection theorems? Wentworth lays out a practical methodology with two complementary directions. One can start from \emph{empirical observation} of evolved and trained agents across biology, economics, and machine learning, build intuitions about what structure appears under what conditions, and try to promote a specific observation into a general theorem. (A standing example: sessile organisms, those fixed in place like plants and sponges, rarely evolve brains, while mobile ones often do; can that become a general theorem relating the value of a control system to the agent's ability to act on what it learns?) Or one can work backward, starting either from a type signature that seems sensible (based on how humans are built) and asking what selection process would produce it, or from a selection process and asking what type signature it should yield. The other direction is incremental work on existing theorems: apply a theorem to a real system and fix what breaks (the subagents idea was born exactly this way, from applying coherence theorems to financial markets and watching them fail), strengthen a result, patch a gap as the Gooder Regulator theorem did, unify several theorems, or strip a domain-specific theorem down to its minimal assumptions so it applies more broadly. The unifying claim behind the whole effort is ambitious and explicit: sufficiently good selection theorems would, in Wentworth's estimate, get us most of the way to solving the hardest parts of alignment, because they would tell us what the agents we are about to build are actually made of.
+
+\section{How we picture Bayesian agents}
+\label{sec:picture}
+
+To make the program concrete we need a candidate for the type signature itself: not the idealized one the coherence theorems hand us, but the one a realistic embedded agent would actually have. Here the descriptive program parts company sharply with the textbook, and the picture is worth developing in detail because it is what the hoped-for selection theorems are trying to derive.
+
+The textbook Bayesian agent enumerates every possible world, assigns each a probability, updates the whole distribution by Bayes' rule on each observation, and computes expected utility by summing over all worlds. We often \emph{define} a Bayesian agent as one whose behavior matches this prescription. But behavioral equivalence does not require the architecture, and the architecture is impossible for anything embedded, since the number of possible worlds is astronomically larger than any physical memory. So the question is what an agent that is \emph{behaviorally} Bayesian, but built to fit inside the world, actually looks like inside. Wentworth and Lorell's answer has several interlocking features.
+
+\paragraph{The world-model is a sparse causal program, not a flat table.} Instead of a probability over fully specified worlds, the model is a \emph{causal diagram} (a Bayes net), whose size grows roughly linearly with the size of the world rather than exponentially, because it stores local dependencies rather than a value for every global configuration. More than that, the model is structured ``like a program,'' with recursively defined, reusable submodels that call one another, so that even an infinite causal structure can have a finite description (a recursive definition of factorial compactly encodes an unbounded causal diagram). The world-model is, in the slogan, a moderately sized program with a lot of recursion.
+
+\paragraph{Inference is lazy and local.} An agent does not recompute its entire belief state on each observation, because most observations are irrelevant to most variables. Seeing a bird fly past the office window tells you nothing about the price of gasoline, and a sane reasoner does not propagate that observation to its gasoline-price beliefs at all. Updates travel by \emph{message passing} along the causal graph, reaching only the variables they actually bear on, and typically converging without touching most of the model. The same laziness applies to decisions: an agent maximizing expected utility never actually needs to \emph{compute} an expected utility. To choose between ordering the lamb and ordering the burrito it needs only the \emph{difference} the two options make, and that difference propagates locally through the model, leaving the vast majority of variables untouched.
+
+\paragraph{Goals attach to latent variables, not to observations.} Real models are organized around \emph{latent variables}, hidden quantities that summarize and mediate among observations. We do not represent a tree as the raw conjunction of all its bark, leaves, roots, and shadows; we posit a latent ``tree'' that explains them jointly. These latents need not correspond to anything real (human models have posited spirits and phlogiston), but empirically most of them do correspond to real structure, and explaining why is the puzzle of the natural abstraction program. The point that matters most for alignment is where goals live: the inputs to a real agent's utility function are typically \emph{latent variables in its world-model}, not its raw observations or actions. You want your spouse to actually \emph{be} happy, a latent state of another mind, not merely to display the observable signs of happiness; the difference between those two goals is the difference between a value over a latent and a value over an observation, and it is enormous.
+
+\paragraph{Caching introduces incoherence, and resolving it is reflection.} For efficiency the agent caches instrumental values, computing once and reusing, in the manner of dynamic programming. Cached values can fall out of date and come to violate the consistency conditions (the Bellman equation, say) that full coherence would demand. So a realistically embedded Bayesian agent is \emph{locally incoherent} much of the time, and detecting and propagating away such inconsistencies is real work. This is a candidate explanation for why humans, who are otherwise well modeled as Bayesian, exhibit characteristic non-Bayesian behaviors and feel cognitive effort when forced to reconcile conflicting beliefs: they are repairing stale caches.
+
+This picture (a recursive, latent-variable causal model, lazily evaluated, with goals over latents and an ever-present housekeeping of cache coherence) is the descriptive program's working hypothesis for the type signature of a real Bayesian agent. Self-modeling, the agent appearing as a node inside its own causal model, fits naturally into the framework but is the least developed corner of it, and remains an open architectural question. The selection theorems of the next section are, in large part, attempts to show that pressure plus realistic environments \emph{produces} exactly these features.
+
+\section{What selection theorems do we expect and want}
+\label{sec:wishlist}
+
+Granting the target picture, which selection theorems would establish that it is what gets selected for, and under what assumptions? Before the wishlist itself, one methodological idea reorganizes the whole search, and it is the most important single point in this section.
+
+\subsection{Broad and robust optima, not just high ones}
+
+Existing selection theorems mostly characterize \emph{optimal} agents: be a coherent expected utility maximizer or be dominated. But real selection processes do not find global optima, and insisting on optimality both overstates the conclusion and misses the mechanism. Two weaker notions are what actually matter.
+
+A \emph{broad} optimum is one that is not too sensitive to the design parameters: the designs near it in parameter space are also decent. This matters because a selection process can only \emph{reach} a design through its neighbors. No matter how high the fitness of some isolated peak, if everything around it in mutation space (or in gradient space, for ML) has low fitness, neither natural selection nor gradient descent can climb to it; there is no path. So the designs that selection actually finds are the ones sitting on broad rises, not lonely spikes.
+
+A \emph{robust} optimum is one not too sensitive to the environment distribution: it stays good as the environment varies. This matters because real selection works from finitely many samples of a varying environment, so sampling noise pushes toward designs that tolerate variation rather than ones tuned to one exact setting.
+
+The reframing is consequential because broad and robust optima are exactly the ones for which the desirable structural features (modularity, abstraction, explicit goals) plausibly emerge: a modular design, for instance, tends to occupy a broad peak because its modules can be varied somewhat independently without collapse. So the program's bet is that selecting for breadth and robustness, not just height, is what produces agent-shaped structure. (Wentworth sketches a tentative mathematical version, that peaks are broad when the interaction terms between a design's parts are small, while candidly flagging that a sign error might invert the argument; the qualitative point stands regardless.)
+
+\subsection{The wishlist}
+
+With breadth and robustness as the lens, the conjectured selection theorems form a coherent slate, each a hypothesis that some realistic pressure selects for one feature of the type signature of Section~\ref{sec:picture}.
+
+\begin{conjecture}[Modularity]
+Systems selected under environments whose demands vary in a structured, piecewise way develop \emph{modular} internal structure, with separable components. Simulations already find that modular variation in the objective produces modular solutions, suggesting that robustness to a changing environment, not efficiency per se, is what drives modularity.
+\end{conjecture}
+
+\begin{conjecture}[Natural abstractions]
+Agents evolving in sufficiently rich environments converge on the same high-level \emph{abstractions} (objects, causes, the latent variables of Section~\ref{sec:picture}). This is the natural abstraction hypothesis: essentially all the information about a chunk of the world that propagates far away through the low-level causal network is summarized by a small high-level description, and agents learn to reason in terms of those summaries.
+\end{conjecture}
+
+\begin{conjecture}[Goals over latents]
+The goals of selected agents take \emph{abstract latent variables in their world-models} as inputs, rather than the bet-able outcomes the coherence theorems assume. This is the structural fix for the gap noted in Section~\ref{sec:selthm}: practitioners already model utilities over unobservable world-states, and selection should favor goals defined over natural abstractions. (A formal hint is the result that description-length minimization coincides with a form of utility maximization.)
+\end{conjecture}
+
+\begin{conjecture}[Subagent structure]
+Selected agents' goals decompose as a \emph{set} of utilities, one per subagent, rather than a single utility function, generalizing the subagents argument. Suggestive evidence includes the way many moral insights feel like Pareto-improving trades among internal subagents that value different things.
+\end{conjecture}
+
+\begin{conjecture}[Mesa-optimization and runtime search]
+As the complexity and variability of the environment increase, selected systems increasingly contain their \emph{own} optimization processes (mesa-optimizers). The logic is a make-or-buy decision about \emph{when} to optimize: some optimizing can be done at training time by the outer process, but when the best action varies a lot in ways predictable only from information available at runtime, it pays to defer the optimization to runtime, inside the agent. That deferred, runtime optimization is precisely what general-purpose search, and hence agency, is. This reframes inner optimizers not as a freak failure mode but as a likely product of scaling, which is exactly why mesa-optimizer misalignment is a serious concern.
+\end{conjecture}
+
+\begin{conjecture}[Internal architectural modularity]
+In large-scale agents selected in sufficiently complex environments, the internal structure has \emph{separate modules} for the world-model, the goal, and the search or optimization process, the clean separation the type signature of Section~\ref{sec:typesig} presupposes.
+\end{conjecture}
+
+Each conjecture comes with environmental assumptions of a recognizable kind: that the environment's structure varies modularly over time or space, that it is complex and variable enough to make runtime optimization pay, that selection samples it finitely (so robustness is rewarded), and that its low-level causal structure admits compressing abstractions in the first place.
+
+\subsection{Why this matters for alignment}
+
+The payoff of the wishlist is that it speaks directly to the questions alignment most needs answered about systems we train but do not design. If selection favors modular agents with explicit, separable world-models, goals, and search processes, then large trained systems may carry interpretable structure: goal content that can be identified before deployment, modules that can be tested in isolation, decision chains that can be traced. The same gradient-descent-cannot-reach-isolated-peaks argument that drives the breadth story suggests why we might expect trained systems to have structure at all, with the pressure toward it growing as data, task complexity, and scale grow. The flip side is the risk register the conjectures generate: mesa-optimization predicts inner optimizers that may pursue proxy goals diverging from the training objective; goals-over-latents and natural-abstraction convergence predict that alignment is tractable if and only if the system's latents line up with ours, with specification gaming and value misalignment as the failure mode when they do not; and modular agents with explicit world-models are exactly the ones structurally capable of modeling their training process and feigning compliance. The descriptive program does not by itself deliver safety, but it aims to tell us which of these worlds we are in.
+
+\section{Takeaways}
+\label{sec:takeaways}
+
+The cleanest way to hold descriptive agent foundations in mind is as the mechanistic counterpart to the representational results of the normative strand. The complete class theorem and its relatives are \emph{representational}: they show that any agent avoiding dominated strategies \emph{can be described} as an expected utility maximizer, while saying nothing about its internal construction. Selection theorems aim to be \emph{mechanistic}: they ask what agents actually \emph{are} (their type signature, their parts and wiring) and what pressures bring such structures into being. The two are complementary halves of one question. The representational result fixes the target shape an effective agent's behavior converges to; the mechanistic program asks which physical pressures produce that shape, what the agent is made of when they do, and what resource plays the role of the measuring stick the coherence arguments quietly assumed.
+
+This is why the descriptive program threads through the rest of the module. It inherits from consequentialist foundations the open problem of the measuring stick (identifying, from physics alone, what counts as a resource and hence where the optimization is), and it shares with the optimization-and-thermodynamics material the bottom-up stance that begins from physical constraints rather than ideal axioms; a selection environment is, after all, a physical environment, and thermodynamics bounds what it can demand and reward. Its picture of a real Bayesian agent (a sparse, recursive, latent-variable causal model with goals over latents) is a concrete hypothesis about the true name of a world-model, and its conjecture that runtime search is selected for when optimization is best deferred is a concrete hypothesis about the true name of general-purpose search. None of the central conjectures is yet a theorem, and the program is candid that its current best example, the coherence theorems, rests on assumptions that fail for the agents we care about. That candor is the program's strength: it knows exactly which assumptions to attack, and it is betting that getting the descriptive type signature of real agents right is most of what it would take to understand, and to align, the agents we are on the verge of creating.
+
+\section*{Sources}
+\addcontentsline{toc}{section}{Sources}
+
+\begin{itemize}[leftmargin=1.5em]
+\item John Wentworth, \emph{Selection Theorems: A Program For Understanding Agents} (read in full). \url{https://www.lesswrong.com/posts/G2Lne2Fi7Qra5Lbuf/selection-theorems-a-program-for-understanding-agents}
+\item John Wentworth and David Lorell, \emph{How We Picture Bayesian Agents} (read in full). \url{https://www.lesswrong.com/posts/TiBsZ9beNqDHEvXt4/how-we-picture-bayesian-agents}
+\item John Wentworth, \emph{What Selection Theorems Do We Expect/Want?} (read in full). \url{https://www.lesswrong.com/posts/RuDD3aQWLDSb4eTXP/what-selection-theorems-do-we-expect-want}
+\item Onward connections: the coherence and measuring-stick material of consequentialist foundations; the optimization-as-entropy-reduction and general-purpose-search threads of the optimization-and-thermodynamics notes.
+\end{itemize}
+
+\end{document}

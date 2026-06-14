@@ -1,0 +1,192 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{desideratum}{Desideratum}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\PC}{\mathrm{PC}}
+\newcommand{\Fin}{\mathrm{Fin}}
+
+\title{Logical Induction \\[1ex]
+{\large Reasoning under logical uncertainty, via a market no efficient trader can beat}}
+\author{Lecture notes, Agent Foundations module \\ Iliad Intensive}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Classical Bayesian reasoning assumes logical omniscience: the moment you know the premises, you are credited with knowing every consequence, every theorem, every output of every program whose code you hold. No real reasoner is like this. You can know the source code of a program and still not know what it prints; you can know the axioms of arithmetic and still not know whether a particular large number is prime, or what the trillionth digit of $\pi$ is. Managing this kind of uncertainty (uncertainty not about the world but about the consequences of what you already know) is the problem of logical uncertainty, and standard probability theory has no account of it, because the standard Dutch book argument that grounds probability already presupposes the omniscience at issue. These notes develop Garrabrant et al.'s solution, logical induction, which weakens the Dutch book demand to something a bounded reasoner can actually meet. Picture a prediction market in which each logical sentence is a share that will eventually pay a dollar if proved and nothing if disproved, the market's prices are the reasoner's probabilities, and a slow background process keeps revealing which sentences are theorems. The reasoner is rational, we declare, exactly when no \emph{efficiently computable} (polynomial-time) trading strategy can exploit its prices for unbounded profit off a bounded investment. This single criterion, that no fast trader can pump you, turns out to force an enormous amount of good behavior: the prices converge to a coherent probability distribution, the reasoner learns to assign high probability to theorems well before they are proved (and in a timely way, no matter how hard the proof), it learns the statistical frequencies of patterns it cannot crack, it respects logical relationships among sentences it cannot yet evaluate, it never holds extreme beliefs without proof, and it comes to trust its own future judgments. We build the market and its criterion precisely, sketch why such a market provably exists and is computable, survey the properties that fall out, and connect the construction back to the coherence theorems it generalizes and the embedded-agency problems it speaks to.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction: the uncertainty that more data cannot fix}
+\label{sec:intro}
+
+There are two quite different reasons you might not know whether a statement is true, and conflating them is the mistake that logical induction is built to repair.
+
+The first is ordinary \emph{empirical} uncertainty. You do not know tomorrow's weather, or the current time in a city you cannot see, because you are missing observations. More data would resolve it. This is the uncertainty that Bayesian probability theory was designed for, and it handles it beautifully: maintain a distribution over the ways the world could be, and update by conditioning as observations arrive.
+
+The second is \emph{logical} uncertainty, and it persists even when no observation is missing at all. You know, in full, the source code of a program, and you still do not know what it will output, because you have not run it. You know every axiom of arithmetic, and you still do not know whether $19{,}483$ is prime, because you have not done the division. You know exactly how $\pi$ is defined, and you still do not know whether its ten-billionth digit is a $7$. Confronted with the sentence
+\[
+\text{``}\,1+1+1+1+1+1+1+1+1+1+1+1+1\text{ is even,''}
+\]
+most people have to stop and count the ones before answering, which already shows that knowing the meaning of a sentence and knowing its truth value are different states, separated not by missing data but by missing \emph{computation}. The bottleneck is that you have not yet done the thinking, and no amount of looking at the world will do the thinking for you.
+
+Classical Bayesianism cannot represent this gap, because it builds logical omniscience into its foundations. A Bayesian agent's beliefs are a probability distribution over fully specified worlds, and a fully specified world has a definite, already-computed answer to every logical question. The framework assumes ``that we can always perform any computation or feat of logic at no cost.'' So a textbook Bayesian who knows the axioms of arithmetic must, on pain of incoherence, already assign probability $1$ to every arithmetical theorem and $0$ to every falsehood, including theorems no one has proved and falsehoods no one has refuted. That is not a description of any reasoner that has to budget its thinking, which is to say it is not a description of any embedded agent. The reason this matters for agent foundations is direct: an agent that is part of the world cannot hold the full deductive closure of its own beliefs in its head, so an account of good reasoning for such an agent must say what it means to be \emph{appropriately uncertain about logic itself}, and how to refine that uncertainty over time as one thinks longer.
+
+The plan is to first collect, in Section~\ref{sec:desiderata}, the intuitive properties we want from such a reasoner, since the field has long agreed more on the desiderata than on any solution. Section~\ref{sec:market} introduces the central picture, a prediction market over logical sentences, and Section~\ref{sec:criterion} turns it into a precise criterion of rationality, the logical induction criterion, with the main existence theorem. Section~\ref{sec:construction} sketches how the market is actually built and why it is computable. Section~\ref{sec:properties} is the payoff: the long list of good behaviors that follow from the one criterion. Section~\ref{sec:connections} connects logical induction back to the coherence theorems it generalizes, to Solomonoff induction, and to the open problems it leaves. The only prerequisites are elementary probability and the idea of polynomial-time computation.
+
+\section{What we want from a bounded reasoner}
+\label{sec:desiderata}
+
+Because it is not obvious what would even count as a solution to logical uncertainty, the literature has proceeded by listing properties a good reasoner ought to have and looking for tensions and patterns among them. It is worth seeing the main ones first, both to fix intuitions and because the striking fact about logical induction is that a single criterion delivers essentially all of them at once.
+
+\begin{desideratum}[Computable approximability]
+The method for assigning and refining probabilities on logical claims should be computable. A good reasoner can never be finished (there is always more to deduce by thinking longer), but the process of refining its beliefs should at least be something an algorithm can carry out.
+\end{desideratum}
+
+\begin{desideratum}[Coherence in the limit]
+The belief state the reasoner is approaching, the beliefs it would hold given unlimited time to think, should be logically consistent: probability $1$ to theorems, $0$ to contradictions, and $\Pr(\phi) \le \Pr(\psi)$ whenever $\phi$ entails $\psi$.
+\end{desideratum}
+
+\begin{desideratum}[Approximate coherence at finite times]
+Limit coherence is not enough; a bounded reasoner should be approximately coherent along the way. If it recognizes that two claims are mutually exclusive (say ``$\mathrm{prg}(7)=0$'' and ``$\mathrm{prg}(7)=1$'' for some program $\mathrm{prg}$), it should assign them probabilities summing to at most $1$ \emph{even before} it can compute $\mathrm{prg}(7)$, rather than holding nonsense until the moment it finishes the computation.
+\end{desideratum}
+
+\begin{desideratum}[Learning statistical patterns]
+Absent any specific knowledge bearing on a logical fact, the reasoner should assign probabilities matching the rate at which similar claims come out true. It should put about $10\%$ on ``the $n$th digit of $\pi$ is a $7$'' for large $n$, assuming it has no efficient way to predict those digits. A reasoner confident the $10^{100}$th digit is a $9$, for no reason, has a broken method.
+\end{desideratum}
+
+\begin{desideratum}[Calibration]
+Among the claims to which the reasoner assigns probability $p$, about a $p$ fraction should turn out true.
+\end{desideratum}
+
+\begin{desideratum}[Non-dogmatism]
+The reasoner should not hold extreme beliefs (probability $0$ or $1$) about a mathematical claim without proof. This is Cromwell's law extended to logic: keep some doubt about anything you have not actually settled, since a Bayesian can never update away from a probability of $0$ or $1$.
+\end{desideratum}
+
+These pull in different directions (timeliness fights against caution, statistical guessing fights against coherence), and much of the difficulty in the area was that proposals tended to satisfy some while violating others. Logical induction's contribution is a criterion from which all of them follow as theorems.
+
+\section{The market picture}
+\label{sec:market}
+
+The conceptual leap is to stop thinking of the reasoner as maintaining a probability distribution directly, and to think of it instead as a \emph{prediction market}, with the probabilities appearing as market prices. The picture is worth installing carefully because every later definition is a precise version of some piece of it.
+
+Each logical sentence is a tradeable share. A share in the sentence $\phi$ is a contract worth one dollar if $\phi$ turns out to be true and nothing if $\phi$ turns out to be false. The market maker (the reasoner whose beliefs we are modeling) quotes a price for each share, and stands ready to buy or sell at that price. If it quotes ``$19{,}483$ is prime'' at $\$0.75$, we read that as the reasoner currently assigning the sentence $75\%$ probability, and it will both buy and sell the share at $75$ cents.
+
+What pins down truth over time is a \emph{deductive process}, a slow background source of verified theorems. Think of a community of mathematicians submitting machine-checked proofs to a curated database, or concretely of a ``Peano prover'' that on day $n$ has output every theorem of arithmetic with a proof of at most $n$ symbols. The process never lies and eventually reveals every theorem, but on any given day it has revealed only finitely much. The reasoner's job is to \emph{outpace} this process: to assign high prices to conjectures that will eventually be proved, and low prices to those that will eventually be refuted, well before the proofs actually arrive.
+
+Finally there are \emph{traders}. A trader is an algorithm that watches the history of prices and places buy and sell orders, hunting for mispricings. Crucially, the traders we hold the market accountable to are the \emph{efficiently computable} ones, those running in time polynomial in the day number. The reasoner is declared rational exactly when no such fast trader can systematically beat its prices. This is the whole idea in one sentence, and the next section makes each italicized word precise.
+
+\section{The logical induction criterion}
+\label{sec:criterion}
+
+We can now state the definition the whole framework culminates in, and then unpack the five notions it depends on.
+
+\begin{definition}[The logical induction criterion]
+\label{def:lic}
+A market $P$ satisfies the \emph{logical induction criterion} relative to a deductive process $D$ if there is no efficiently computable trader $T$ that exploits $P$ relative to $D$. A market meeting this criterion is a \emph{logical inductor}.
+\end{definition}
+
+\paragraph{Markets.} Let $\mathcal{S}$ be the set of all sentences of a propositional language. A \emph{valuation} is any function $V : \mathcal{S} \to [0,1]$, with $V(\phi)$ the value assigned to $\phi$. A \emph{pricing} is a computable rational valuation $P : \mathcal{S} \to \Q \cap [0,1]$, with the reading that a $\phi$-share is worth $\$1$ if $\phi$ is true. A \emph{market} $P = (P_1, P_2, \dots)$ is a computable sequence of pricings, one per day. We will mostly work with markets whose pricings are \emph{belief states}: rational valuations with finite support, so that day $n$'s beliefs are a finite spreadsheet of (sentence, probability) pairs that the reasoner literally writes down and revises the next day. The interpretation, justified after the fact by the limit-coherence theorem below, is that $P_n(\phi) = 0.75$ means ``on day $n$ the reasoner assigns $\phi$ probability $75\%$.''
+
+\paragraph{Deductive processes and worlds.} A \emph{deductive process} $D : \N^+ \to \Fin(\mathcal{S})$ is a computable, nested sequence $D_1 \subseteq D_2 \subseteq \cdots$ of finite sets of sentences, where $D_n$ is read as the theorems revealed by day $n$; its union $D_\infty$ is everything eventually proved. Against this we set the notion of a \emph{world}: any truth assignment $W : \mathcal{S} \to \B$ with $\B = \{0,1\}$. The subtlety, and it is the key relaxation in the whole theory, is that worlds need \emph{not} be logically consistent. A bounded reasoner cannot tell at a glance which truth assignments hide a contradiction, since exposing a contradiction takes work, so we use a weaker, checkable notion of coherence:
+
+\begin{definition}[Propositional consistency]
+\label{def:pc}
+A world $W$ is \emph{propositionally consistent} (p.c.) if it respects Boolean structure: $W(\phi \wedge \psi) = W(\phi) \wedge W(\psi)$, $W(\phi \vee \psi) = W(\phi) \vee W(\psi)$, $W(\neg \phi) = 1 - W(\phi)$, and so on, so that the truth value of any sentence is fixed by Boolean algebra from the truth values of its atoms. Given a set $D$ of sentences, $\PC(D)$ denotes the p.c.\ worlds that make every sentence in $D$ true.
+\end{definition}
+
+Propositional consistency is checkable by a bounded reasoner, where full logical consistency is not, and that is exactly why the theory is built on it. A world can be propositionally consistent yet logically impossible (it can, say, deny a theorem nobody has proved yet); the deductive process gradually weeds such worlds out, because once $D$ reveals a theorem, every p.c.\ world consistent with $D$ must honor it.
+
+\paragraph{Traders.} A \emph{trading strategy} for day $n$ is, formally, an affine combination $c + \xi_1\phi_1 + \cdots + \xi_k \phi_k$ of shares, where each coefficient $\xi_i$ is an ``expressible feature,'' a continuous function of the market's past prices that says how many shares of $\phi_i$ to buy (negative meaning sell), and $c$ is the bookkeeping cash term recording what the purchases cost at the prevailing prices. Continuity is what lets the market find prices that no trader can game (it is the hook for the fixed-point argument later). A \emph{trader} is a sequence of such strategies, one per day. It is \emph{efficiently computable} if it runs in time polynomial in the day number $n$, so that each day it has somewhat more data and somewhat more compute, but never an unfair amount.
+
+\paragraph{Exploitation.} This is the heart of the matter, the precise form of ``the trader beats the market.'' Track the trader's net holdings (shares owned, minus cash spent) as it interacts with the market over time. Each propositionally consistent world $W$ gives one possible valuation of those holdings, counting each owned $\phi$-share as worth $\$1$ if $W$ makes $\phi$ true. The set of all such plausible valuations, across all days and all worlds still consistent with what $D$ has revealed, is the set of ways the trader's net worth could honestly be appraised.
+
+\begin{definition}[Exploitation]
+\label{def:exploit}
+A trader $T$ \emph{exploits} a market $P$ relative to $D$ if the set of plausible valuations of its net holdings,
+\[
+\Big\{\, W\Big(\textstyle\sum_{i \le n} T_i(P)\Big) \;:\; n \in \N^+,\; W \in \PC(D_n) \,\Big\},
+\]
+is bounded below but not bounded above. In words: the trader's losses are capped (it never risks more than some finite amount), yet its potential gains grow without limit. It makes unbounded returns off a bounded investment.
+\end{definition}
+
+A simple example fixes the idea. Suppose a market stubbornly prices ``$1+1=2$'' at $\$0.50$ on every single day, and a trader buys one share each day. Before the deductive process gets around to proving $1+1=2$, the trader is paying $50$ cents a day and its position could in principle be worthless, so its loss is bounded by the modest amount it has spent. But from the day the proof appears onward, every remaining p.c.\ world must value each share at the full dollar, and the trader, having bought a share every day, holds a position worth more and more without limit while having risked only a finite stake. That is exploitation, and a market that lets it happen is not a logical inductor. (Exploitation is subtler than ``buy something that pays out'': a trader can also exploit by arbitraging between two sentences whose disjunction is provable even if neither sentence is ever individually decided, so the criterion rewards spotting logical relationships, not just betting on outcomes.)
+
+\paragraph{The criterion and its main theorem.} With all five notions in hand, Definition~\ref{def:lic} says a market is a logical inductor exactly when no polynomial-time trader can exploit it. The intuitive content is captured in one line, which is worth memorizing because every property in Section~\ref{sec:properties} is an instance of it:
+\begin{quote}
+Consider any polynomial-time method for identifying a pattern in logic. If the market's prices do not learn to reflect that pattern, a trader can use the pattern to exploit the market. So a logical inductor must learn to reflect every such pattern.
+\end{quote}
+The reason this is not vacuous is that such markets exist, and exist constructively.
+
+\begin{theorem}[Existence, Garrabrant et al.]
+\label{thm:existence}
+For any deductive process $D$, there exists a computable belief sequence $P$ that satisfies the logical induction criterion relative to $D$. Consequently, for any recursively axiomatizable theory $\Gamma$, there is a computable logical inductor over $\Gamma$ (taking $D$ to reveal exactly the theorems of $\Gamma$).
+\end{theorem}
+
+\section{How the market is built}
+\label{sec:construction}
+
+The existence proof is constructive, and its mechanism is illuminating enough to sketch, since it shows why ``no efficient trader can win'' is achievable rather than merely desirable. The construction has two moves.
+
+The first move handles a \emph{single} trader. Because a trading strategy is a continuous function of the current prices, and the market gets to set those prices, the market can always find a price vector at which a given trader is left indifferent, making essentially no profit. With finitely many traders to worry about on a given day, one wants a single price vector that simultaneously neutralizes all of them, and this is exactly a fixed point of a continuous map, guaranteed to exist by Brouwer's fixed point theorem.
+
+The second move handles \emph{all} efficient traders at once, by packaging them into one. Enumerate the polynomial-time trading strategies (restricted to those that risk at most $\$1$ in the worst case), and build a single ``trading firm'' that, on day $n$, runs the first $n$ of them in parallel, giving strategy number $i$ a budget of $2^{-i}$ of the total. The firm exploits the market if and only if some individual efficient trader does: if trader $k$ could win unboundedly, the firm captures $2^{-k}$ of that still-unbounded windfall, while every other strategy can cost it at most its tiny share, so the firm's total downside is bounded by $\sum_i 2^{-i} = \$1$. The market maker then sets its prices, using the single-trader fixed-point trick applied to the firm, so that the firm earns at most $2^{-n}$ on day $n$. The firm's lifetime profit is therefore bounded by $\sum_{n} 2^{-n} = \$1$, a finite amount. Since the firm was the most dangerous trader there is (it dominates every individual efficient trader), and even it cannot make unbounded profit, no efficient trader can exploit the market. The price search is a brute-force enumeration over rationals, so the whole thing is computable; in fact the resulting inductor has a finite belief state every day, the spreadsheet picture made literal. The price of generality is efficiency: the construction is wildly impractical to run, but its mere existence is what licenses every property below.
+
+\section{What falls out of the criterion}
+\label{sec:properties}
+
+The reason logical induction is celebrated is that the single criterion of Definition~\ref{def:lic} entails a long list of the properties one would want from a reasoner under logical uncertainty, each provable by exhibiting the efficient trader that would exploit any inductor lacking it. We survey the main ones; throughout, the argument has the same shape (``if the prices failed to do this, here is the fast trader that would pump them''), which is the intuitive line from Section~\ref{sec:criterion} cashed out.
+
+\paragraph{Convergence and coherence.} The prices must converge. If $P_n(\phi)$ oscillated forever between, say, $0.3$ and $0.7$, a trader could buy low and sell high across the swings indefinitely, an unbounded profit off a bounded stake. So every sentence's price approaches a limit. Moreover the limiting prices form a coherent probability distribution over the logically consistent worlds: provable sentences tend to $1$, refutable ones to $0$, and the probabilities of mutually exclusive exhaustive alternatives sum to $1$. (If a provable sentence settled at $1-\varepsilon$, a trader buying at that price and collecting the eventual dollar would skim $\varepsilon$ forever.) This retroactively justifies calling the prices ``probabilities'' at all.
+
+\paragraph{Timely learning.} Coherence in the limit is cheap; the powerful property is that the inductor learns \emph{quickly}, faster than it can prove things. For any efficiently computable sequence of theorems $\phi_1, \phi_2, \dots$, the inductor assigns $\phi_n$ near-probability $1$ by day $n$, no matter how astronomically long the actual proof of $\phi_n$ is. If it lagged, assigning $\phi_n$ less than $1-\varepsilon$ on day $n$, the trader who buys $\phi_n$ on day $n$ (recognizing the cheap-to-describe pattern that generates the sequence) would profit $\varepsilon$ indefinitely. The competitive pressure forces the prices to anticipate the pattern long before the deductive process grinds out the proofs, and it learns sparser subsequences even faster (the $P(n)$th theorem by day $n$, for any polynomial $P$).
+
+\paragraph{Calibration, and learning statistical patterns.} Logical inductors are well calibrated: among sentences they price at $p$, about a $p$ fraction come true. And when a sequence of sentences is effectively \emph{unpredictable} to anything running as fast as the inductor (pseudorandom, with no polynomial-time way to forecast which are true), the inductor settles on the correct limiting frequency in a timely way. The flagship example: it assigns ``the $n$th digit of $\pi$ is a $7$'' a probability approaching $10\%$ for large $n$, because any systematic deviation would be a pattern a trader could exploit, yet the digits themselves are too hard to predict for the inductor to do better than the base rate.
+
+\paragraph{Learning logical relationships.} The inductor respects relationships among sentences it cannot evaluate. For an efficiently computable stream of mutually exclusive, exhaustive pairs, it brings their two probabilities to sum to (about) $1$ in a timely manner, even when neither member's truth value is known. It will price ``the $173{,}498$th digit of $\pi$ is even'' and ``\ldots is odd'' so that the two probabilities sum to nearly $1$ long before anyone computes that digit, because a violation of the sum rule is an arbitrage and arbitrages get punished.
+
+\paragraph{Non-dogmatism.} The inductor never settles on an extreme belief without proof. A sentence the process never disproves keeps a limiting probability bounded above $0$; one it never proves keeps a limiting probability bounded below $1$. (The trader that enforces this buys a never-refuted sentence at successively halved prices, $\$0.50$, $\$0.25$, $\$0.125, \dots$, banking unbounded value if the price ever reaches $0$.) On any particular finite day the inductor may be pushed to a wrong extreme, but in the limit it keeps an open mind about everything it has not actually settled.
+
+\paragraph{Introspection and self-trust.} Because the inductor's own beliefs are themselves a computable, hence pattern-bearing, sequence, the inductor comes to know about them: it can price sentences \emph{about its own prices} accurately (introspection). The most striking instance, and the one that connects this material to the tiling-agents problem, is \emph{self-trust}: a logical inductor's current credence in a sentence is, to good approximation, a weighted average of what it expects its own \emph{future} credences to be. It defers to its later, better-informed self without having to witness the reasoning that its future self will do. This is a probabilistic cousin of exactly the trust a parent agent wants in a successor whose specific conclusions it cannot anticipate, and it is striking that here the deference falls out for free from unexploitability, where in the proof-based setting of tiling agents the analogous self-trust runs straight into the L\"obian obstacle.
+
+\section{Connections and open problems}
+\label{sec:connections}
+
+It is worth situating logical induction against the coherence theorems it descends from, and being honest about what it does not yet do.
+
+The lineage runs directly through the Dutch book. The coherence theorems that ground Bayesian probability say a rational agent's beliefs must be un-Dutch-bookable: no system of bets can be arranged to take money from it for sure. But that argument quietly assumes logical omniscience, because checking that a book of bets is sure to profit requires knowing all the logical relationships among the bets, which is precisely the computation a bounded reasoner cannot do. Logical induction keeps the spirit of the Dutch book and weakens its letter exactly where the omniscience was hiding. Instead of demanding that \emph{no} exploiting strategy exist, it demands only that no \emph{efficiently computable} exploiting strategy exist. That is a weaker requirement, achievable by a real computer, and yet it is strong enough to recover coherence in the limit, so it sits underneath classical Bayesian coherence as the computationally realistic foundation the coherence theorems wanted but could not have. The picture is exactly parallel to the move, familiar from cryptography and learning theory, from ``no adversary'' to ``no efficient adversary.''
+
+There is also a family resemblance to Solomonoff induction, the idealized theory of empirical learning. Solomonoff induction maintains all computable hypotheses as experts and reweights them by predictive accuracy; logical induction maintains all polynomial-time traders as experts and reweights them, in effect, by trading profit, with the market price emerging as the aggregate verdict. The difference is that Solomonoff's experts each model the entire world, while logical induction's traders can specialize, each watching one corner of mathematics, which is what lets the market knit together partial competences into a global belief state. The framework is not even tied to logic: feed the same machinery a stream of pixels instead of a stream of theorems and it learns empirical patterns, so logical induction is better seen as a general theory of timely, pattern-respecting prediction that happens to be applied to the deductive stream.
+
+Two limitations are worth naming, because they mark the live research frontier. First, logical inductors have no notion of \emph{decision-directed} thinking: they improve their beliefs about everything in parallel, with no mechanism to focus computation on the question that currently matters, the way a person decides what to think about. Second, they do not handle logical \emph{counterpossibilities}. Reasoning ``if Fermat's Last Theorem were false, then \ldots'' is something mathematicians do productively, but a logical inductor eventually assigns the falsehood probability $0$, and conditioning on a probability-$0$ event is undefined, so coherent reasoning about impossible mathematical scenarios remains out of reach. Both gaps matter for decision theory, where an embedded agent must reason about logically structured counterfactuals (what a perfect predictor will have computed, what another copy of its own algorithm will output) under exactly the kind of logical uncertainty this theory formalizes. Logical induction is the first framework that lets a computable, embedded reasoner be sensibly uncertain about logic and get steadily, provably less wrong; making that reasoner also decide well is the next problem.
+
+\section*{Sources}
+\addcontentsline{toc}{section}{Sources}
+
+\begin{itemize}[leftmargin=1.5em]
+\item \emph{An Intuitive Guide to Garrabrant Induction} (read in full). \url{https://www.lesswrong.com/posts/y5GftLezdozEHdXkL/an-intuitive-guide-to-garrabrant-induction}
+\item Garrabrant, Benson-Tilsen, Critch, Soares, and Taylor, \emph{Logical Induction} (Chapters 1 and 3 in detail: desiderata, and the market / deductive-process / trader / exploitation definitions and main theorem; Chapter 4 skimmed for the properties of logical inductors). \url{https://arxiv.org/pdf/1609.03543}
+\item Onward connections: the Dutch book and coherence material of consequentialist foundations; the self-trust property (Section 4.12 of the Logical Induction paper) and its relation to the tiling-agents notion of trusting a successor.
+\end{itemize}
+
+\end{document}

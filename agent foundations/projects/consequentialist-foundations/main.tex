@@ -1,0 +1,236 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\util}[1]{\text{\texteuro}#1}
+
+\title{Consequentialist Foundations \\[1ex]
+{\large Why capable agents look like expected utility maximizers, from money pumps to the complete class theorem}}
+\author{Lecture notes, Agent Foundations module \\ Iliad Intensive}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+One of the central difficulties in aligning a powerful AI is that we have to reason about a system that does not yet exist, and that may be far more capable than anything we have seen. We cannot inspect its source code or run experiments on the finished article before it matters. What we can do is look for properties so structurally forced that any sufficiently capable, non-self-defeating agent must have them, whatever its internals. The coherence theorems are the cleanest example. These notes develop them from the ground up, in three movements. First, the intuitive argument: an agent whose preferences run in circles can be turned into a money pump, cycled through trades that each look locally fine but leave it strictly poorer, and the requirement of not being pumpable is exactly a consistency requirement on its preferences. Extending the same move to gambles forces the agent to act as though it multiplies utilities by ``quantitative thingies'' that obey the laws of probability, and to maximize their weighted sum. Second, a problem the intuitive argument hides: dominated strategies are only detectable relative to some resource that plays the role of money, and it is not obvious what that resource is for an arbitrary physical system. This is Wentworth's \emph{measuring stick of utility} problem. Third, the rigorous form of the coherence argument, the \emph{complete class theorem}, which drops the betting story entirely and works directly with consequences: any decision rule that is not Pareto-dominated across all possible states of the world is equivalent to maximizing expected utility under some prior probability distribution, with the probabilities and the utilities falling out together rather than being assumed in advance. We close by being precise about what these results do and do not establish: they are representational, a statement about how an agent can be described from the outside, not a claim about the machinery inside it, and they come with assumptions whose failure is exactly where the interesting open problems live.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction: reasoning about minds we have not built}
+\label{sec:intro}
+
+Suppose you are handed the following job. Somewhere in the future a system will be built that is much better than you at steering the world toward whatever it is steering toward. You will not get to watch it grow up, you will not get many tries, and by the time its behavior is legible to you it will already be too late to change the design. You are asked, now, to say something reliable about how it will behave.
+
+This looks impossible, and in full generality it is. But notice the shape of a few claims that survive the difficulty. ``It will not leave free energy on the table that it could have used.'' ``It will not pay to be sent in a circle and arrive back where it started.'' ``If it reliably gets what it wants, then from the outside its behavior will be describable as if it valued some things more than others, in consistent amounts.'' These are not claims about the system's circuitry. They are claims about what any effective goal-pursuit has to look like, on pain of working against itself. Agent foundations calls the search for such claims the search for \emph{robust} properties, or sometimes ``true names'': concepts that keep their meaning under heavy optimization pressure and for agents far more capable than us.
+
+The coherence theorems are the oldest and sturdiest entry in that catalogue, and they are the subject of these notes. Their slogan is that \emph{coherent decisions imply consistent utilities}: an agent that reliably avoids a certain kind of shooting-itself-in-the-foot must behave as though it has a utility function and a probability distribution, and is maximizing expected utility. The word ``behave'' is doing real work, and we will keep returning to it. The theorems do not say the agent contains a utility function written down somewhere. They say its outward behavior can be \emph{summarized} by one. That is both their strength (it holds no matter what the internals are) and their limit (it tells us nothing directly about those internals).
+
+We build the picture in the order that makes the motivation clearest, which is not quite the order in which the ideas are usually first met. Section~\ref{sec:moneypump} gives the intuitive coherence argument for preferences over certain outcomes: circular preferences make you a money pump, and refusing to be pumped is consistency. Section~\ref{sec:probabilities} extends the same argument to uncertain prospects and watches probabilities and expected utility emerge from it, with neither assumed at the start. Section~\ref{sec:measuringstick} stops to ask a question the first two sections quietly assumed away: relative to \emph{what} are we measuring whether a strategy is dominated? This is the measuring-stick problem, and it is where coherence arguments touch the physical world. Section~\ref{sec:completeclass} presents the complete class theorem, the version of the coherence argument that a working decision theorist would actually defend, which derives Bayesian expected utility maximization from pure dominance reasoning without ever mentioning bets, money, or Dutch books. Section~\ref{sec:scope} collects what has and has not been shown, the caveats, and the bridge to the descriptive and thermodynamic strands of the program.
+
+The only prerequisite is comfort with elementary probability and a willingness to take an example seriously before its generalization arrives.
+
+\section{Dominated strategies and circular preferences}
+\label{sec:moneypump}
+
+Start with an agent that has preferences but no particular discipline imposed on them. To make it concrete, let it have opinions about pizza. It prefers onion to pineapple, it prefers pineapple to mushroom, and (here is the trouble) it prefers mushroom to onion. Each preference taken alone is unremarkable. Together they form a cycle: onion $\succ$ pineapple $\succ$ mushroom $\succ$ onion.
+
+Watch what a moderately clever pizza vendor can do to such an agent. The agent is currently holding a mushroom slice. The vendor offers: for one penny, I will swap your mushroom for a pineapple. Since the agent prefers pineapple to mushroom, and a penny is small, it pays and takes the pineapple. Before it can eat, the vendor offers a free swap: give me the pineapple, take this onion instead. The agent prefers onion to pineapple, so it accepts, gaining (it feels) for free. Then a third free offer: trade the onion back for a mushroom. The agent prefers mushroom to onion, so it accepts again. It is now holding a mushroom slice, exactly the kind of slice it started with, and it is one penny poorer. The vendor can run the loop again, and again, pumping the agent for a penny per cycle until its pockets are empty. Steve Omohundro's version drops the pizza and uses a commuter who prefers Berkeley to San Francisco, San Jose to Berkeley, and San Francisco to San Jose, and who will therefore, if you let it, spend the rest of its life and its money in taxis going around the bay.
+
+The technical name for what went wrong is that the agent followed a \emph{dominated strategy}.
+
+\begin{definition}[Dominated strategy]
+\label{def:dominated}
+A strategy is \emph{dominated} if there is some other strategy available to the agent that does strictly better, and never does worse, by the agent's own lights. An agent using a dominated strategy is, by its own standard, leaving value on the table.
+\end{definition}
+
+The losing agent's strategy is dominated by the trivial alternative of declining every offer and keeping the original mushroom slice. That alternative gets the agent the same pizza and keeps the penny, so it is strictly better and the cyclic behavior is strictly worse. Nothing about the world forced the loss; the agent did it to itself, and the cause was the cycle in its preferences.
+
+Two features of this argument deserve emphasis, because the entire subject is built on them and both are easy to misread.
+
+The first is that the argument does not tell the agent \emph{what} to prefer. We did not prove that pineapple ``really'' tastes better than mushroom, or that an ideal reasoner must like onion. The conclusion is conditional and structural: \emph{whatever} the agent's tastes, if they contain a cycle then the agent is exploitable, and if the agent is to be unexploitable then its tastes cannot contain a cycle. Eliminating one specific kind of self-defeating behavior turns out to correspond exactly to imposing a consistency requirement (here, transitivity and acyclicity) on the preferences that happen to be there. Coherence arguments always have this flavor. They are not in the business of supplying goals; they are in the business of saying what the bookkeeping around any goals has to look like.
+
+The second is the direction of the inference. We are not assuming the agent has a utility function and deriving that it avoids money pumps. We are assuming it avoids money pumps and deriving that its preferences must have the structure that a utility function would give them. A real-valued utility function $U$ assigns each outcome a number so that the agent prefers $a$ to $b$ exactly when $U(a) > U(b)$. Such an assignment is automatically transitive and acyclic, because the real numbers are. So ``representable by a utility function'' and ``free of the cycles that make you pumpable'' are, over a finite set of outcomes, two descriptions of the same condition. The coherence requirement is the substantive thing; the utility function is just a convenient way to write a coherent preference order down.
+
+\section{From preferences to probabilities and expected utility}
+\label{sec:probabilities}
+
+So far the agent has been choosing among outcomes it gets for certain. Real agents choose among \emph{gambles}: actions whose consequences depend on facts they do not control or have not yet computed. The remarkable thing is that the very same money-pump style of argument, pushed into the world of uncertainty, forces far more structure than mere acyclicity. It forces the agent to behave as though it has assigned numbers to outcomes (utilities) \emph{and} numbers to uncertain events (probabilities), and to be maximizing the probability-weighted average of the utilities. And it forces these two kinds of number to come into existence \emph{together}, neither one prior to the other.
+
+Yudkowsky's framing is worth stating carefully, because it inverts the usual textbook order. The textbook starts with probabilities (somehow given), starts with a utility function (somehow given), multiplies and sums them, and announces that a rational agent maximizes the result. The coherence framing refuses to start with either. ``From the standpoint of coherence theorems, we don't start with a notion of probability.'' We start only with an agent making choices among gambles, and with the demand that it not adopt qualitatively dominated strategies. From that demand we extract, as a forced consequence, that the agent must be acting \emph{as if} it multiplies the value of each outcome by a certain quantitative weight attached to each possibility, and only once we see what laws those weights have to obey do we recognize them and decide to call them probabilities.
+
+\subsection{Why there must be quantitative weights}
+
+Consider a concrete gamble. I offer the agent the following deal: give me one apple now, and I will flip a coin; if it comes up heads I give you one orange, and if it comes up tails I give you three plums. Whether the agent should take this deal cannot be settled by its preferences over apples, oranges, and plums alone, because the outcome is uncertain. It has to weigh the orange-branch against the plum-branch somehow, and the weighing cannot be arbitrary if the agent is to avoid being pumped.
+
+Suppose the agent assigns each outcome a utility, measured for bookkeeping in ``utils'' which we will write with a euro sign, so that one orange is worth $\util{2}$ and three plums are worth $\util{1.5}$ to this agent. If the agent treats the coin as fair, weighting each branch by $0.5$, then the value it should put on the whole gamble is
+\[
+0.5 \cdot U(\text{1 orange}) + 0.5 \cdot U(\text{3 plums}) \;=\; 0.5 \cdot \util{2} + 0.5 \cdot \util{1.5} \;=\; \util{1.75}.
+\]
+This is an \emph{expected utility}: a weighted average of outcome utilities, with the weights attached to the uncertain events. The claim of the coherence theorems is that an agent which is not throwing away value must value gambles by some such weighted average, choosing the option whose expected utility is highest. An agent that valued gambles in any way \emph{not} expressible as such a weighted sum could be offered a menu of gambles on which its choices are dominated, in the same spirit as the pizza loop, just with more arithmetic.
+
+The deep point is what the weights have to satisfy.
+
+\subsection{Why the weights obey the laws of probability}
+
+Call the weights probabilities, provisionally, and watch the constraints appear.
+
+\paragraph{They sum to one.} Suppose our agent, betting on a single coin flip, assigns weight $0.6$ to heads and weight $0.7$ to tails. These sum to $1.3$, which feels harmlessly like enthusiasm but is in fact exploitable. Offer the agent a contract that pays out $0.8$ apples no matter which way the coin lands. By the agent's own weights, it values this contract at $0.6 \cdot \util{0.8} + 0.7 \cdot \util{0.8} = \util{1.04}$, so it will pay up to one apple to obtain something that returns it $0.8$ apples with certainty. That is a guaranteed loss of $0.2$ apples, a dominated strategy. The only way to block every such trade is for the weights across mutually exclusive and exhaustive possibilities to sum to exactly one. ``The thingies you multiply utilities by must sum to 1, whether you call them probabilities or not.''
+
+\paragraph{Dutch books name the same fact.} The packaged version of this kind of argument is the \emph{Dutch book}. Picture a bookmaker who must quote a price $\$x$ for a ticket that pays $\$1$ if event $X$ happens, and a price $\$y$ for a ticket that pays $\$1$ if the mutually exclusive, exhaustive event $Y$ happens. Exactly one of $X, Y$ occurs, so owning both tickets guarantees a $\$1$ payout. If $x + y \ne 1$, a clever counterparty buys or sells the pair to extract a sure profit from the bookmaker. Coherent prices must satisfy $x + y = 1$. The Dutch book is not a new principle; it is one more way of staging the same dominance argument, and Yudkowsky is explicit that it ``has to be seen as one more added piece in the company of all the other coherence theorems'' rather than the foundation by itself.
+
+\paragraph{Conditional probability is forced too.} The structure goes further than additivity. Consider three tickets concerning two events $Q$ and $R$. Ticket one pays $\$1$ if $Q$ occurs; let its fair price be $\$x$. Ticket two is refunded if $Q$ fails to occur, and pays $\$1$ if $R$ occurs given that $Q$ did; let its price be $\$y$, which is functioning as the price of ``$R$ given $Q$''. Ticket three pays $\$1$ only if $Q$ and $R$ both occur; let its price be $\$z$. A counterparty who can find any mismatch among these prices can assemble a guaranteed profit, and working out exactly which configurations are safe yields a clean equation:
+\[
+z = x \cdot y.
+\]
+For prices $x, y, z \in (0,1)$ this is the unique unexploitable relationship. Reading $x$ as $P(Q)$, $y$ as $P(R \mid Q)$, and $z$ as $P(Q \wedge R)$, the equation $z = x \cdot y$ is precisely the definition of conditional probability, $P(Q \wedge R) = P(Q)\,P(R \mid Q)$. We did not postulate the product rule; we postulated unexploitability and the product rule fell out. As a sanity check on the danger, a bookmaker who quotes $x = 0.60$, $y = 0.70$, and $z = 0.20$ (so that $z \ne xy = 0.42$) can be made to lose money for certain by a suitable combination of the three tickets.
+
+\subsection{What the coherence picture establishes, and admits}
+
+Stack these arguments together (the pizza loop, the apple-orange-plum gamble, the sum-to-one bet, the Dutch book, the conditional-probability tickets) and they all point at the same small set of properties. An agent that is, in Yudkowsky's phrase, ``doing as well as qualitatively possible'' at getting what it wants must be describable as having coherent relative quantities of wantedness over the outcomes (a utility function) and coherent weights over the uncertain events (a probability distribution), and as choosing so as to maximize the probability-weighted utility. Probabilities and utilities are not handed to the agent from outside; they are extracted, together, from the single demand that it not be turned into a pump.
+
+Yudkowsky is careful, and we should be too, about the status of these demonstrations. They are intuition pumps for theorems, not the theorems themselves: ``these aren't the professional-grade coherence theorems as they appear in real math.'' The professional-grade results, of which the complete class theorem in Section~\ref{sec:completeclass} is the one we will actually prove, do the same work with the gaps closed. He also flags two honest caveats that we will inherit. Perfect coherence is usually impossible to compute, so no bounded agent is ever exactly coherent; and a system that is messy on the inside may still be impossible to pump from the outside, so looking coherent and being internally tidy are different things. Both caveats become central later: the first is the entire motivation for logical induction, and the second is the gap between the representational reading of these theorems and the mechanistic questions of descriptive agent foundations.
+
+Before we reach the rigorous theorem, we have to confront something the arguments above quietly leaned on every time they said the word ``dominated''.
+
+\section{The measuring stick of utility}
+\label{sec:measuringstick}
+
+Every dominance argument so far has been denominated in a resource. The pizza agent lost \emph{pennies}. The gambler lost \emph{apples}. The Dutch booked bookmaker lost \emph{dollars}. ``Strictly worse off'' was always worse off \emph{in units of} something we tacitly agreed was worth having. Wentworth's measuring-stick problem asks what that something is, and points out that the coherence theorems are quietly parasitic on the answer.
+
+The pressure becomes visible through a standard objection. People sometimes say that coherence theorems are vacuous because \emph{every} system can be cast as a utility maximizer: whatever a rock does, just declare its utility function to be ``do exactly that'', and the rock is now optimal. If this were the whole story, the theorems would tell us nothing about anything. The reply is that the trivialization only works if you are allowed to choose the utility function \emph{after} seeing the behavior and over the very same variables the behavior ranges on. The coherence theorems are not about that. They assume the existence of some resource, something that works like money, and they single out systems that are Pareto-optimal with respect to \emph{that} resource, systems that do not throw it away. Relative to a fixed resource, ``dominated strategy'' is a substantive, falsifiable notion. An agent that will pay to cycle pepperoni $\to$ mushroom $\to$ anchovy $\to$ pepperoni is genuinely doing something wrong: either it has no consistent utility over toppings, or it is violating the assumption that more money is better. The measuring stick is what makes the theorem bite rather than tautologize.
+
+What does a thing need in order to serve as a measuring stick? Wentworth isolates two properties, and they are exactly the properties that make a literal ruler useful. The resource must be \emph{additive across decisions}, so that paying a penny here and a penny there genuinely costs two pennies, the way lengths laid end to end add. And more of it must be \emph{desirable, all else equal}, so that larger numbers mean better, the way a longer measured length is unambiguously more length. Money has both properties, which is why money is the canonical measuring stick; but the properties, not the coinage, are what matter. Underneath them sits a third, more basic fact: the resource is \emph{fungible}, tradeable for many different things the agent might want, which is what lets willingness-to-pay reveal an entire preference ordering. Energy, time, and negentropy are all candidate measuring sticks for the same reason, and the connection to thermodynamics (free energy as a near-universal currency that physical processes spend) is one of the threads that ties consequentialist foundations to the optimization-and-thermodynamics material.
+
+The genuinely hard and unsolved part is recognizing a measuring stick \emph{in the wild}. When we already think of dollars or joules as resources the problem is invisible, but that is because we imported the answer. Wentworth poses the question in its sharpest form: ``If somebody hands me a simulation of a world with some weird physics, what program can I run on that simulation to identify all the resources in it?'' We do not have such a program. And the stakes of having one are exactly the stakes of agent foundations: if we could read off the resources of an arbitrary physical system directly from its physics, with no agency assumed in advance, then the coherence theorems ``would give us a nontrivial sense in which some physical systems do contain embedded agents, and other physical systems don't.'' We could point at a region of the world and say, objectively, this much optimization is happening here, measured against this resource. Wentworth is candid that the intuitive argument linking resources to utility (effective steering of the world into a small set of states nearly always requires hoarding instrumentally convergent resources, so systems that squander resources cannot steer well) is ``an intuitive, qualitative argument, not really a mathematical one.'' Turning it into a real selection theorem is open work, and it is one of the places where this topic hands off to the descriptive program in Section~\ref{sec:scope}.
+
+The upshot for the rest of these notes is a piece of intellectual hygiene. Whenever a coherence theorem says ``dominated'', ask: dominated in what currency, and who fixed the currency? The next section presents a version of the argument that is admirably explicit about this, because it replaces the betting story with a bare preference-per-state-of-the-world and lets the currency be whatever the loss function encodes.
+
+\section{The complete class theorem}
+\label{sec:completeclass}
+
+The coherence arguments of Sections~\ref{sec:moneypump} and~\ref{sec:probabilities} have a feature that some find unsatisfying as a foundation: they define belief in terms of willingness to bet and preference in terms of willingness to pay, and then derive rationality from the badness of certain bets and payments. The whole justification routes through hypothetical exploitation scenarios. Abram Demski's presentation of the \emph{complete class theorem} offers a foundation of a different character, one that ``should directly point to why it matters'' by comparing consequences directly, with no bookie in sight. It is the version of the coherence argument that survives contact with a careful decision theorist, and it derives the full apparatus (probabilities, utilities, and expected utility maximization) from nothing but the principle that you should not adopt a course of action when another available course does at least as well in every possible world and strictly better in some.
+
+\subsection{Setup}
+
+A decision problem is specified by a handful of pieces.
+
+\begin{definition}[Decision problem]
+\label{def:decprob}
+We are given a set $\Theta$ of possible \emph{states of the world}, a set $X$ of possible \emph{observations}, a set $A$ of available \emph{actions}, a \emph{likelihood} $F(x \mid \theta)$ giving the probability of observation $x$ when the world is in state $\theta$, and a \emph{loss function} $L(\theta, a)$ encoding the agent's preferences, where lower loss means a more preferred outcome. A \emph{decision rule} $\delta$ is a function from observations to actions: $\delta(x) \in A$ is the action taken upon seeing $x$.
+\end{definition}
+
+The loss function is where this framework keeps its measuring stick. It is given as part of the problem, a primitive ordering of how good each (state, action) pair is, and we will see that the theorem extracts a probability distribution but takes the per-state comparison of outcomes as the raw material. For the core result we take $\Theta$ and $A$ finite.
+
+A decision rule should be judged by how it performs across the worlds it might be in. The right summary is its expected loss in each world.
+
+\begin{definition}[Risk]
+\label{def:risk}
+The \emph{risk} of decision rule $\delta$ in state $\theta$ is its expected loss in that world,
+\[
+R(\theta, \delta) \;=\; \E_{x \sim F(\cdot \mid \theta)}\big[\, L(\theta, \delta(x)) \,\big].
+\]
+The vector $\big(R(\theta, \delta)\big)_{\theta \in \Theta}$, one number per possible world, is the rule's \emph{risk profile}, a point in $\R^{|\Theta|}$.
+\end{definition}
+
+\subsection{Dominance, admissibility, and the Bayesian rules}
+
+Now we import, in this cleaner setting, the only normative idea the theorem needs: do not get Pareto-dominated across worlds.
+
+\begin{definition}[Pareto improvement and admissibility]
+\label{def:admissible}
+A rule $\delta^*$ is a \emph{Pareto improvement} over $\delta$ if $R(\theta, \delta) \ge R(\theta, \delta^*)$ for every state $\theta$, with strict inequality $R(\theta, \delta) > R(\theta, \delta^*)$ for at least one state. A rule is \emph{admissible} if no Pareto improvement over it exists, and otherwise \emph{inadmissible} (dominated).
+\end{definition}
+
+An inadmissible rule is one a competitor beats in some world while never doing worse in any world, the multi-world analogue of paying a penny to end up where you started. Admissibility is the bare requirement that you not be dominated like that. Notice how little has been assumed: a per-state ranking of outcomes, and the demand not to be dominated. No probabilities over $\Theta$ have entered.
+
+On the other side we have the Bayesian rules, defined in the usual way relative to a prior.
+
+\begin{definition}[Bayes risk and Bayes-optimality]
+\label{def:bayes}
+Given a prior probability distribution $\pi$ over states $\Theta$, the \emph{Bayes risk} of $\delta$ is the prior-weighted average of its risk,
+\[
+r(\pi, \delta) \;=\; \E_{\theta \sim \pi}\big[ R(\theta, \delta) \big] \;=\; \sum_{\theta} \pi(\theta)\, R(\theta, \delta).
+\]
+A rule is \emph{Bayes-optimal} with respect to $\pi$ if it minimizes $r(\pi, \cdot)$. A prior is \emph{non-dogmatic} if $\pi(\theta) > 0$ for every $\theta$, that is, it rules out no state in advance.
+\end{definition}
+
+A Bayes-optimal rule is exactly an expected-utility maximizer: it has a probability distribution over the world ($\pi$), a value attached to outcomes (the negative of $L$), and it picks the action that optimizes the probability-weighted value. The content of the theorem is that this familiar object and the bare notion of admissibility coincide.
+
+\subsection{The theorem}
+
+One direction is easy and worth seeing first, because it explains why a non-dogmatic prior is the right hypothesis.
+
+\begin{theorem}[Bayes rules are admissible]
+\label{thm:cc-easy}
+When $\Theta$ and $A$ are finite, any decision rule that is Bayes-optimal with respect to a non-dogmatic prior $\pi$ is admissible.
+\end{theorem}
+
+\begin{proof}[Why this holds]
+Suppose $\delta$ minimizes $r(\pi, \cdot)$ for a prior $\pi$ that puts positive weight on every state, and suppose for contradiction that $\delta^*$ Pareto-improves on $\delta$. Then $R(\theta, \delta) \ge R(\theta, \delta^*)$ for all $\theta$ and strictly for some $\theta_0$. Because $\pi(\theta_0) > 0$, averaging these inequalities with weights $\pi$ gives $r(\pi, \delta) > r(\pi, \delta^*)$, contradicting the optimality of $\delta$. So no Pareto improvement exists, and $\delta$ is admissible. The non-dogmatism is exactly what lets the strict improvement in one world survive the averaging; a prior that assigned $\theta_0$ probability zero could ignore an improvement there.
+\end{proof}
+
+The substantial direction is the converse, the complete class theorem proper, which says the Bayesian rules are not merely \emph{a} class of admissible rules but \emph{the} class: every admissible rule is Bayesian for some prior.
+
+\begin{theorem}[Complete class theorem]
+\label{thm:cc}
+When $\Theta$ and $A$ are finite, a decision rule $\delta$ is admissible if and only if it is Bayes-optimal with respect to some prior $\pi$ over $\Theta$.
+\end{theorem}
+
+\begin{proof}[Geometry of the proof]
+Represent each available rule by its risk profile, the point $\big(R(\theta, \delta)\big)_{\theta} \in \R^{|\Theta|}$. Allowing the agent to randomize among rules (choose rule $i$ with some probability, a mixed strategy) means the set $\mathcal{R} \subseteq \R^{|\Theta|}$ of achievable risk profiles is \emph{convex}, since mixing rules mixes their risk profiles; with finitely many pure rules it is also \emph{closed} and bounded. Lower is better in every coordinate, so the agent wants to be on the lower-left frontier of $\mathcal{R}$.
+
+Let $\delta$ be admissible, with risk profile $s = \big(R(\theta, \delta)\big)_\theta$. Admissibility says no point of $\mathcal{R}$ lies weakly below $s$ in every coordinate and strictly below in some coordinate. Equivalently, the open ``negative quadrant'' hanging below and to the left of $s$, the set $\{ y : y_\theta < s_\theta \text{ for all } \theta \}$ (more precisely the set of points that would Pareto-improve $s$), is disjoint from the convex set $\mathcal{R}$. Two disjoint convex sets can be separated by a hyperplane (the separating hyperplane theorem). The separating hyperplane has a normal vector $\pi = (\pi_\theta)_\theta$, and because the quadrant we separated from points toward decreasing values in every coordinate, the normal can be taken to have all nonnegative components. Normalize it to sum to one, and it is a probability distribution over $\Theta$. The separation says exactly that $s$ minimizes $\sum_\theta \pi_\theta R(\theta, \cdot)$ over $\mathcal{R}$, that is, $\delta$ is Bayes-optimal for the prior $\pi$. Combined with Theorem~\ref{thm:cc-easy}, admissibility and Bayes-optimality coincide.
+\end{proof}
+
+A two-state picture makes the geometry tangible. With $\Theta = \{\theta_1, \theta_2\}$, each rule is a point in the plane with coordinates (risk in world 1, risk in world 2). The dominated rules sit up and to the right, in the interior or on the wrong side; the admissible rules form the lower-left boundary of the convex hull. A prior $\pi = (\pi_1, \pi_2)$ is a direction, and the Bayes-optimal rule for that prior is the boundary point you reach by sliding a line of slope $-\pi_1/\pi_2$ as far down-left as it will go. Sweeping the prior from $(1,0)$ to $(0,1)$ sweeps the contact point along the entire lower-left frontier, and every admissible point is hit by exactly the prior whose line is tangent there. The Bayesian rules are not a special corner of good behavior; they \emph{are} the frontier.
+
+\subsection{What was assumed, and what was derived}
+
+The reason this theorem is a \emph{foundation} and not merely a characterization is the accounting of inputs and outputs. What went in: finite $\Theta$ and $A$, a per-state preference ordering of outcomes (the loss $L$), and the single rationality principle of admissibility (do not be Pareto-dominated). What came out, with none of it assumed in advance: a probability distribution $\pi$ over states, and the conclusion that the agent's behavior maximizes expected utility under that distribution. As Demski puts it, a genuine decision-theoretic foundation ``should not assume that an agent has any probabilistic beliefs to start out,'' and here the beliefs are manufactured from the geometry of the risk set rather than stipulated. Probabilities and utilities arrive together, two faces of the separating hyperplane, exactly as the intuitive arguments hinted but could not cleanly demonstrate.
+
+Several apparent assumptions can be removed, which is reassuring about what is essential. The likelihood $F$ is not really needed: a deterministic observation model is the special case where $F$ is always $0$ or $1$, and observation noise can always be absorbed by refining the state space (let a world specify both the true temperature and the reading on a faulty thermometer). The randomization used to make $\mathcal{R}$ convex need not be assumed to be probabilistic from the outside; one can fold an explicit coin into the worlds and recover mixed strategies without presupposing the notion of probability the theorem is supposed to produce. And the von Neumann--Morgenstern independence axiom, usually posited, here \emph{becomes a theorem}: any violation of independence shows up as a Pareto improvement, so admissibility entails it rather than assuming it. Continuity can be relaxed as well, at the cost of allowing exotic (surreal-valued) utilities, via additive-representation results. The finiteness of $\Theta$ and $A$ is the assumption that does real work and is hardest to shed: with unbounded sets the geometry gets genuinely more delicate and the justification for Bayesianism weakens, which Demski flags as ``potentially quite interesting'' rather than settled.
+
+\subsection{A bonus: the same theorem is an argument for utilitarianism}
+
+One pleasant surprise is that the complete class theorem reads twice. Reinterpret the index $\theta$ not as a possible state of one agent's world but as a \emph{person} in a population, let $A$ be the collective actions available, and let $R(\theta, \delta)$ be how badly off person $\theta$ is under collective policy $\delta$. Then admissibility becomes Pareto-efficiency across people (do not pick a policy that another policy beats for someone and ties for everyone), and the derived weights $\pi$ become each person's weight in the social aggregate. The theorem now says: every Pareto-efficient social policy maximizes some positive linear combination of the individuals' cardinal utilities. This is essentially Harsanyi's aggregation theorem, an argument that a Pareto-respecting social planner must act like a weighted utilitarian, obtained for free from the same geometry. (A caveat raised in discussion, due to Jessica Taylor, is that the theorem rationalizes a Pareto-efficient outcome after the fact as \emph{some} weighted sum, rather than showing that running the weighted-sum procedure is what produced it; the representational reading bites here exactly as it does in the single-agent case.)
+
+\section{What the theorems do and do not say}
+\label{sec:scope}
+
+It is worth ending by stating precisely what has been established, because the coherence results are as often overclaimed as underused.
+
+They are \emph{representational}, not \emph{mechanistic}. The complete class theorem says that any admissible agent \emph{can be described from the outside} as maximizing expected utility under some prior. It does not say the agent contains a prior, a utility function, or an expectation-maximizing loop. A thermostat, a trained network, and an idealized Bayesian planner might all be admissible in a given decision problem and so all be summarizable by the same $(\pi, U)$, while differing utterly in their internals. This is the precise sense of the word ``behave'' we flagged at the start. The theorems pin down the shadow an effective agent casts on its behavior; they are silent about the object casting it. That silence is not a defect, it is the source of the robustness (the result holds whatever the internals are), but it means coherence arguments cannot, by themselves, tell you how to build a safe agent or read one's goals off its weights. They tell you what target the outside behavior is converging toward, and thereby what a more capable system will tend to look like from where we stand: more like a clean expected utility maximizer, with fewer exploitable inconsistencies, as the optimization pressure on it increases.
+
+They rest on a measuring stick we cannot yet locate in general. Every dominance notion, including the loss function $L$ that the complete class theorem treats as primitive, presupposes a currency in which being dominated is bad. Section~\ref{sec:measuringstick} is the reminder that for an arbitrary physical system we do not know how to identify that currency without smuggling in the agency we were trying to detect. Solving the measuring-stick problem (finding the resources of a world from its physics alone) would upgrade these theorems from a description we apply when we already know what counts as a resource into a test we could run on raw physics to find the embedded agents. That is squarely the project of descriptive agent foundations, and the handoff is clean: the coherence theorems supply the representational target (what selected-for agents should look like from outside), and the descriptive and thermodynamic programs ask what physical pressures actually produce that shape and what resource actually plays the role of money.
+
+They assume an idealization that real agents violate, and the violations are the research. Perfect coherence is uncomputable, so every real agent is incoherent somewhere; an agent that is logically uncertain (does not know all the consequences of its own beliefs) cannot even assign the correct probabilities the Dutch book demands, which is precisely the crack that logical induction is built to fill. And the implicit assumptions behind the cleanest theorems (complete, static, path-independent preferences) fail for humans and for trained systems, which is exactly where the better, more mechanistic selection theorems are needed. The coherence theorems are best read not as the final word on agency but as its sturdiest first foothold: the thing that is forced, structurally, about effective goal-pursuit, stated so cleanly that we can see exactly which of its assumptions to attack next.
+
+\section*{Sources}
+\addcontentsline{toc}{section}{Sources}
+
+\begin{itemize}[leftmargin=1.5em]
+\item Eliezer Yudkowsky, \emph{Coherent decisions imply consistent utilities} (sections: Introduction; Why not circular preferences?; Probabilities and expected utilities through Conditional probability; Conclusion). \url{https://www.lesswrong.com/s/SgomvxZ3cJWy2SBCu/p/RQpNHSiWaXTvDxt6R}
+\item John Wentworth, \emph{The measuring stick of utility problem}. \url{https://www.lesswrong.com/posts/73pTioGZKNcfQmvGF/the-measuring-stick-of-utility-problem}
+\item Abram Demski, \emph{Complete Class: Consequentialist Foundations}. \url{https://www.lesswrong.com/posts/sZuw6SGfmZHvcAAEP/complete-class-consequentialist-foundations}
+\item Background and onward connections: \emph{Embedded Agency} (Demski and Garrabrant); the Dutch book and admissibility/complete-class references collected in the Iliad Intensive pre-reading.
+\end{itemize}
+
+\end{document}
