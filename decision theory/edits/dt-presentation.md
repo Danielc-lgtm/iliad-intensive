@@ -6,13 +6,7 @@ Title: **Decision Theory**
 Author: Daniel C
 Date: (placeholder)
 
-
-
-
-
 Rough sketch (cover all following points, reverse engineer what I meant, heavily search online to gather full background context, write it in a way for maximal self-containedness, extreme clarity, and well motivated motivations)
-
-
 
 Motivation for decision theory:
 
@@ -23,8 +17,6 @@ Motivation for decision theory:
 - Reflective stability: We want to study safety properties that are reflective stable (because we need safety properties to remain invariant under self-modification, check agency presentation slides), decision theory is a natural, simple setting to study these questions (Would an agent with decision theory A want to "self-modify" to decision theory B, or construct a successor with decision theory B)
 
 - Multi-agent dynamics: Decision theory problems often get tricky when it involves strategic interactions/mutual modelling between different agents.  We want to find the sort of decision theory so that we can design agents that can successfully cooperate with other superintelligent agents and avoid conflict outcomes, without being exploitable
-
-
 
 Why is decision theory hard:
 
@@ -44,8 +36,6 @@ Evidential decision theory:
 
 - Explain the problem of spurious counterfactuals, use "Decision_Theory_CDT_to_UDT_1_1 (1)" from sources as inspiration
 
-
-
 Functional decision theory and the updateless decision theory:
 
 - For this,  combine the structure between the decision theory slides and Decision_Theory_CDT_to_UDT_1_1 (1). Make use of paradoxes. For UDT make sure you emphasize the aspects that are emphasized in the decision theory slides
@@ -54,17 +44,11 @@ Functional decision theory and the updateless decision theory:
 
 (In general, just augment the slides with the decision_theory_cdt_to_udt doc in an appropriate way)
 
-
-
 Problems with updateless decision theory:
 
 - UDT would sacrifice utility in the actual world in exchange for utility in hypothetical worlds that doesn't exist (do a deep search to understand what I mean, explain in a clarifying way)
 
 - Logical updatelessness (search online to understand what it is)
-
-
-
-
 
 5 and 10 problem
 
@@ -75,10 +59,6 @@ Problems with updateless decision theory:
 - Have a self-contained introduction to Lob's theorem as well
 
 - [Embedded Agency (full-text version) — LessWrong](https://www.lesswrong.com/s/Rm6oQRJJmhGCcLvxh/p/i3BTagvt3HbPMx6PN)
-
-
-
-
 
 Formalization of decision theory problem:
 
