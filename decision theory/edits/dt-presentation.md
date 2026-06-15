@@ -1,83 +1,216 @@
-# Decision Theory Presentation
-
-(Title page only -- content to be added.)
+# Decision Theory
 
 Title: **Decision Theory**
 Author: Daniel C
 Date: (placeholder)
 
-Rough sketch (cover all following points, reverse engineer what I meant, heavily search online to gather full background context, write it in a way for maximal self-containedness, extreme clarity, and well motivated motivations)
+Markdown mirror of `projects/dt-presentation/main.tex` (26 slides). Add `<div>...</div>`
+edit markers after any line to request a change.
 
-Motivation for decision theory:
+---
 
-- Modelling and reason about how superintelligent agents will behave even if we don't understand details of its architectures
+## Title page
 
-- Implementation: Guide implementation for how to make decisions in an optimal way (Problem decomposition: Figure out a specification of a goal that we want to optimize, then optimize for it correctly. Decision theory is about the second part, without the second part the specification would not be sufficient for alignment, as the AI might optimize it in a wrong way)
+## Roadmap
 
-- Reflective stability: We want to study safety properties that are reflective stable (because we need safety properties to remain invariant under self-modification, check agency presentation slides), decision theory is a natural, simple setting to study these questions (Would an agent with decision theory A want to "self-modify" to decision theory B, or construct a successor with decision theory B)
+- **Block: From classical choice to embedded counterfactuals**
+  - Why decision theory matters for AI safety (modelling, specification, reflective stability, multi-agent conflict)
+  - Why it is hard: optimisation is solved for *dualistic* agents but not for *embedded* ones, where the agent must *construct* counterfactuals
+  - The candidates: CDT, EDT, FDT, UDT 1.0/1.1 -- each a different recipe for the counterfactual
+  - The hard core: problems with UDT, the 5-and-10 problem, logical counterfactuals, Löb's theorem
+  - A unifying goal: formalise decision problems as programs and ask which theory is *optimal* across all "fair" problems
 
-- Multi-agent dynamics: Decision theory problems often get tricky when it involves strategic interactions/mutual modelling between different agents.  We want to find the sort of decision theory so that we can design agents that can successfully cooperate with other superintelligent agents and avoid conflict outcomes, without being exploitable
+# Section: Why decision theory?
 
-Why is decision theory hard:
+## Why study decision theory? (for AI safety)
 
-- Base this part on the decision theory slides in sources, the bit about how decision theory in dualistic case is easy, but embedded is hard because you have to construct counterfactuals. But improve this for more well-motivatedness and clarity
+- **Block: Four reasons**
+  - Architecture-independent modelling: reason about behaviour without knowing the build
+  - Implementation / specification--optimisation split: decision theory is part (2); a perfect spec is not sufficient if counterfactuals are constructed wrongly
+  - Reflective stability: would an agent with theory A self-modify into theory B? (link to Agent Foundations deck)
+  - Multi-agent dynamics: cooperate with other superintelligences and avoid conflict, without being exploitable
 
-- For "dualistic case is easy" part, explain and link that the "dualistic case" is basically the existing framework on EU maximization, complete class theorems etc, which have good applications in economics/RL. But we want a theory that works 
+# Section: Why is decision theory hard?
 
-Causal decision theory
+## The easy case: dualistic agents
 
-- Also follow the decision theory slides. But with the following improvements: More self contained introduction to bayesian networks and interventions. Afterwards mention that internvention is contradictory with embeddedness or physics (sever connection with upstream variables). In particular, heavily read and incorporate the arrow_of_time_presentation from agent foundations/sources to explain the conflict between causal decision theory and physics
+- **Block: When the agent is cleanly separated from the world**
+  - Clean input/output channels; agent "larger than" and "outside" the world
+  - Action is a free variable; optimisation solved: `a* = argmax_a E[U | do(A=a)]`
+  - Mature framework: vNM/Savage axioms, Bayesian updating, complete-class theorems
+  - Underpins economics, statistics, RL
 
-- Make good diagrams
+## The hard case: embedded agents
 
-Evidential decision theory:
+- **Block: When the agent is a part of the world it reasons about**
+  - Agent is a piece of the world; can be copied, predicted, simulated, read
+  - "Which action I take" is just another fact; no ready-made "what if I acted differently"
+  - The central difficulty: constructing counterfactuals
+  - EDT (condition), CDT (intervene), FDT/UDT (logical output of the decision procedure)
 
-- Formally define evidential decision theory as conditioning
+# Section: Causal decision theory
 
-- Explain the problem of spurious counterfactuals, use "Decision_Theory_CDT_to_UDT_1_1 (1)" from sources as inspiration
+## A 60-second primer: Bayesian networks
 
-Functional decision theory and the updateless decision theory:
+- **Block: Encoding "what depends on what"**
+  - DAG; joint factorises as product of `P(X_i | Pa(X_i))`
+  - Each variable independent of non-descendants given its parents
+  - [image: bayesnet.png]
 
-- For this,  combine the structure between the decision theory slides and Decision_Theory_CDT_to_UDT_1_1 (1). Make use of paradoxes. For UDT make sure you emphasize the aspects that are emphasized in the decision theory slides
+## Causal decision theory: seeing vs. doing
 
-- For UDT make sure that you make diagrams that emphasize the idea of different branches of possibility that correspond to different observations, and you want to "coordinate" across all those different branches. Doing a kind of "global optimization" instead of "local optimization"
+- **Block: The do-operator**
+  - Observing X=x (evidence) vs doing X=x (intervention)
+  - `do(X=x)`: sever arrows into X, fix X=x, propagate; adjustment over parents `Pa(X)`
+  - Barometer/storm confounder example
+  - CDT: `a* = argmax_a E[U | do(A=a)]`
 
-(In general, just augment the slides with the decision_theory_cdt_to_udt doc in an appropriate way)
+## CDT on Newcomb's problem
 
-Problems with updateless decision theory:
+- **Block: Two-boxing, and why** (+ causal-graph diagram: disposition S -> action A, prediction P; A,P -> U; CDT cuts S->A)
+  - Newcomb setup; do(A) severs action from disposition, box contents fixed, two-boxing dominates
+  - Predictably: two-boxers get $1,000, one-boxers get $1,000,000
+  - CDT wins the battle, loses the war; discards the prediction's dependence on the agent
 
-- UDT would sacrifice utility in the actual world in exchange for utility in hypothetical worlds that doesn't exist (do a deep search to understand what I mean, explain in a clarifying way)
+## CDT vs. physics: the intervention is a fiction
 
-- Logical updatelessness (search online to understand what it is)
+- **Block: Does CDT really "reflect physical reality"? (following Ebtekar & Hutter)**
+  - do(A) holds the past fixed and magically sets the action -- what licenses cutting it from its causes?
+  - In deterministic, time-reversible physics, the action has antecedents; a predictor reading them is ordinary physics
+  - Severing incoming arrows contradicts embeddedness; throws away real correlations
+  - Pressures moving the counterfactual onto the policy/computation
 
-5 and 10 problem
+# Section: Evidential decision theory
 
-- Explain the 5 and 10 problem in an extremely clarifying but self-contained way, emphasize the problem of logical counterfactuals: The agent has access to its own source code and can prove things about its own source code, so it can prove things about its own actions, so it does not have a well defined notion of "what would happen if I had taken a different action"
+## Evidential decision theory: condition, don't intervene
 
-- Link back to embedded agency: The agent's action is just another fact about the world
+- **Block: EDT as conditioning**
+  - `a* = argmax_a E[U | A=a]`; evaluate by the news the action brings
+  - Newcomb: one-boxing is strong evidence the box is full; EDT one-boxes and gets the million
+  - Contrast: `E[U | do(A=a)]` (CDT) vs `E[U | A=a]` (EDT)
 
-- Have a self-contained introduction to Lob's theorem as well
+## EDT mistakes evidence for control
 
-- [Embedded Agency (full-text version) — LessWrong](https://www.lesswrong.com/s/Rm6oQRJJmhGCcLvxh/p/i3BTagvt3HbPMx6PN)
+- **Block: The smoking lesion**
+  - Lesion causes cancer and the urge to smoke; smoking harmless, benefit b
+  - EDT abstains (smoking is bad news) though abstaining does not reduce cancer: symptom vs lever
+  - Scorecard: CDT loses Newcomb, EDT loses smoking lesion; missing a third kind of dependence
 
-Formalization of decision theory problem:
+## Spurious counterfactuals: EDT breaks for self-aware agents
 
-- A framework on formalizing and judging decision theory. (Use moderate formalism to make this more precise), use diagrams appropriately
+- **Block: Conditioning on a probability-zero action**
+  - A self-aware agent can predict its own action; the un-taken action has P=0
+  - `E[U | A=a]` becomes 0/0 -- undefined; un-taken action can be assigned any value (spurious counterfactual)
+  - Foreshadows the 5-and-10 problem and the need for logical dependence
 
-- Both agents and the world are represented as programs, with the following properties:
-  
-  - Agent has access to the world's source code as well as its own source code, returns an action
-  
-  - The world can make function calls on the agent (where we think of agent as a function from some input -> Action) and can search for proofs about the agent's input output behavior, return a utility
-  
-  - Fairness (search for what fairness means in decision theory): We don't feed the agent's source code to the world directly because we don't want worlds that are "unfair" in the sense of "if the agent's source code is written in python, then punish the agent". The agent should only be judged on its input output behavior
+# Section: Functional & updateless decision theory
 
-- We would like to design an agent that performs well (the optimal mapping to actions such that utility (returned by the world) is high for almost all worlds)
+## Functional decision theory: choose the algorithm's output
 
-- What the agent has to account for:
-  
-  - Coordinate across different function calls: If the world does multiple function calls on the agent (basically testing "what would the agent do in some counterfactual situation?"), then the agent has to discover that, and make sure that the counterfactual behavior is "coordinated" to ensure optimal utility
-  
-  - Subjunctive dependence: Suppose that the world calls a subroutine A where the subroutine A is isomorphic to the agent itself (e.g. same algorithm with a different implementaiton). Per functional decision theory the agent should treat its own action as if it is also controlling the output of subroutine A (since subroutine is essentially a copy). So the agent has to discover that the world ccontains something which is isomorphic to itself
-  
-  - Here is a description I wrote, use it to improve motivation: Many of the central puzzles in decision theory — Newcomb's problem, counterfactual mugging, the five-and-ten problem, open-source game theory — share a common structure: the agent and the environment are both programs that may inspect each other's source code, simulate each other's input-output behaviour, or contain subroutines that are algorithmically isomorphic to one another. Yet these problems are typically presented as standalone thought experiments, and the existing decision theories (CDT, EDT, FDT, UDT) are evaluated by checking their prescriptions case by case rather than against a unified optimality criterion over a well-defined problem class. The substantive question is whether one can formalise a class of computational environments rich enough to encompass all of these problems simultaneously, together with a criterion of optimality against which any candidate decision theory can be measured. The formalism would need to capture at least three features: fairness (the environment's payoffs depend only on the agent's policy or input-output behaviour, not on implementation details unrelated to its outputs), counterfactual querying (the environment may call the agent as a subroutine under different observations to determine its counterfactual actions, so the agent must coordinate across these calls), and subjunctive dependence (the environment may contain a subroutine whose algorithm is isomorphic to the agent's own, so the agent must recognise this and treat its decision as controlling the subroutine's output as well). A concrete starting point would be to define such a problem class, prove that the known decision theories differ in their performance on it, and determine whether any of them (or a modification) is optimal across all fair problems in the class.
+- **Block: Identify with the computation, not the body**
+  - You are an implementation of a decision computation; predictors/copies are other implementations
+  - FDT counterfactual: "this algorithm, on this input, outputs a"; everything logically downstream changes
+  - Newcomb (one-box, right reason) and smoking lesion (smoke) both handled correctly
+  - Slogan: physically different (CDT) / evidence (EDT) / decision computation different (FDT)
+
+## Twin Prisoner's Dilemma & subjunctive dependence
+
+- **Block: Same function, two bodies** (+ diagram: logical fact -> my action, twin's action)
+  - Twin PD; CDT both defect ($1 each); FDT both cooperate ($3 each)
+  - Subjunctive dependence: two systems depend on one logical fact; FDT controls all instances at once
+
+## Counterfactual mugging: the updateless move
+
+- **Block: Paying in a branch you know you're not rewarded in** (+ tree diagram: coin -> tails reward / heads cost, one policy spans both)
+  - Setup; updateful refuses ($100 cost only); ex-ante policy "pay if asked" worth (R-c)/2 > 0
+  - UDT pays: evaluate against the prior, don't delete the branch your policy controls
+  - Updatelessness is not ignorance; reflective stability (nothing to self-modify)
+
+## UDT 1.1: optimise the whole policy, not one action
+
+- **Block: When local outputs must be coordinated** (+ diagram: one global policy -> obs 1 / obs 2, coordinated)
+  - Copied-agent anti-coordination; local "if Alg(1)=A then Alg(2)?" is the wrong type
+  - UDT 1.1 (Wei Dai): choose the whole policy `pi*`, then apply to the actual observation
+  - Global optimisation over branches, not local optimisation
+
+## The three shifts in "what am I choosing?"
+
+- **Block: CDT/EDT -> FDT -> UDT 1.0 -> UDT 1.1 (after Kosoy's formalism)**
+  - Table: rule / object chosen / update status / dependence used
+  - Shift 1 (FDT): physical act -> algorithm output
+  - Shift 2 (UDT 1.0): posterior -> prior
+  - Shift 3 (UDT 1.1): single output -> whole policy
+
+# Section: Problems with UDT
+
+## Problem 1: paying for worlds that don't exist
+
+- **Block: Ex-ante optimality is only as good as the prior**
+  - UDT burns real utility in the actual branch (pays $100 in heads for a tails-world it knows didn't happen)
+  - Bad when the prior misjudges which worlds are possible: a real, exploitable tax for fake benefits
+  - Is "best from the prior" the right notion of rational?
+
+## Problem 2: logical updatelessness
+
+- **Block: Which prior, when some of your uncertainty is mathematical?**
+  - Uncertainty is also logical (own source code, digits of pi, halting)
+  - "Don't update" is clear empirically, unclear logically: thinking longer = learning = looks like updating
+  - Logical updatelessness; no coherent "logical prior"; open problem, needs logical uncertainty
+
+# Section: The 5-and-10 problem
+
+## The 5-and-10 problem
+
+- **Block: The simplest decision, made impossible by self-knowledge**
+  - Take $5 or $10; obviously $10
+  - Embedded agent can prove facts about its own action
+  - Naive proof-based agent: prove "(A=5)=>U=x", "(A=10)=>U=y", take higher
+  - Trap: un-taken action makes "(A=10)=>U=0" vacuously true -- a spurious counterfactual -> takes $5
+
+## A self-contained look at Löb's theorem
+
+- **Block: When "provable" is allowed to behave like "true"**
+  - Box P = "P is provable"; distinguish the sentence Box P from the metafact "the system proves P"
+  - Löb: if |- (Box P -> P) then |- P; equivalently |- Box(Box P -> P) -> Box P
+  - Curry-style intuition
+  - Special case P = false: a consistent system cannot prove its own consistency (Gödel II)
+
+## Why Löb makes the spurious proof available
+
+- **Block: The self-fulfilling proof**
+  - S = ((A=10) => U=0); the agent built so proving S leads it to take $5
+  - Box S -> S provable, so by Löb |- S; agent takes $5
+  - A naive proof search is not safe; logical counterfactuals (counterpossibles) remain open
+  - Embedded-agency moral; the same Löbian obstacle hits successor-trust / reflective stability
+
+# Section: A formal criterion for decision theories
+
+## Why we want a formal optimality criterion
+
+- **Block: Beyond case-by-case scoring**
+  - Newcomb, mugging, 5-and-10, twin PD, open-source games share structure (programs inspecting/simulating each other)
+  - Theories judged case-by-case rather than against one standard
+  - Substantive question: one class of environments + one optimality criterion
+
+## Agents and worlds as programs
+
+- **Block: The setup** (+ diagram: Agent <-> World, world queries agent and proves about it)
+  - Agent: program with own + world source code -> action
+  - World: program that may call the agent on many inputs and search for proofs about it -> utility
+  - Goal: high utility across (almost) all worlds
+
+## Fairness
+
+- **Block: Judging the agent only on its behaviour**
+  - Without it, worlds could punish source code; criterion vacuous
+  - Fairness: world depends on the agent only through input/output behaviour (its policy)
+  - Newcomb, smoking lesion, mugging, twin PD, open-source PD are all fair
+
+## What a good agent must discover
+
+- **Block: Two demands -- which are exactly FDT/UDT turned into a spec**
+  - Coordinate across function calls (= UDT 1.1's policy view)
+  - Subjunctive dependence: detect a subroutine isomorphic to itself (= FDT)
+- **Block: The open problem (and the bridge ahead)**
+  - Define the class, define optimality, show theories differ, ask whether any is optimal
+  - Caveats: logical counterfactuals, logical uncertainty, what counts as a policy, multi-agent fairness/bargaining -> Deck II
