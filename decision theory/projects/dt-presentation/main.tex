@@ -27,6 +27,7 @@
 			\item \textbf{Why decision theory matters for AI safety} (modelling, specification, reflective stability, multi-agent conflict)
 			\item \textbf{Why it is hard:} optimisation is solved for \emph{dualistic} agents but not for \emph{embedded} ones, where the agent must \emph{construct} counterfactuals
 			\item \textbf{The candidates:} causal (CDT), evidential (EDT), functional/logical (FDT), updateless (UDT 1.0, UDT 1.1) -- each is a different recipe for the counterfactual
+			\item \textbf{A unifying lens:} CDT vs EDT as two readings of an action in sequential (AIXI-style) prediction -- an \emph{intervention} (chronological semimeasure) vs \emph{evidence} (joint prediction)
 			\item \textbf{The hard core:} problems with UDT, the 5-and-10 problem, logical counterfactuals and L\"ob's theorem
 			\item \textbf{A unifying goal:} formalise decision problems as programs and ask which decision theory is \emph{optimal} across all ``fair'' problems
 		\end{itemize}
@@ -243,6 +244,62 @@
 			\item EDT's recipe $\mathbb{E}[U\mid A=a]$ is then $\tfrac{0}{0}$ -- \textbf{undefined}. You may assign the unchosen action \emph{any} value you like: a \textbf{spurious counterfactual}.
 			\item So conditioning gives \emph{no constraint} on counterfactual actions you are certain you won't take -- exactly the cases decision-making turns on.
 			\item (Foreshadow: in proof-theoretic form this same pathology becomes the \textbf{5-and-10 problem}, and the fix needs a notion of \emph{logical} dependence.)
+		\end{itemize}
+		}
+	\end{block}
+}
+
+%==================================================================
+\section{CDT and EDT as sequential prediction}
+%==================================================================
+
+\frame{\frametitle{Prerequisites: the sequential prediction setting}
+	\begin{block}{Histories, environments as chronological semimeasures, and beliefs}
+		{\tiny
+		\begin{itemize}
+			\item Interaction: at each step $t$ the agent emits an action $a_t\in\mathcal{A}$ and receives a percept $e_t\in\mathcal{E}$ (e.g.\ $e_t=(o_t,r_t)$). The history is $h_{<t}=a_1 e_1\cdots a_{t-1}e_{t-1}$.
+			\item An \textbf{environment} is a \textbf{chronological semimeasure} $\rho$: it gives the probability of percepts \emph{given} actions,
+			$$\rho(e_{1:t}\,\|\,a_{1:t})\in[0,1],$$
+			where the double bar $\|$ marks the actions as \textbf{conditioned-on inputs, never predicted}.
+			\begin{itemize}\scriptsize
+				\item[--] \emph{chronological:} $e_{1:t}$ may depend on $a_{1:t}$ but not on \emph{future} actions;
+				\item[--] \emph{semimeasure:} $\sum_{e_t}\rho(e_{1:t}\|a_{1:t})\le\rho(e_{<t}\|a_{<t})$ (probability may leak; a measure has equality).
+			\end{itemize}
+			\item The agent's belief is a \textbf{Bayesian mixture} over a class $\mathcal{M}$ of environments, $\;\xi(e_{<t}\|a_{<t})=\sum_{\nu\in\mathcal{M}}w_\nu\,\nu(e_{<t}\|a_{<t})$ (AIXI: $\mathcal{M}=$ lower-semicomputable $\nu$, $w_\nu=2^{-K(\nu)}$).
+			\item Decision-theoretic crux: \textbf{when the agent chooses $a_t$, does that choice update its belief about which environment it is in?} The answer separates CDT from EDT.
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Chronological semimeasure $=$ CDT}
+	\begin{block}{The action is an intervention, not evidence}
+		{\tiny
+		\begin{itemize}
+			\item In a chronological semimeasure the action appears \textbf{only to the right of $\|$}: $\rho$ assigns \emph{no} probability to actions, so ``the action as evidence about $\rho$'' is not even definable.
+			\item The posterior over environments updates on \textbf{percepts only}, holding the actions fixed as given:
+			$$w_\nu(h_{<t}) \;=\; w_\nu\,\frac{\nu(e_{<t}\,\|\,a_{<t})}{\xi(e_{<t}\,\|\,a_{<t})}.$$
+			Choosing $a_t$ does \textbf{not} reweight $w_\nu$: \emph{you do not update ``which environment am I in'' by deciding.}
+			\item So the agent evaluates an action by \emph{intervening} and propagating through a \emph{fixed} which-world belief:
+			$$a_t \;=\; \arg\max_{a}\ \sum_{e_t}\xi(e_t\,\|\,h_{<t}\,a)\,\big[r_t+\cdots\big] \;=\; \arg\max_a \mathbb{E}_\xi\big[\,U \,\|\, \mathrm{do}(a)\,\big].$$
+			\item This is exactly \textbf{CDT}: the chronological bar $\|$ \emph{is} the do-operator, lifted to whole histories. (Newcomb: such an agent two-boxes -- the prediction is a fixed past percept, untouched by $\mathrm{do}(a)$.)
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Joint prediction $=$ EDT}
+	\begin{block}{Actions predicted exactly like observations}
+		{\tiny
+		\begin{itemize}
+			\item Now model the \emph{entire} history $h=a_1 e_1 a_2 e_2\cdots$ as \textbf{one stream to predict} over $(\mathcal{A}\times\mathcal{E})^{*}$ -- actions get probabilities too. Take the generative model to be a mixture over (world $\nu$, policy $\pi$) pairs:
+			$$P(h_{1:t}) \;=\; \sum_{\nu,\pi} w_{\nu,\pi}\prod_{k=1}^{t}\pi(a_k\mid h_{<k})\,\nu(e_k\mid h_{<k}a_k).$$
+			(Solomonoff's $M(h)=\sum_{p:U(p)=h*}2^{-\ell(p)}$ is the universal such joint predictor.)
+			\item Choosing/observing $a_t$ is now ordinary \textbf{evidence}: Bayes updates the joint posterior over \emph{both} the policy and the world,
+			$$w_{\nu,\pi}(h_{<t}\,a_t)\ \propto\ w_{\nu,\pi}\,\Big[\textstyle\prod_{k<t}\cdots\Big]\,\pi(a_t\mid h_{<t}).$$
+			The factor $\pi(a_t\mid h_{<t})$ tells you ``\textbf{what policy am I running}''; and any world $\nu$ \emph{correlated with the action in the prior} $w_{\nu,\pi}$ is reweighted -- ``\textbf{what world am I in}''.
+			\item So the agent evaluates an action by \emph{conditioning}: $\;a_t = \arg\max_a \mathbb{E}_P[\,U \mid A_t{=}a,\ h_{<t}\,]$.
+			\item This is exactly \textbf{EDT} -- and it reproduces the smoking lesion: the prior correlates the lesion (a world-feature) with the smoking disposition (a policy-feature), so conditioning on ``I smoke'' upweights lesion-worlds and the act looks like bad news, though it is no lever.
 		\end{itemize}
 		}
 	\end{block}

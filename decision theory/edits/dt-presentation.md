@@ -4,7 +4,7 @@ Title: **Decision Theory**
 Author: Daniel C
 Date: (placeholder)
 
-Markdown mirror of `projects/dt-presentation/main.tex` (25 slides). Add `<div>...</div>`
+Markdown mirror of `projects/dt-presentation/main.tex` (28 slides). Add `<div>...</div>`
 edit markers after any line to request a change.
 
 ---
@@ -17,6 +17,7 @@ edit markers after any line to request a change.
   - Why decision theory matters for AI safety (modelling, specification, reflective stability, multi-agent conflict)
   - Why it is hard: optimisation is solved for *dualistic* agents but not for *embedded* ones
   - The candidates: CDT, EDT, FDT, UDT 1.0/1.1
+  - A unifying lens: CDT vs EDT as two readings of an action in sequential (AIXI-style) prediction — intervention (chronological semimeasure) vs evidence (joint prediction)
   - The hard core: problems with UDT, the 5-and-10 problem, logical counterfactuals, Löb's theorem
   - A unifying goal: formalise decision problems as programs and ask which theory is *optimal*
 
@@ -72,6 +73,33 @@ edit markers after any line to request a change.
 ## Spurious counterfactuals: EDT breaks for self-aware agents
 
 - **Block: Conditioning on a probability-zero action** — self-predicting agent gives P(A=a)=0; `E[U|A=a]` is 0/0; spurious counterfactual; foreshadows 5-and-10 / logical dependence
+
+# Section: CDT and EDT as sequential prediction
+
+## Prerequisites: the sequential prediction setting
+
+- **Block: Histories, environments as chronological semimeasures, and beliefs**
+  - interaction: actions a_t in A, percepts e_t=(o_t,r_t); history h_{<t}
+  - environment = chronological semimeasure `rho(e_{1:t} || a_{1:t})`; `||` marks actions as conditioned-on inputs, never predicted
+  - chronological (no dependence on future actions); semimeasure `sum_{e_t} rho(e_{1:t}||a_{1:t}) <= rho(e_{<t}||a_{<t})`
+  - Bayesian mixture `xi = sum_nu w_nu nu` (AIXI: lower-semicomputable nu, w_nu=2^{-K(nu)})
+  - crux: does choosing a_t update the belief about which environment you're in? (separates CDT from EDT)
+
+## Chronological semimeasure = CDT
+
+- **Block: The action is an intervention, not evidence**
+  - action appears only to the right of `||`; rho assigns no probability to actions
+  - posterior updates on percepts only: `w_nu(h_{<t}) = w_nu nu(e_{<t}||a_{<t}) / xi(e_{<t}||a_{<t})`; choosing a_t does not reweight w_nu
+  - value by intervening through a fixed which-world belief: `a_t = argmax_a sum_{e_t} xi(e_t || h_{<t} a) [r_t + ...] = argmax_a E_xi[U || do(a)]`
+  - exactly CDT: the chronological bar `||` is the do-operator on histories; Newcomb -> two-box
+
+## Joint prediction = EDT
+
+- **Block: Actions predicted exactly like observations**
+  - model the whole history as one stream over (A x E)*; generative model = mixture over (world nu, policy pi): `P(h_{1:t}) = sum_{nu,pi} w_{nu,pi} prod_k pi(a_k|h_{<k}) nu(e_k|h_{<k}a_k)`; Solomonoff M is the universal joint predictor
+  - conditioning on a_t updates the joint posterior over both policy and world: `w_{nu,pi}(h_{<t}a_t) ∝ w_{nu,pi} [...] pi(a_t|h_{<t})`; pi-factor = "what policy am I", nu correlated-in-prior = "what world am I in"
+  - value by conditioning: `a_t = argmax_a E_P[U | A_t=a, h_{<t}]`
+  - exactly EDT; reproduces the smoking lesion (prior correlates lesion with smoking disposition)
 
 # Section: Functional & updateless decision theory
 
