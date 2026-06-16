@@ -310,17 +310,17 @@
 \section{Functional \& updateless decision theory}
 %==================================================================
 
-\frame{\frametitle{Functional decision theory: intervene on the function}
-	\begin{block}{The three rules side by side (Yudkowsky \& Soares 2017)}
+\frame{\frametitle{Functional decision theory: choose your function's output}
+	\begin{block}{``Which output of this very function would yield the best outcome?''}
 		{\tiny
 		\begin{itemize}
-			\item Write $V$ for the outcome's value, $\mathrm{Act}$ for the physical-action node, and $\mathrm{fdt}(P,G,x)$ for the \emph{logical node} representing the output of the agent's decision function on observation $x$:
-			$$\mathrm{EDT}(P,x)=\arg\max_a \mathbb{E}[V\mid \mathrm{Obs}{=}x,\ \mathrm{Act}{=}a],$$
-			$$\mathrm{CDT}(P,G,x)=\arg\max_a \mathbb{E}[V\mid \mathrm{do}(\mathrm{Act}{=}a),\ \mathrm{Obs}{=}x],$$
-			$$\boxed{\ \mathrm{FDT}(P,G,x)=\arg\max_a \mathbb{E}\big[V\mid \mathrm{do}\big(\mathrm{fdt}(P,G,x){=}a\big)\big]\ }$$
-			\item The only change from CDT is \emph{which node you intervene on}. CDT intervenes on the physical act -- Peirce's \textbf{token} (``\emph{my} action is $a$''). FDT intervenes on the \textbf{type} -- the abstract function -- so every predictor, copy, or simulation computing that same function updates with it.
-			\item \textbf{Newcomb:} setting $\mathrm{fdt}{=}$one-box also moves $\Omega$'s earlier prediction $\Rightarrow$ box full; FDT one-boxes. \textbf{Smoking lesion:} the lesion does not compute your decision, so $\mathrm{do}(\mathrm{fdt}{=}\text{smoke})$ leaves it untouched; FDT smokes. \textbf{FDT gets both right.}
-			\item Caveat: the function's output is fixed of \emph{logical necessity}, so FDT must evaluate \emph{counterpossibles} (antecedents that run counter-to-logic) -- still the main open problem (cf.\ the 5-and-10 problem).
+			\item Reframe \emph{what you are choosing}. You are not just \emph{this body about to act}; you are running a fixed \textbf{decision function}, and your action is its \emph{output} on the situation you face.
+			\item Many things in the world may depend on that \emph{same} function: a predictor who \textbf{modelled} it, a \textbf{copy} of you running it, a simulation of it. When the function's output changes, all of them change \emph{with} it.
+			\item So FDT does not ask ``what should I do, holding everything else fixed?'' (that is CDT). It asks the question the paper puts at its centre:
+			\begin{center}\emph{``which output of this very decision function -- given everything in the world that depends on it -- would yield the best outcome?''}\end{center}
+			and then \emph{returns that output}. Concretely: score each candidate action $a$ by the outcome in the world where \emph{my decision function outputs $a$} (so the predictor predicted $a$, and every copy outputs $a$), and take the best.
+			\item It acts \emph{as if it controls all instances of the computation at once} -- not by magic, but because they really are the same logical fact.
+			\item This wins the earlier cases for the \emph{right} reason: in Newcomb the prediction tracks the function's output, so FDT \textbf{one-boxes}; the lesion does \emph{not} run the function, so FDT still \textbf{smokes}. FDT shines exactly where embedded agents live -- worlds containing copies of you, or predictors that model your decision procedure.
 		\end{itemize}
 		}
 	\end{block}

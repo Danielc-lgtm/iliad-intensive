@@ -100,12 +100,14 @@ edit markers after any line to request a change.
 
 # Section: Functional & updateless decision theory
 
-## Functional decision theory: intervene on the function
+## Functional decision theory: choose your function's output
 
-- **Block: The three rules side by side (Yudkowsky & Soares 2017)**
-  - `EDT(P,x) = argmax_a E[V | Obs=x, Act=a]`; `CDT(P,G,x) = argmax_a E[V | do(Act=a), Obs=x]`; `FDT(P,G,x) = argmax_a E[V | do(fdt(P,G,x)=a)]` (boxed)
-  - only change from CDT is which node you intervene on: physical act (token) vs the logical function node (type)
-  - Newcomb one-boxes, smoking lesion smokes; caveat: counterpossibles still open
+- **Block: "Which output of this very function would yield the best outcome?"** (intuition-first, after the FDT paper; improves on the sources FDT slides)
+  - reframe what you are choosing: you run a fixed decision function; your action is its output
+  - predictors who modelled it, copies running it, simulations of it all move together with its output
+  - FDT asks "which output of this very decision function -- given everything that depends on it -- yields the best outcome?" and returns it; score each action a by the world where the function outputs a
+  - acts as if it controls all instances of the computation at once (same logical fact)
+  - Newcomb one-boxes, smoking lesion smokes; shines where embedded agents live (copies/predictors)
 
 ## Twin Prisoner's Dilemma & subjunctive dependence
 
