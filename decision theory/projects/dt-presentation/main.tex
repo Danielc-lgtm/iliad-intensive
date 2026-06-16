@@ -89,8 +89,21 @@
 }
 
 %==================================================================
-\section{Causal decision theory}
+\section{Defining EDT and CDT}
 %==================================================================
+
+\frame{\frametitle{Evidential decision theory: condition, don't intervene}
+	\begin{block}{EDT as conditioning}
+		{\tiny
+		\begin{itemize}
+			\item EDT evaluates an action by the \emph{news} it would bring -- it \textbf{conditions} on ``I do $a$'' as evidence:
+			$$a^{*} = \arg\max_{a}\; \mathbb{E}\big[\,U \mid A=a\,\big].$$
+			\item Conditioning treats the action as evidence about \emph{everything} correlated with it -- including facts the action does not cause.
+			\item (We will see this \emph{help} on Newcomb but \emph{mislead} on the smoking lesion -- once both rules are on the table.)
+		\end{itemize}
+		}
+	\end{block}
+}
 
 \frame{\frametitle{A 60-second primer: Bayesian networks}
 	\begin{columns}[T]
@@ -131,11 +144,12 @@
 	\begin{block}{The $\mathrm{do}$-operator}
 		{\tiny
 		\begin{itemize}
-			\item Pearl's key distinction: \emph{observing} $X{=}x$ (passive evidence) is not the same as \emph{doing} $X{=}x$ (an intervention).
+			\item Pearl's key distinction: \emph{observing} $X{=}x$ (passive evidence, as in EDT) is not the same as \emph{doing} $X{=}x$ (an intervention).
 			\item $\mathrm{do}(X=x)$: \textbf{sever all arrows into $X$} (cut $X$ off from its causes), fix $X=x$, propagate downstream. Adjusting over the direct causes $z=\mathrm{Pa}(X)$:
 			$$P\big(Y \mid \mathrm{do}(X{=}x)\big) = \sum_{z} P(Y\mid x, z)\,P(z).$$
 			\item Sprinkler graph: \emph{seeing} the sprinkler on raises the chance it was cloudy, hence lowers the chance of rain. \emph{Doing} $\mathrm{do}(S{=}\text{on})$ cuts $C\to S$, so it tells you \textbf{nothing} about rain.
 			\item \textbf{CDT:} $a^{*} = \arg\max_a \mathbb{E}[U \mid \mathrm{do}(A=a)]$ -- judge each action by the causal consequences of \emph{intervening} on it, holding the rest of the past fixed.
+			\item The contrast in one line: $\;\mathbb{E}[U\mid \mathrm{do}(A{=}a)]$ (CDT, severs the action's causes) vs.\ $\;\mathbb{E}[U\mid A{=}a]$ (EDT, keeps them as evidence).
 		\end{itemize}
 		}
 	\end{block}
@@ -156,97 +170,6 @@
 	\end{center}
 	\end{column}
 	\end{columns}
-}
-
-\frame{\frametitle{CDT on Newcomb's problem}
-	\begin{columns}[T]
-	\begin{column}{0.60\textwidth}
-	\begin{block}{Two-boxing, and why}
-		{\tiny
-		\begin{itemize}
-			\item \textbf{Newcomb:} a transparent box holds \$1{,}000; an opaque box holds \$1{,}000{,}000 \emph{iff} a highly reliable predictor $\Omega$ foresaw you would take \emph{only} the opaque box. $\Omega$ has already chosen.
-			\item CDT applies $\mathrm{do}(A)$: this \textbf{severs} your action from your disposition $S$, so it no longer carries information about $\Omega$'s prediction $P$. The box contents are now fixed; taking both boxes earns \$1{,}000 more \emph{in every fixed state}. CDT \textbf{two-boxes}.
-			\item But predictably: two-boxers are predicted to two-box and walk away with \$1{,}000; one-boxers get \$1{,}000{,}000.
-			\item CDT wins the battle (local dominance) and loses the war (the predictable policy is poor). It \emph{deliberately discards} the dependence of $\Omega$'s prediction on the agent's decision.
-		\end{itemize}
-		}
-	\end{block}
-	\end{column}
-	\begin{column}{0.40\textwidth}
-	\begin{center}
-	\begin{tikzpicture}[>=Stealth, font=\tiny, node distance=6mm,
-	   v/.style={draw, circle, inner sep=1.2pt, minimum size=6.5mm, align=center}]
-	  \node[v, fill=blau-upc!15] (S) {$S$\\ disp.};
-	  \node[v, fill=red!12, below left=8mm and 3mm of S] (A) {$A$\\ act};
-	  \node[v, fill=blue!8, below right=8mm and 3mm of S] (P) {$P$\\ pred.};
-	  \node[v, fill=green!12, below=14mm of S] (U) {$U$};
-	  \draw[->] (S)--(A); \draw[->] (S)--(P);
-	  \draw[->] (A)--(U); \draw[->] (P)--(U);
-	  \node[font=\tiny, right=1mm of P, text width=1.6cm] {\textit{CDT cuts} $S\!\to\!A$, \textit{losing the link to} $P$.};
-	\end{tikzpicture}
-	\end{center}
-	\end{column}
-	\end{columns}
-}
-
-\frame{\frametitle{CDT vs.\ physics: the intervention is a fiction}
-	\begin{block}{Does CDT really ``reflect physical reality''? (following Ebtekar \& Hutter)}
-		{\tiny
-		\begin{itemize}
-			\item CDT's $\mathrm{do}(A=a)$ holds the past fixed, \textbf{magically sets the action}, and propagates forward. What licenses cutting the action loose from its causes?
-			\item In a \emph{deterministic, time-reversible} physical world, your action has physical antecedents (your brain state, your source code). A predictor that reads those antecedents is correlated with your action through \textbf{perfectly ordinary physics}, not magic.
-			\item ``Severing the incoming arrows to $A$'' directly \textbf{contradicts embeddedness}: it pretends your action has no causes, but physically it does. The intervention is a harmless idealisation for a dualistic agent; for an embedded agent it \emph{throws away real correlations} (with predictors, copies, simulations).
-			\item So the usual defence is backwards: physics gives no privileged metaphysical ``intervention'' that frees the action from its past. This pressures us to move the counterfactual off the \emph{physical act} and onto the agent's \emph{policy / computation}.
-		\end{itemize}
-		}
-	\end{block}
-}
-
-%==================================================================
-\section{Evidential decision theory}
-%==================================================================
-
-\frame{\frametitle{Evidential decision theory: condition, don't intervene}
-	\begin{block}{EDT as conditioning}
-		{\tiny
-		\begin{itemize}
-			\item EDT evaluates an action by the \emph{news} it would bring -- it \textbf{conditions} on ``I do $a$'' as evidence:
-			$$a^{*} = \arg\max_{a}\; \mathbb{E}\big[\,U \mid A=a\,\big].$$
-			\item On \textbf{Newcomb}: one-boxing is strong evidence the opaque box is full (the predictor is reliable), so $\mathbb{E}[U\mid A=\text{one-box}]$ is huge. EDT \textbf{one-boxes} and gets the million. EDT captures exactly the predictive dependence CDT discards.
-			\item The contrast in one line: $\;\mathbb{E}[U\mid \mathrm{do}(A{=}a)]$ (CDT, severs the action's causes) vs.\ $\;\mathbb{E}[U\mid A{=}a]$ (EDT, keeps them as evidence).
-		\end{itemize}
-		}
-	\end{block}
-}
-
-\frame{\frametitle{EDT mistakes evidence for control}
-	\begin{block}{The smoking lesion}
-		{\tiny
-		\begin{itemize}
-			\item A genetic lesion $L$ causes cancer (cost $C$) \emph{and} makes you more likely to want to smoke. Smoking itself is harmless and gives benefit $b>0$.
-			\item Conditioning on ``I smoke'' raises $P(L)$, hence raises estimated cancer risk: $\mathbb{E}[U\mid \text{smoke}] = b - C\,P(L\mid\text{smoke})$. For strong correlation, EDT \textbf{abstains} -- even though abstaining does \emph{nothing} to reduce cancer. EDT confuses a \textbf{symptom} for a \textbf{lever}.
-			\item \textbf{Scorecard:} CDT and EDT are each half right.
-			\begin{itemize}\scriptsize
-				\item[--] CDT ignores predictive dependence $\Rightarrow$ loses Newcomb.
-				\item[--] EDT overreacts to mere correlation $\Rightarrow$ loses the smoking lesion.
-			\end{itemize}
-			\item The missing ingredient is a dependence that is neither raw physical causation nor raw evidential correlation.
-		\end{itemize}
-		}
-	\end{block}
-}
-
-\frame{\frametitle{Spurious counterfactuals: EDT breaks for self-aware agents}
-	\begin{block}{Conditioning on a probability-zero action}
-		{\tiny
-		\begin{itemize}
-			\item A capable embedded agent can reason about (even \emph{prove} things about) its own source code, so it can largely predict its own action. But then, for the action $a$ it will \emph{not} take, $P(A=a)=0$.
-			\item EDT's recipe $\mathbb{E}[U\mid A=a]$ is then $\tfrac{0}{0}$ -- \textbf{undefined}. You may assign the unchosen action \emph{any} value you like: a \textbf{spurious counterfactual}.
-			\item So conditioning gives \emph{no constraint} on counterfactual actions you are certain you won't take -- exactly the cases decision-making turns on.
-			\item (Foreshadow: in proof-theoretic form this same pathology becomes the \textbf{5-and-10 problem}, and the fix needs a notion of \emph{logical} dependence.)
-		\end{itemize}
-		}
-	\end{block}
 }
 
 %==================================================================
@@ -300,6 +223,84 @@
 			The factor $\pi(a_t\mid h_{<t})$ tells you ``\textbf{what policy am I running}''; and any world $\nu$ \emph{correlated with the action in the prior} $w_{\nu,\pi}$ is reweighted -- ``\textbf{what world am I in}''.
 			\item So the agent evaluates an action by \emph{conditioning}: $\;a_t = \arg\max_a \mathbb{E}_P[\,U \mid A_t{=}a,\ h_{<t}\,]$.
 			\item This is exactly \textbf{EDT} -- and it reproduces the smoking lesion: the prior correlates the lesion (a world-feature) with the smoking disposition (a policy-feature), so conditioning on ``I smoke'' upweights lesion-worlds and the act looks like bad news, though it is no lever.
+		\end{itemize}
+		}
+	\end{block}
+}
+
+%==================================================================
+\section{Where CDT and EDT fail}
+%==================================================================
+
+\frame{\frametitle{Newcomb's problem: CDT two-boxes, EDT one-boxes}
+	\begin{columns}[T]
+	\begin{column}{0.60\textwidth}
+	\begin{block}{The same problem splits the two rules}
+		{\tiny
+		\begin{itemize}
+			\item \textbf{Newcomb:} a transparent box holds \$1{,}000; an opaque box holds \$1{,}000{,}000 \emph{iff} a highly reliable predictor $\Omega$ foresaw you would take \emph{only} the opaque box. $\Omega$ has already chosen.
+			\item \textbf{CDT} applies $\mathrm{do}(A)$: this \textbf{severs} your action from your disposition $S$, so it no longer informs $\Omega$'s prediction $P$. The contents are fixed; taking both boxes earns \$1{,}000 more \emph{in every fixed state}. CDT \textbf{two-boxes} and predictably walks away with \$1{,}000.
+			\item \textbf{EDT} conditions: one-boxing is strong \emph{evidence} the opaque box is full, so $\mathbb{E}[U\mid\text{one-box}]$ is huge. EDT \textbf{one-boxes} and gets \$1{,}000{,}000 -- it keeps exactly the predictive dependence CDT discards.
+			\item \textbf{Verdict:} CDT loses Newcomb. (In the lens above: the chronological-semimeasure agent two-boxes; the joint-prediction agent one-boxes.)
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.40\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny, node distance=6mm,
+	   v/.style={draw, circle, inner sep=1.2pt, minimum size=6.5mm, align=center}]
+	  \node[v, fill=blau-upc!15] (S) {$S$\\ disp.};
+	  \node[v, fill=red!12, below left=8mm and 3mm of S] (A) {$A$\\ act};
+	  \node[v, fill=blue!8, below right=8mm and 3mm of S] (P) {$P$\\ pred.};
+	  \node[v, fill=green!12, below=14mm of S] (U) {$U$};
+	  \draw[->] (S)--(A); \draw[->] (S)--(P);
+	  \draw[->] (A)--(U); \draw[->] (P)--(U);
+	  \node[font=\tiny, right=1mm of P, text width=1.6cm] {\textit{CDT cuts} $S\!\to\!A$, \textit{losing the link to} $P$.};
+	\end{tikzpicture}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
+
+\frame{\frametitle{EDT mistakes evidence for control}
+	\begin{block}{The smoking lesion}
+		{\tiny
+		\begin{itemize}
+			\item A genetic lesion $L$ causes cancer (cost $C$) \emph{and} makes you more likely to want to smoke. Smoking itself is harmless and gives benefit $b>0$.
+			\item Conditioning on ``I smoke'' raises $P(L)$, hence raises estimated cancer risk: $\mathbb{E}[U\mid \text{smoke}] = b - C\,P(L\mid\text{smoke})$. For strong correlation, EDT \textbf{abstains} -- even though abstaining does \emph{nothing} to reduce cancer. EDT confuses a \textbf{symptom} for a \textbf{lever}.
+			\item \textbf{Scorecard:} CDT and EDT are each half right.
+			\begin{itemize}\scriptsize
+				\item[--] CDT ignores predictive dependence $\Rightarrow$ loses Newcomb.
+				\item[--] EDT overreacts to mere correlation $\Rightarrow$ loses the smoking lesion.
+			\end{itemize}
+			\item The missing ingredient is a dependence that is neither raw physical causation nor raw evidential correlation.
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{CDT vs.\ physics: the intervention is a fiction}
+	\begin{block}{Does CDT really ``reflect physical reality''? (following Ebtekar \& Hutter)}
+		{\tiny
+		\begin{itemize}
+			\item CDT's $\mathrm{do}(A=a)$ holds the past fixed, \textbf{magically sets the action}, and propagates forward. What licenses cutting the action loose from its causes?
+			\item In a \emph{deterministic, time-reversible} physical world, your action has physical antecedents (your brain state, your source code). A predictor that reads those antecedents is correlated with your action through \textbf{perfectly ordinary physics}, not magic.
+			\item ``Severing the incoming arrows to $A$'' directly \textbf{contradicts embeddedness}: it pretends your action has no causes, but physically it does. The intervention is a harmless idealisation for a dualistic agent; for an embedded agent it \emph{throws away real correlations} (with predictors, copies, simulations).
+			\item So the usual defence is backwards: physics gives no privileged metaphysical ``intervention'' that frees the action from its past. This pressures us to move the counterfactual off the \emph{physical act} and onto the agent's \emph{policy / computation}.
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Spurious counterfactuals: EDT breaks for self-aware agents}
+	\begin{block}{Conditioning on a probability-zero action}
+		{\tiny
+		\begin{itemize}
+			\item A capable embedded agent can reason about (even \emph{prove} things about) its own source code, so it can largely predict its own action. But then, for the action $a$ it will \emph{not} take, $P(A=a)=0$.
+			\item EDT's recipe $\mathbb{E}[U\mid A=a]$ is then $\tfrac{0}{0}$ -- \textbf{undefined}. You may assign the unchosen action \emph{any} value you like: a \textbf{spurious counterfactual}.
+			\item So conditioning gives \emph{no constraint} on counterfactual actions you are certain you won't take -- exactly the cases decision-making turns on.
+			\item (Foreshadow: in proof-theoretic form this same pathology becomes the \textbf{5-and-10 problem}, and the fix needs a notion of \emph{logical} dependence.)
 		\end{itemize}
 		}
 	\end{block}
