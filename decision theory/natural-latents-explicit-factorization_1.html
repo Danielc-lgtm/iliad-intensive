@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finding the latent: one space, many quotients</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --ink:#1b1b18; --muted:#6a685f; --bg:#fcfbf7; --line:#e3e0d6;
+    --accent:#0f6e56; --accent-soft:#e1f5ee; --warn:#993c1d; --warn-soft:#faece7;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    line-height:1.72; font-size:18px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:64px 24px 120px}
+  header{margin-bottom:48px; border-bottom:1px solid var(--line); padding-bottom:28px}
+  h1{font-size:30px; line-height:1.25; margin:0 0 12px; font-weight:600; letter-spacing:-0.01em}
+  .sub{color:var(--muted); font-size:17px; font-style:italic; margin:0}
+  h2{font-size:22px; margin:54px 0 14px; font-weight:600; letter-spacing:-0.005em}
+  h2 .n{color:var(--accent); font-variant-numeric:tabular-nums; margin-right:10px; font-weight:600}
+  h3{font-size:18px; margin:30px 0 8px; font-weight:600}
+  p{margin:14px 0}
+  a{color:var(--accent)}
+  code,.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; font-size:0.86em;
+    background:#f0eee6; padding:1px 5px; border-radius:4px}
+  .lead{font-size:19px}
+  .aside{
+    background:var(--accent-soft); border-left:3px solid var(--accent);
+    border-radius:0 8px 8px 0; padding:18px 22px; margin:28px 0; font-size:16.5px; line-height:1.65;
+  }
+  .aside h3{margin-top:0; color:#085041; font-size:16px; text-transform:uppercase; letter-spacing:0.06em}
+  .warnbox{
+    background:var(--warn-soft); border-left:3px solid var(--warn);
+    border-radius:0 8px 8px 0; padding:18px 22px; margin:28px 0; font-size:16.5px; line-height:1.65;
+  }
+  .warnbox h3{margin-top:0; color:var(--warn); font-size:16px; text-transform:uppercase; letter-spacing:0.06em}
+  .keybox{
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:20px 24px; margin:26px 0;
+  }
+  .keybox .label{font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent);
+    font-weight:600; font-family:system-ui,sans-serif; margin-bottom:6px}
+  .step{
+    border:1px solid var(--line); border-radius:10px; padding:18px 24px; margin:20px 0; background:#fff;
+  }
+  .step .stepn{font-family:system-ui,sans-serif; font-size:13px; font-weight:700; color:var(--accent);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px}
+  table{border-collapse:collapse; width:100%; margin:22px 0; font-size:15.5px;
+    font-variant-numeric:tabular-nums}
+  th,td{text-align:left; padding:8px 12px; border-bottom:1px solid var(--line)}
+  th{font-family:system-ui,sans-serif; font-size:13px; text-transform:uppercase;
+    letter-spacing:0.04em; color:var(--muted); font-weight:600}
+  td.mono{font-family:"SF Mono",ui-monospace,Menlo,monospace; background:none; padding:8px 12px}
+  tr.hi td{background:var(--accent-soft)}
+  tr.bad td{background:var(--warn-soft)}
+  figure{margin:30px 0; text-align:center}
+  figcaption{color:var(--muted); font-size:15px; margin-top:10px; font-style:italic}
+  .fig-svg{max-width:100%; height:auto}
+  hr{border:none; border-top:1px solid var(--line); margin:48px 0}
+  .small{font-size:15px; color:var(--muted)}
+  ul,ol{margin:14px 0; padding-left:24px}
+  li{margin:7px 0}
+  .toc{font-size:15.5px; color:var(--muted)}
+  .toc a{text-decoration:none}
+  .toc ol{padding-left:22px}
+  strong{font-weight:600}
+  @media (max-width:600px){ body{font-size:16.5px} .wrap{padding:40px 18px 80px} h1{font-size:25px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Finding the latent: one space, many quotients</h1>
+  <p class="sub">A single observable space, observables as partitions of it, and the explicit arithmetic of positing a latent — including when the latent is a gauge artifact, when it is forced, and when it refuses to be discrete.</p>
+</header>
+
+<p class="lead">There is one observable space $D$ with one distribution $\mu$. Every observable is a partition of $D$ — a quotient, a way of refusing to distinguish some outcomes. The full set of observables is the entire partition lattice of $D$. A mediator-redund question is only posed once a few partitions are <em>selected</em> from that lattice; a latent space is then posited to answer it. This note works the whole pipeline explicitly: how the latent depends on the selection, how to factor it out of the numbers by hand, why two observables can never pin it down, why a third one can, and what happens when the rank refuses to stop growing.</p>
+
+<div class="toc">
+<strong>Contents</strong>
+<ol>
+  <li><a href="#space">One space, observables as partitions</a></li>
+  <li><a href="#select">The latent depends on the selection — through one table</a></li>
+  <li><a href="#scores">Scoring a candidate: $\varepsilon_{\rm med}$ and $\varepsilon_{\rm red}$</a></li>
+  <li><a href="#rank">Reading the table: rank</a></li>
+  <li><a href="#factor2">Factoring with two observables — explicitly</a></li>
+  <li><a href="#three">A third witness needs a bigger room</a></li>
+  <li><a href="#eigen">Recovering the latent by eigendecomposition — every step</a></li>
+  <li><a href="#kill">The third observable kills the impostor</a></li>
+  <li><a href="#why">Why no observable could have done this job</a></li>
+  <li><a href="#general">Beyond one binary latent: rank in general, multiple latents, continuous latents</a></li>
+  <li><a href="#parked">Parked question</a></li>
+</ol>
+</div>
+
+<hr>
+
+<h2 id="space"><span class="n">1</span>One space, observables as partitions</h2>
+
+<p>Let the observable space be $D = \{1,2,3,4\}$ with distribution
+$$\mu(1)=0.09,\quad \mu(2)=0.41,\quad \mu(3)=0.41,\quad \mu(4)=0.09.$$
+That is the entire given: four atoms, four numbers. There are no separate "variables" handed to us alongside it.</p>
+
+<p>An <strong>observable</strong> is a partition of $D$. For example $X_0 = \{12\}\{3\}\{4\}$ is the observable that cannot tell $1$ from $2$; its induced distribution is $\{12\}\mapsto 0.50$, $\{3\}\mapsto 0.41$, $\{4\}\mapsto 0.09$. The <em>set of all observables</em> on this space is the full partition lattice of $D$ — fifteen partitions for four atoms, from the discrete partition $\{1\}\{2\}\{3\}\{4\}$ (perfect resolution) down to the trivial one-block partition (sees nothing).</p>
+
+<p>Note what this framing rules out: there is no pre-given "row variable" and "column variable." A contingency-table presentation $M_{ab} = P(X_1{=}a, X_2{=}b)$ is not part of the data; the row/column split <em>is</em> a choice of two partitions. The bare multiset of probabilities $\{0.41, 0.41, 0.09, 0.09\}$, with no grouping, supports many incompatible readings — that is the next section.</p>
+
+<hr>
+
+<h2 id="select"><span class="n">2</span>The latent depends on the selection — through one table</h2>
+
+<p>To pose a mediator-redund problem we must be <strong>given</strong> a selection of partitions, say two of them, $X_1$ and $X_2$. Everything a latent can ever respond to is then the pushforward of $\mu$ under the joint quotient map $d \mapsto (X_1(d),\, X_2(d))$:
+$$M_{ab} \;=\; \mu\!\big(X_1^{-1}(a)\cap X_2^{-1}(b)\big).$$
+Two selections inducing the same table induce the same latent problem; structure in $\mu$ finer than the meet $X_1 \wedge X_2$ is invisible.</p>
+
+<p>How much the selection matters is the whole point, so it is worth seeing across the <em>entire</em> lattice rather than the tidy corner I first reached for. The four atoms have fourteen non-trivial partitions and hence $\binom{14}{2}=91$ unordered pairs one could select. Pushing the same $\mu$ through each pair and recording the rank of the induced table gives this distribution:</p>
+
+<figure>
+<svg class="fig-svg" width="560" height="132" viewBox="0 0 560 132" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rank distribution over all 91 selections: 2 rank-1, 71 rank-2, 18 rank-3">
+  <text x="0" y="33" font-family="system-ui,sans-serif" font-size="13.5" fill="#6a685f">rank 1 · indep</text>
+  <rect x="118" y="20" width="12" height="24" fill="#c98a6a"/>
+  <text x="138" y="37" font-family="system-ui,sans-serif" font-size="13" fill="#6a685f">2 pairs</text>
+  <text x="0" y="71" font-family="system-ui,sans-serif" font-size="13.5" fill="#6a685f">rank 2 · binary</text>
+  <rect x="118" y="58" width="420" height="24" fill="#1d9e75"/>
+  <text x="500" y="75" font-family="system-ui,sans-serif" font-size="13" fill="#fff" text-anchor="end">71 pairs</text>
+  <text x="0" y="109" font-family="system-ui,sans-serif" font-size="13.5" fill="#6a685f">rank 3 · ternary</text>
+  <rect x="118" y="96" width="107" height="24" fill="#6fc3a3"/>
+  <text x="233" y="113" font-family="system-ui,sans-serif" font-size="13" fill="#6a685f">18 pairs</text>
+</svg>
+<figcaption>Across all 91 selections, a latent is the generic outcome; independence is the rare exception.</figcaption>
+</figure>
+
+<p>So the honest statement is nearly the reverse of what a pairs-into-pairs view suggests. Only <em>two</em> of the ninety-one selections induce an independent (rank-1) table — and both are among the three balanced two-pair selections I had singled out, which is exactly why restricting to that corner made carrying a latent look special when it is in fact the rule. (If $\mu$ were uniform every table would be rank 1: it takes both a structured $\mu$ and a selection that exposes the structure. Latent structure is irreducibly <em>relational</em> — shared structure across the selected observables, never a property of the bare bag of numbers.)</p>
+
+<p>The selection also fixes <em>how many</em> states the latent needs, not merely whether one is needed. A few representative pairs of different shapes:</p>
+
+<table>
+<thead><tr><th>Selection $(X_1, X_2)$</th><th>Induced table</th><th>shape</th><th>rank = cardinality</th></tr></thead>
+<tbody>
+<tr class="hi"><td>$\{12\}\{34\}$ vs $\{13\}\{24\}$</td><td class="mono">[[.09,.41],[.41,.09]]</td><td>2×2</td><td>2 — binary</td></tr>
+<tr><td>$\{12\}\{34\}$ vs $\{14\}\{23\}$</td><td class="mono">[[.09,.41],[.09,.41]]</td><td>2×2</td><td>1 — trivial (independent)</td></tr>
+<tr><td>$\{12\}\{34\}$ vs $\{1\}\{23\}\{4\}$</td><td class="mono">[[.09,.41,0],[0,.41,.09]]</td><td>2×3</td><td>2 — binary</td></tr>
+<tr><td>$\{1\}\{23\}\{4\}$ vs $\{1\}\{24\}\{3\}$</td><td class="mono">[[.09,0,0],[0,.41,.41],[0,.09,0]]</td><td>3×3</td><td>3 — ternary</td></tr>
+</tbody>
+</table>
+
+<p>The same $\mu$, read through different selected observables, demands a constant, a binary, or a ternary latent. The latent's cardinality is a property of the <em>selection</em>, not of the distribution — which is precisely why Section 4 must <em>derive</em> the cardinality from the table rather than assume it.</p>
+
+<p>One family of selections should be set aside as degenerate: <strong>nested</strong> pairs, where one partition refines the other. Then the finer observable already determines the coarser, the table has a single nonzero per column, and the "latent" it produces is just the coarser observable relabeled — a deterministic function of $D$ with trivial mediation. For instance $\{123\}\{4\}$ against $\{12\}\{3\}\{4\}$ gives $\left(\begin{smallmatrix}0.5 & 0.41 & 0\\ 0 & 0 & 0.09\end{smallmatrix}\right)$: rank 2, but no genuine shared structure. The selections that pose a real mediator-redund question are the <strong>transverse</strong> ones, where neither partition refines the other — all four rows above are transverse. <em>Which</em> selections are the right ones to range over is itself the parked question of Section 11.</p>
+
+<p>For the rest of this note, fix the transverse binary-latent selection $X_1 = \{12\}\{34\}$, $X_2 = \{13\}\{24\}$, with induced table
+$$M = \begin{pmatrix} 0.09 & 0.41 \\ 0.41 & 0.09 \end{pmatrix}.$$</p>
+
+<p class="small">(Relabeling the blocks of either observable permutes rows or columns of $M$ — e.g. to $\left(\begin{smallmatrix}0.41 & 0.09\\ 0.09 & 0.41\end{smallmatrix}\right)$ — and changes nothing structural. Block names are gauge; the partition into observables is the physics. We use the row-swapped form below for tidier arithmetic.)</p>
+
+<hr>
+
+<h2 id="scores"><span class="n">3</span>Scoring a candidate: $\varepsilon_{\rm med}$ and $\varepsilon_{\rm red}$</h2>
+
+<p>A candidate summary $Z$ — jointly distributed with the selected observables, but not necessarily a function of $D$ — is scored by two errors. The <strong>mediation error</strong> is the dependence that survives conditioning,
+$$\varepsilon_{\rm med}(Z) \;=\; \mathrm{TC}(X_1,\dots,X_n \mid Z),$$
+which for two observables reduces to $I(X_1;X_2\mid Z)$, zero exactly when $Z$ screens them off. The <strong>redundancy error</strong> measures failure of single-observable recoverability,
+$$\varepsilon_{\rm red}(Z) \;=\; \max_i\, H(Z \mid X_i).$$
+A <strong>mediator-redund</strong> keeps both small. The question is where such a $Z$ can live: among the partitions of $D$ we already have, or only in a posited latent space.</p>
+
+<hr>
+
+<h2 id="rank"><span class="n">4</span>Reading the table: rank</h2>
+
+<div class="aside">
+<h3>Primer: singular values and rank</h3>
+<p>Any matrix factors as $M = U\Sigma V^{\top}$ with $U,V$ orthogonal and $\Sigma$ diagonal with entries $\sigma_1 \ge \sigma_2 \ge \cdots \ge 0$ — the <strong>singular values</strong>. Geometrically, $M$ maps the unit sphere to an ellipsoid whose semi-axes have lengths $\sigma_i$; the $\sigma_i^2$ are the eigenvalues of $M^{\top}M$; the number of nonzero $\sigma_i$ is the rank. Since permutation matrices are orthogonal and $PMQ$ has the same singular values as $M$, the spectrum is exactly the part of the table that survives renaming each observable's blocks. For our $M$: singular values $\{0.50,\ 0.32\}$ — rank $2$.</p>
+</div>
+
+<h3>Why rank is the cardinality, not a proxy for it</h3>
+
+<p>The claim to earn is that the number of values a latent needs equals the rank of the table — not as a rule of thumb, but by definition, once one identity is in place.</p>
+
+<p><strong>Mediation <em>is</em> factorization.</strong> To say a latent $\Lambda$ with values $\lambda \in \{1,\dots,k\}$ mediates the pair is to say $X_1 \perp X_2 \mid \Lambda$, i.e. $P(X_1,X_2 \mid \lambda) = P(X_1\mid\lambda)\,P(X_2\mid\lambda)$ for each $\lambda$. Summing over $\Lambda$ weighted by $P(\Lambda)$ gives
+$$M_{ab} \;=\; \sum_{\lambda=1}^{k} w_\lambda\, a_\lambda(a)\, b_\lambda(b), \qquad w_\lambda = P(\Lambda{=}\lambda),\quad a_\lambda = P(X_1\mid\lambda),\quad b_\lambda = P(X_2\mid\lambda).$$
+This is precisely a decomposition of $M$ into $k$ nonnegative rank-one terms whose factors are probability vectors. The converse holds too: <em>any</em> such decomposition defines a mediating latent — read $w_\lambda$ as $\Lambda$'s distribution and $a_\lambda, b_\lambda$ as its conditionals, and conditional independence holds by construction. Mediating latents with $k$ values and $k$-term nonnegative factorizations of $M$ are the same objects, listed two ways.</p>
+
+<p><strong>So minimal cardinality is rank, by definition.</strong> The fewest values a mediating latent can have is the fewest nonnegative rank-one terms summing to $M$, and that number already has a name: the <em>nonnegative rank</em> $\operatorname{rank}_+(M)$. Rank is not standing in for cardinality; it <em>is</em> the minimal cardinality. The base case is the independent one: $\operatorname{rank}_+(M)=1$ means $M$ is a single product $P(X_1)P(X_2)^{\top}$, mediated by the constant latent, with nothing shared to explain.</p>
+
+<p><strong>The geometric reading,</strong> where the intuition lives: normalize each column of $M$ to get a conditional slice $P(X_1\mid X_2{=}b)$. Mediation says every slice is a convex mixture
+$$P(X_1\mid X_2{=}b) \;=\; \sum_\lambda P(\Lambda{=}\lambda\mid X_2{=}b)\; a_\lambda$$
+of the latent's archetypes $a_\lambda = P(X_1\mid\lambda)$. So the archetypes are the vertices of a simplex that <em>contains</em> every observed slice and is itself <em>contained</em> in the probability simplex. The minimal number of vertices of such a sandwiched simplex is the nonnegative rank — the fewest pure types whose mixtures reproduce all the observed conditionals.</p>
+
+<p><strong>What the singular spectrum actually gives you.</strong> Each slice is a nonnegative combination of the $k$ archetypes, so all slices lie in the linear span of those $k$ vectors, a space of dimension at most $k$. Hence $k \ge$ the dimension the columns of $M$ span $=$ the ordinary (linear) rank — the count of nonzero singular values, the quantity the SVD computes and the one that survives relabeling. So linear rank is a <em>lower bound</em> on cardinality: the latent needs <em>at least</em> that many states. The bound need not be tight — there are $4\times4$ nonnegative matrices of linear rank $3$ whose nonnegative rank is $4$ — so reading the floor off the spectrum is not the end of the story; you confirm it is reached by <em>constructing</em> the factorization, which Sections 5 and 7 do. (For every table here the two ranks coincide, since a nonnegative matrix has $\operatorname{rank}_+ \le \min(\text{rows},\text{cols})$, which pins it to the linear rank in these small cases.) With noise the singular values decay instead of vanishing, and the count above the noise floor estimates the cardinality — the same diagnostic, softened.</p>
+
+<p>Our table has singular values $\{0.50,\ 0.32\}$, so linear rank $2$: a binary latent is necessary. Since $\operatorname{rank}_+ = 2$ here as well, it is also sufficient — which the next section exhibits explicitly.</p>
+
+<hr>
+
+<h2 id="factor2"><span class="n">5</span>Factoring with two observables — explicitly</h2>
+
+<p>Posit $|\Lambda| = 2$ and write out what the decomposition demands, cell by cell, using the row order with $0.41$ on the diagonal:
+$$\begin{aligned}
+0.41 &= w_0\, a_0(0)\, b_0(0) + w_1\, a_1(0)\, b_1(0) \\
+0.09 &= w_0\, a_0(0)\, b_0(1) + w_1\, a_1(0)\, b_1(1) \\
+0.09 &= w_0\, a_0(1)\, b_0(0) + w_1\, a_1(1)\, b_1(0) \\
+0.41 &= w_0\, a_0(1)\, b_0(1) + w_1\, a_1(1)\, b_1(1)
+\end{aligned}$$</p>
+
+<p>Count degrees of freedom: after normalization there are five free parameters ($w_0$, plus one per conditional $a_0, a_1, b_0, b_1$), against three independent equations (four cells, one of which is fixed by the table summing to $1$). The system is <strong>underdetermined</strong> — solutions form a continuous family. Here are two of its members, both exact.</p>
+
+<div class="step">
+<div class="stepn">Solution A — the symmetric latent</div>
+<p>Take $w = (0.5,\, 0.5)$, $a_0 = b_0 = (0.9,\, 0.1)$, $a_1 = b_1 = (0.1,\, 0.9)$. Check the corner cell:
+$$0.5(0.9)(0.9) + 0.5(0.1)(0.1) = 0.405 + 0.005 = 0.41. \checkmark$$
+And the off-diagonal: $0.5(0.9)(0.1) + 0.5(0.1)(0.9) = 0.045+0.045 = 0.09$. $\checkmark$ This is the "noisy shared bit" reading: a fair latent bit, each observable a $10\%$-noise copy of it.</p>
+</div>
+
+<div class="step">
+<div class="stepn">Solution B — the pure-state impostor</div>
+<p>Demand instead that component $0$ be the <em>pure state</em>: $a_0 = b_0 = (1, 0)$, deterministically block-$0$ on both observables. Then $w_0$ is subtracted from the $(0,0)$ cell only, and the residual $M - w_0\, e_{00}$ must be rank $1$, i.e. have zero determinant:
+$$(0.41 - w_0)(0.41) - (0.09)^2 = 0 \;\;\Rightarrow\;\; w_0 = 0.41 - \tfrac{0.0081}{0.41} = 0.3902.$$
+The residual $\left(\begin{smallmatrix}0.0198 & 0.09\\ 0.09 & 0.41\end{smallmatrix}\right)$ factors as one product term with $w_1 = 0.6098$ and $a_1 = b_1 = (0.18,\, 0.82)$. Check the corner: $0.3902 + 0.6098(0.18)(0.18) = 0.3902 + 0.0198 = 0.41$. $\checkmark$</p>
+</div>
+
+<p>Both solutions reproduce $M$ exactly, and both are perfect mediators by construction — a mixture of product distributions is conditionally independent given the component. Yet they describe <em>different worlds</em>: in A the latent is a fair bit seen through symmetric noise; in B the world is $39\%$ "definitely block-$0$ everywhere" and $61\%$ "lean strongly block-$1$." Two observables cannot distinguish them.</p>
+
+<div class="warnbox">
+<h3>Existence is cheap</h3>
+<p>With two observables, a binary latent always exists once the rank is $2$ — but it is not <em>identified</em>. The factorization has gauge freedom, and "the latent" is partly an artifact of how you choose to draw it. Whatever makes a latent worth positing, it cannot be visible from two observables alone.</p>
+</div>
+
+<hr>
+
+<h2 id="three"><span class="n">6</span>A third witness needs a bigger room</h2>
+
+<p>Can we add a third observable on $D=\{1,2,3,4\}$? No — and the obstruction is instructive. Any two transverse two-block partitions of four atoms already separate every atom (their meet is the discrete partition), so a third partition is a <em>function</em> of the first two: it carries no independent witness, only a relabeling of information already present. In the one-space framing, the atom count of $D$ bounds how many transverse observables it can host — three independent binary views require $2^3 = 8$ atoms.</p>
+
+<p>So enlarge the space: $D' = \{1,\dots,8\}$, atoms written as triples $(x_1,x_2,x_3) \in \{0,1\}^3$, with distribution
+$$\mu(0,0,0) = \mu(1,1,1) = 0.365, \qquad \mu(\text{all six others}) = 0.045,$$
+and select the three coordinate partitions $X_1, X_2, X_3$ (e.g. $X_1$ groups atoms by their first coordinate). Each pairwise pushforward is the familiar table $\left(\begin{smallmatrix}0.41 & 0.09\\ 0.09 & 0.41\end{smallmatrix}\right)$ — marginalize the third coordinate: $0.365 + 0.045 = 0.41$ on the diagonal, $0.045+0.045 = 0.09$ off it. The two-observable problem of Section 5 sits inside this one, three times over. The question is what the third view adds.</p>
+
+<hr>
+
+<h2 id="eigen"><span class="n">7</span>Recovering the latent by eigendecomposition — every step</h2>
+
+<p>With three conditionally independent views, the latent can be computed — not fitted, <em>computed</em> — by linear algebra on observed tables. First the idea, then the arithmetic.</p>
+
+<p><strong>The idea.</strong> Write $A_i[x,\lambda] = P(X_i = x \mid \lambda)$. If $\Lambda$ mediates all three observables, then the pairwise table and any slice of the three-way table both factor through the same components:
+$$M_{12} = A_1\, \mathrm{diag}(w)\, A_2^{\top}, \qquad N := P(X_1, X_2, X_3{=}0) = A_1\, \mathrm{diag}(w \circ c)\, A_2^{\top},$$
+where $c_\lambda = P(X_3{=}0 \mid \lambda)$. The slice is the pairwise table with each component reweighted by how much it likes $X_3 = 0$. Now multiply one by the inverse of the other — the $A_2$ and $w$ factors cancel:
+$$B \;:=\; N\, M_{12}^{-1} \;=\; A_1\, \mathrm{diag}(c)\, A_1^{-1}.$$
+$B$ is built entirely from observed tables, yet its <strong>eigenvalues are the latent's conditionals</strong> $P(X_3{=}0\mid\lambda)$ and its <strong>eigenvectors are the columns of</strong> $P(X_1\mid\lambda)$. The latent is sitting inside the observed numbers as a spectral decomposition.</p>
+
+<p><strong>The arithmetic.</strong></p>
+
+<div class="step">
+<div class="stepn">Step 1 — assemble the two tables from $\mu$</div>
+<p>$$M_{12} = \begin{pmatrix} 0.41 & 0.09 \\ 0.09 & 0.41 \end{pmatrix}, \qquad
+N = P(X_1, X_2, X_3{=}0) = \begin{pmatrix} 0.365 & 0.045 \\ 0.045 & 0.045 \end{pmatrix}.$$
+(The $N$ entries are read straight off $\mu$: e.g. $N_{00} = \mu(0,0,0) = 0.365$, $N_{01} = \mu(0,1,0) = 0.045$.)</p>
+</div>
+
+<div class="step">
+<div class="stepn">Step 2 — invert $M_{12}$</div>
+<p>$$\det M_{12} = 0.41^2 - 0.09^2 = 0.1681 - 0.0081 = 0.16, \qquad
+M_{12}^{-1} = \frac{1}{0.16}\begin{pmatrix} 0.41 & -0.09 \\ -0.09 & 0.41 \end{pmatrix}.$$</p>
+</div>
+
+<div class="step">
+<div class="stepn">Step 3 — form $B = N\,M_{12}^{-1}$</div>
+<p>Row 1: $\big(0.365 \cdot 0.41 - 0.045\cdot 0.09,\; -0.365\cdot 0.09 + 0.045\cdot 0.41\big)/0.16 = (0.1456,\, -0.0144)/0.16 = (0.91,\, -0.09)$.<br>
+Row 2: $\big(0.045\cdot 0.41 - 0.045\cdot 0.09,\; -0.045\cdot 0.09 + 0.045\cdot 0.41\big)/0.16 = (0.0144,\, 0.0144)/0.16 = (0.09,\, 0.09)$.
+$$B = \begin{pmatrix} 0.91 & -0.09 \\ 0.09 & 0.09 \end{pmatrix}.$$</p>
+</div>
+
+<div class="step">
+<div class="stepn">Step 4 — eigenvalues: the latent's $X_3$-conditionals</div>
+<p>$\operatorname{tr} B = 1.00$, $\det B = (0.91)(0.09) - (-0.09)(0.09) = 0.0819 + 0.0081 = 0.09$, so
+$$\lambda^2 - \lambda + 0.09 = 0 \;\;\Rightarrow\;\; \lambda = \frac{1 \pm \sqrt{1 - 0.36}}{2} = \frac{1 \pm 0.8}{2} = \mathbf{0.9} \text{ and } \mathbf{0.1}.$$
+These are $P(X_3 = 0 \mid \Lambda = 0) = 0.9$ and $P(X_3 = 0 \mid \Lambda = 1) = 0.1$ — extracted from observed tables alone.</p>
+</div>
+
+<div class="step">
+<div class="stepn">Step 5 — eigenvectors: the latent's $X_1$-conditionals</div>
+<p>For $\lambda = 0.9$: $(0.91 - 0.9)v_1 = 0.09\,v_2 \Rightarrow v \propto (9, 1)$, which normalized to sum $1$ gives $P(X_1 \mid \Lambda{=}0) = (0.9,\, 0.1)$.<br>
+For $\lambda = 0.1$: $(0.91 - 0.1)v_1 = 0.09\, v_2 \Rightarrow v \propto (1, 9)$, giving $P(X_1\mid\Lambda{=}1) = (0.1,\, 0.9)$.</p>
+</div>
+
+<div class="step">
+<div class="stepn">Step 6 — weights from the marginal</div>
+<p>$P(X_1{=}0) = 0.5$ must mix as $0.9\,w_0 + 0.1\,w_1 = 0.5$ with $w_0 + w_1 = 1$, so $0.8\,w_0 = 0.4$ and
+$$w_0 = w_1 = \tfrac12.$$</p>
+</div>
+
+<p>The recovered latent is Solution A — the fair bit with $10\%$ noise — and the recovery used no generative story, only the tables induced by the selected partitions. By symmetry of the construction the same components reproduce every slice and every pairwise table, so this latent mediates all three observables exactly: $\varepsilon_{\rm med} = 0$.</p>
+
+<hr>
+
+<h2 id="kill"><span class="n">8</span>The third observable kills the impostor</h2>
+
+<p>What about Solution B, the pure-state impostor that fit the pairwise table perfectly? For it to survive, there must exist conditionals $c_\lambda = P(X_3{=}0\mid\lambda)$ extending it to the three-way table. Two cells suffice to test this.</p>
+
+<p>Cell $(1,1,0)$ of the three-way table is $\mu(1,1,0) = 0.045$. Component $0$ is pure on block $0$, so it contributes nothing here; only component $1$ does:
+$$w_1\, a_1(1)\, b_1(1)\, c_1 = 0.6098 \times 0.82 \times 0.82 \times c_1 = 0.41\, c_1 = 0.045
+\;\;\Rightarrow\;\; c_1 = 0.1098.$$</p>
+
+<p>The marginal $P(X_3 {=} 0) = 0.5$ then forces
+$$0.3902\, c_0 + 0.6098 \times 0.1098 = 0.5 \;\;\Rightarrow\;\; 0.3902\, c_0 = 0.4330 \;\;\Rightarrow\;\; c_0 = \mathbf{1.11}.$$</p>
+
+<p>A conditional probability greater than $1$. <strong>The impostor cannot be extended</strong> — no assignment of $X_3$-behavior to its components reproduces the observed three-way table. The gauge family that fit two observables has been cut down to a point by the third.</p>
+
+<div class="keybox">
+<div class="label">Redundancy is identifiability</div>
+<p style="margin-bottom:0">This is the conceptual payoff. A mediator always exists (condition on everything). What the redundancy condition adds — the latent recoverable from each observable, the <em>same</em> latent from every angle — is exactly what forces the factorization to be unique. With two views the decomposition has gauge freedom and "the latent" is partly invention; with three views, uniqueness theorems (Kruskal's condition holds here: $k$-ranks $2{+}2{+}2 \ge 2\cdot 2 + 2$) pin it down, and the eigendecomposition computes it. Redundancy is not a nicety bolted onto mediation — it is the difference between <em>a</em> latent and <em>the</em> latent.</p>
+</div>
+
+<hr>
+
+<h2 id="why"><span class="n">9</span>Why no observable could have done this job</h2>
+
+<p>Could the mediator-redund have been found among the partitions of $D'$ itself, sparing us the latent space? Score the recovered latent first: it mediates exactly, and each observable is one binary-symmetric-channel hop from it, so
+$$\varepsilon_{\rm med}(\Lambda) = 0, \qquad \varepsilon_{\rm red}(\Lambda) = h(0.1) = 0.469 \text{ bits},$$
+where $h$ is binary entropy. Now compare against the lattice. Exhaustive enumeration over partitions (of the four-atom space; the three-copy case is computed the same way) gives:</p>
+
+<table>
+<thead><tr><th>Candidate $Z$</th><th>$\varepsilon_{\rm med}$</th><th>$\varepsilon_{\rm red}$</th></tr></thead>
+<tbody>
+<tr><td>constant partition</td><td class="mono">0.320</td><td class="mono">0.000</td></tr>
+<tr><td>$Z = X_1$ (a single selected observable)</td><td class="mono">0.000</td><td class="mono">0.680</td></tr>
+<tr><td>$Z = $ discrete partition (full resolution)</td><td class="mono">0.000</td><td class="mono">0.680</td></tr>
+<tr class="hi"><td>latent $\Lambda$ (not a partition of $D$)</td><td class="mono">0.000</td><td class="mono">0.469</td></tr>
+</tbody>
+</table>
+
+<p>Among partitions with $\varepsilon_{\rm med} \le 0.01$, the best achievable redundancy is $h(0.18) = 0.680$ bits; the latent achieves $0.469$. The gap is no accident — it is data processing. Recovering $\Lambda$ from one observable is one noisy hop, $\mathrm{BSC}(0.1)$, costing $h(0.1)$; recovering one observable from another is two hops composed, $\mathrm{BSC}(0.1)\circ\mathrm{BSC}(0.1) = \mathrm{BSC}(0.18)$, costing $h(0.18)$. Any partition fine enough to mediate is at least a full coordinate, and so pays the two-hop, effect-to-effect price. The latent sits one hop from everyone, closer to each observable than the observables are to each other.</p>
+
+<p>With three copies the separation widens: no single coordinate mediates the rest, so a near-perfect partition-mediator must aggregate coordinates — exactly what destroys single-observable recoverability. Exhaustive search at $p = 0.2$, $n = 3$ gives best partition redundancy $1.332$ bits under $\varepsilon_{\rm med}\le 0.001$, against the latent's $h(0.2) = 0.722$, which stays pinned at the one-hop price for every $n$.</p>
+
+<p>The deeper reading: the latent's conditionals are $0.9/0.1$ — <em>fractional</em>. The shared core of these observables is a soft, stochastic object with no deterministic factorization, invisible to a lattice that only contains $0/1$ coarsenings. The latent space is the completion in which fractional shared structure has a witness.</p>
+
+<hr>
+
+<h2 id="general"><span class="n">10</span>Beyond one binary latent</h2>
+
+<h3>Rank in general</h3>
+<p>The strategy "posit a latent with as many values as the rank" is correct with one refinement: the minimal cardinality of an exactly-mediating latent is the <strong>nonnegative</strong> rank of the table (the fewest nonnegative product terms summing to it), and ordinary linear rank is a lower bound that can be strict for larger tables. For $2\times 2$ and for the examples here they coincide. In practice: linear rank, read from the singular spectrum, tells you the latent needs <em>at least</em> $k$ states; constructing the nonnegative factorization tells you whether $k$ suffices. With noise, spectra decay rather than truncate; the count of singular values above the noise floor is the latent's effective cardinality and the tail is each observable's private noise.</p>
+
+<h3>Multiple latents</h3>
+<p>Several distinct latents announce themselves as <em>block structure across pairwise tables</em>. If latent $A$ drives observables $\{X_1, X_2\}$ and an independent latent $B$ drives $\{X_3, X_4\}$, then within-group tables have rank $2$ while every across-group table has rank $1$. The pattern of pairwise ranks partitions the observables into communities, one latent per community, and the joint latent is the product $(A, B)$ — its component count multiplies across blocks. Finding multiple latents is finding the connected components of the "which pairs share structure" graph, then factoring each component as above.</p>
+
+<h3>Continuous latents: when the rank won't stop growing</h3>
+<p>Now the unfair coin: bias $\theta$ drawn from a continuous prior, observables $X_1, \dots, X_n$ i.i.d. flips given $\theta$. Each finite collection of flips still admits a <em>finite</em> mediating latent — but watch what happens to its minimal size as observables are added. With $n$ flips the table is determined by the moments $\mathbb{E}[\theta^k]$, $k \le n$, and the minimal exactly-mediating discrete latent is the smallest atom-set matching those moments — a Gaussian-quadrature problem, with answer the rank of the Hankel moment matrix. For $\theta \sim \mathrm{Uniform}(0,1)$ (moments $m_k = \tfrac{1}{k+1}$):</p>
+
+<table>
+<thead><tr><th>flips observed $n$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead>
+<tbody><tr><td>minimal latent cardinality</td>
+<td class="mono">1</td><td class="mono">2</td><td class="mono">2</td><td class="mono">3</td><td class="mono">3</td><td class="mono">4</td><td class="mono">4</td><td class="mono">5</td></tr></tbody>
+</table>
+
+<p>The rank climbs without bound, roughly one new latent state per two new observables. Each finite-$n$ latent is real but provisional — the quadrature shadow of $\theta$ at the current resolution — and the only latent that remains stable under <em>adding observables</em> is the continuous bias itself. (In the infinite-exchangeable limit this is de Finetti's theorem: the mixing measure over $\theta$ is the canonical latent.)</p>
+
+<div class="keybox">
+<div class="label">A diagnostic</div>
+<p style="margin-bottom:0">Discrete latent: the rank <strong>stabilizes</strong> as observables are added — three witnesses pin it down and the fourth confirms. Continuous latent: the rank <strong>keeps growing</strong>, each new observable resolving the latent a little finer. "How many values should the latent have" is thus not a property of any one table but of the trajectory of tables as the selection grows — discreteness itself is something you detect in the limit, not posit at the start.</p>
+</div>
+
+<hr>
+
+<h2 id="parked"><span class="n">11</span>Parked question</h2>
+
+<p>Sections 2 and 10 both gesture at a larger question deliberately deferred here: the latent was computed <em>given</em> a selection of partitions, but the selection itself ranges over a lattice. Which selections carry latents? Is there a latent stable across many overlapping selections, and is that stability — rather than presence-for-one-selection — what deserves the name <em>natural</em>? The coin example hints that the answer involves trajectories of selections, not single ones. To be developed.</p>
+
+<hr>
+<p class="small">All arithmetic in this note was verified numerically: the pushforward tables of Section 2; both factorizations of Section 5 (each reconstructs $M$ to machine precision); the eigendecomposition of Section 7 (eigenvalues $0.9, 0.1$; eigenvectors $(0.9,0.1), (0.1,0.9)$; weights $\tfrac12,\tfrac12$); the contradiction $c_0 = 1.11$ of Section 8; the partition-enumeration frontier of Section 9 with $h(0.1)=0.469$, $h(0.18)=0.680$, $h(0.2)=0.722$; and the Hankel ranks of Section 10.</p>
+
+</div>
+</body>
+</html>
