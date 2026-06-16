@@ -40,90 +40,305 @@
 %==================================================================
 \section{Self-modelling failures \& AIXI}
 %==================================================================
+% Diagrams in this section are recreated in TikZ after C. Wyeth, Embedded Agency;
+% the cybernetic / embedded-agent figures are after the LessWrong Embedded Agency sequence.
 
-\frame{\frametitle{Large agents vs.\ embedded agents}
-	\begin{block}{The cybernetic picture and its hidden assumptions}
+\frame{\frametitle{The cybernetic model and large agents}
+	\begin{columns}[T]
+	\begin{column}{0.56\textwidth}
+	\begin{block}{Learn a model, then plan with it}
 		{\tiny
 		\begin{itemize}
-			\item Cybernetic model: an agent learns a \emph{model} of its environment and \emph{plans} with it towards a goal. Two implicit assumptions:
+			\item Cybernetic model: an agent \emph{learns a model} of its environment and \emph{plans} with it to achieve a goal.
+			\item Two implicit assumptions:
 			\begin{itemize}\scriptsize
 				\item[(1)] the agent is \textbf{``larger than''} the environment -- its mind can hold a full copy of the world;
-				\item[(2)] the agent is \textbf{``outside''} the environment. (Note $1\Rightarrow2$, so model-based RL almost always assumes (2).)
+				\item[(2)] the agent is \textbf{``outside''} the environment.
 			\end{itemize}
-			\item Embedded reality: the agent is \emph{a special part of} the environment. It can be modified, copied, or destroyed; and \textbf{other equally powerful agents may exist, mutually reasoning about one another}.
-			\item Can we still reason when the agent is \emph{smaller} than its environment, and contained in it?
+			\item Note $1\Rightarrow2$, so model-based RL almost always assumes (2). Can we still reason when the agent is \emph{smaller} than its environment?
 		\end{itemize}
 		}
 	\end{block}
-	{\tiny \hfill (This section follows C.~Wyeth, \textit{Embedded Agency} / Wyeth \& Hutter.)}
+	\end{column}
+	\begin{column}{0.44\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny,
+	   b/.style={draw, rounded corners, align=center, inner sep=3pt}]
+	  \node[b, fill=red!12, dashed] (ag) {agent\\ (model $+$ planner)};
+	  \node[b, fill=blue!10, right=11mm of ag] (env) {environment};
+	  \draw[->] (ag.north east) to[bend left=22] node[above,font=\tiny]{action} (env.north west);
+	  \draw[->] (env.south west) to[bend left=22] node[below,font=\tiny]{percept, reward} (ag.south east);
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape clean boundary: the agent sits \emph{outside} the world}
+	\end{center}
+	\end{column}
+	\end{columns}
+	{\tiny \hfill (Section follows C.~Wyeth, \textit{Embedded Agency}; diagrams recreated, after the LessWrong Embedded Agency sequence.)}
 }
 
-\frame{\frametitle{AIXI: the ideal large agent}
-	\begin{block}{Optimal planning against a universal mixture (Hutter)}
+\frame{\frametitle{The actual situation: embedded agency}
+	\begin{columns}[T]
+	\begin{column}{0.54\textwidth}
+	\begin{block}{The agent is a part of the world}
 		{\tiny
 		\begin{itemize}
-			\item History-based RL: the agent emits actions $a_t$, gets percepts $e_t=(o_t,r_t)$; history $h_{<t}$.
-			\item \textbf{Universal mixture} over (lower semicomputable) environments $\nu\in\mathcal{M}$, Solomonoff weights $w_\nu=2^{-K(\nu)}$ ($\|$: percepts given actions):
-			$$\xi(e_{1:m}\,\|\,a_{1:m}) \;=\; \sum_{\nu\in\mathcal{M}} w_\nu\,\nu(e_{1:m}\,\|\,a_{1:m}).$$
-			\item \textbf{AIXI} acts by expectimax against $\xi$ (optimal policy $\pi^{*}=\arg\max_\pi V^{\pi}_\xi$):
-			$$a_t \;=\; \arg\max_{a_t}\sum_{e_t}\cdots\max_{a_m}\sum_{e_m}\Big(\textstyle\sum_{k=t}^{m} r_k\Big)\;\xi(e_{t:m}\,\|\,h_{<t}a_{t:m}).$$
-			\item In words: \emph{try every program that could be the world, weight by simplicity $2^{-K(\nu)}$, act to maximise expected reward.} The ideal \emph{dualistic} agent -- but is it \emph{embedded}-ready?
+			\item An agent is \emph{just a special part of} the environment.
+			\item It may be \textbf{modified, destroyed, or copied} (by itself or others) between interaction steps.
+			\item Other \textbf{equally powerful agents} may exist, \emph{mutually reasoning about each other}.
+			\item Safety relevance of getting this right: reward hacking, the shutdown problem, user identification.
+			\item Can we reason about an agent \emph{smaller} than, and contained in, its environment?
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.46\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny]
+	  \node[draw, fill=blue!8, minimum width=4.1cm, minimum height=2.4cm, label={[font=\tiny]above:environment}] (env) {};
+	  \node[draw, fill=red!14, rounded corners, inner sep=2pt, font=\tiny] (ag) at ([shift={(-1.1cm,-0.3cm)}]env.center) {agent};
+	  \node[draw, dashed, fill=gray!12, rounded corners, inner sep=2pt, font=\tiny, align=center] (mod) at ([shift={(0.8cm,0.35cm)}]env.center) {its model\\ (incomplete)};
+	  \draw[->, dashed] (ag) -- (mod);
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape it cannot fit the whole world (including itself) inside}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
+
+\frame{\frametitle{History-based reinforcement learning}
+	\begin{columns}[T]
+	\begin{column}{0.50\textwidth}
+	\begin{block}{The general framework}
+		{\tiny
+		\begin{itemize}
+			\item Under the cybernetic assumption, a very general class of tasks is modelled as \textbf{history-based RL}.
+			\item The agent emits actions $a_n$ and receives percepts $e_n=(o_n,r_n)$: observations $o_n$ and rewards $r_n$.
+			\item The \emph{interaction history} is the interleaved sequence $a_1 o_1 r_1\, a_2 o_2 r_2\cdots$
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.50\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny,
+	   b/.style={draw, rounded corners, align=center, inner sep=3pt}]
+	  \node[b, fill=red!12] (ag) {Agent};
+	  \node[b, fill=blue!10, right=16mm of ag] (env) {Environment};
+	  \draw[->] (ag.north east) to[bend left=15] node[above,font=\tiny]{actions $a_n$} (env.north west);
+	  \draw[->] (env.south west) to[bend left=15] node[below,font=\tiny]{$o_n$, $r_n$} (ag.south east);
+	\end{tikzpicture}\\[3mm]
+	{\tiny $\cdots\, a_1 o_1 r_1\ \ a_2 o_2 r_2\ \ a_3 o_3 r_3\, \cdots$}\\[1mm]
+	\begin{tikzpicture}[>=Stealth]\draw[->] (0,0)--(2.6,0) node[right,font=\tiny]{time};\end{tikzpicture}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
+
+\frame{\frametitle{AIXI}
+	\begin{block}{The optimal history-based agent for computable environments [Hut00]}
+		{\tiny
+		\begin{itemize}
+			\item AIXI \textbf{plans optimally against a Bayesian mixture of all programs}: a Solomonoff prior over environment-programs $q$, weighted by simplicity $2^{-\ell(q)}$.
+			\item The simplest formulation fits on one line (fixed horizon $m$, iterative value function), writing $e_i=o_i r_i$:
+			$$a_k \;:=\; \arg\max_{a_k}\sum_{o_k r_k}\cdots\max_{a_m}\sum_{o_m r_m}\big[r_k+\dots+r_m\big]\!\!\sum_{q:\,U(q,\,a_{1:m})=e_{1:m}}\!\! 2^{-\ell(q)}.$$
+			\item Read right-to-left: weight every environment-program $q$ consistent with the chosen actions by $2^{-\ell(q)}$, average the reward, then \emph{expectimax} over actions and percepts. The gold standard of an idealised \emph{dualistic} agent -- but is it \emph{embedded}-ready?
 		\end{itemize}
 		}
 	\end{block}
 }
 
-\frame{\frametitle{Joint prediction, semimeasures, and selected bits}
-	\begin{block}{Going beyond the cybernetic split -- and where it breaks}
+\frame{\frametitle{Joint history prediction: the idea}
+	\begin{columns}[T]
+	\begin{column}{0.54\textwidth}
+	\begin{block}{Predict the whole tape, actions included}
 		{\tiny
 		\begin{itemize}
-			\item Idea: instead of treating actions as given, \textbf{jointly predict the whole history} (actions \emph{and} percepts) with Solomonoff's universal distribution
-			$$M(x) \;=\!\! \sum_{p:\,U(p)=x*}\!\! 2^{-\ell(p)}\qquad(\text{sum over programs whose output starts with } x).$$
-			The cybernetic assumption is the special case where actions are \emph{conditioned on}, not predicted.
-			\item $M$ is only a \textbf{semimeasure}: probability can leak (the sequence may ``stop''),
-			$$\nu(x)\;\ge\;\sum_{a\in\Sigma}\nu(xa)\qquad(\text{a measure has equality}).$$
-			\item \textbf{Prediction of selected bits fails} (Lattimore--Hutter--Gavane; Wyeth--Hutter): there is $\omega\in\mathbb{B}^\infty$ with $\omega_{2n}=\omega_{2n-1}$ for all $n$, yet $\;\liminf_n M(\omega_{2n}\mid\omega_{1:2n-1})<1$. Reading: even when the reward has \emph{always} equalled the action bit, AIXI \emph{infinitely often doubts} it will continue. (Normalising $M$ closes the semimeasure gap and repairs \emph{this}.)
+			\item Go \emph{beyond} the cybernetic framework by \textbf{jointly predicting the entire history} -- actions and percepts alike.
+			\item Formalisation: $a_1 e_1 a_2 e_2\cdots = h \sim \rho$ for a distribution $\rho$ over histories.
+			\item The cybernetic assumption is the \emph{special case} $\rho=\mu^{\pi}$: the history factorises into an environment $\mu$ (percepts given actions) and a policy $\pi$ (actions given history).
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.46\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[font=\tiny]
+	  \foreach \i in {0,1,2,3} {
+	    \draw[fill=green!8] (\i*0.95,0) rectangle (\i*0.95+0.8,0.8);
+	    \draw[fill=gray!25] (\i*0.95+0.22,0.22) rectangle (\i*0.95+0.58,0.58);
+	  }
+	  \node[font=\tiny] at (4.05,0.4) {$\cdots$};
+	  \node[font=\tiny, anchor=west] at (-0.05,1.08) {environment state};
+	  \node[font=\tiny, anchor=west] at (0.4,-0.28) {agent state};
+	  \draw[->] (0,-0.62)--(2.9,-0.62) node[right]{time};
+	\end{tikzpicture}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
+
+\frame{\frametitle{Joint history prediction: Solomonoff's mixture}
+	\begin{block}{From pure prediction to a joint belief}
+		{\tiny
+		\begin{itemize}
+			\item For pure prediction, Ray Solomonoff's universal distribution is a Bayesian mixture over all probabilistic programs:
+			$$M(x) \;=\!\! \sum_{p:\,U(p)=x*}\!\! 2^{-\ell(p)}\qquad(\text{programs whose output starts with } x).$$
+			\item Marcus Hutter extended this to decision problems. The joint AIXI belief is built from $M$ as a product of one-step conditionals:
+			$$\xi^{U}(e_{1:t}\,\|\,a_{1:t}) \;=\; \prod_{i=1}^{t} M\big(e_i \mid h_{<i}\,a_i\big).$$
+			\item \emph{Why not just use this to predict the joint distribution -- actions and all?}
 		\end{itemize}
 		}
 	\end{block}
 }
 
-\frame{\frametitle{AIXI cannot model itself}
-	\begin{block}{``AIXI does not believe the universe contains AIXI''}
+\frame{\frametitle{Joint history prediction: why it breaks for RL}
+	\begin{block}{Joint prediction does not transfer cleanly}
 		{\tiny
 		\begin{itemize}
-			\item AIXI believes its environment is lower semicomputable, but \textbf{AIXI's own optimal policy is \emph{not} lower semicomputable} (it sits higher in the hierarchy). So AIXI's hypothesis class $\mathcal{M}$ \emph{cannot contain a copy of itself}.
-			\item AIXI is a \textbf{Cartesian dualist}: it believes its policy is \emph{fixed} and interacts with the world from the outside, never overwritten by anything inside it. An embedded agent's computation is, by contrast, just more physics.
-			\item Consequence for multi-agent settings: AIXI cannot represent another agent as powerful as itself -- which is exactly what the grain of truth problem (next) demands.
+			\item Joint prediction does \textbf{not} immediately transfer to RL; learning may \textbf{not converge} even when the cybernetic assumption holds.
+			\item One can choose \textbf{uncomputable odd bits} that destroy Solomonoff prediction on the \emph{computable} even bits, e.g.
+			$$\mathtt{11}\ \ \mathtt{00}\ \ \mathtt{00}\ \ \mathtt{11}\ \ \mathtt{11}\ \ \mathtt{11}\ \ \mathtt{11}\ \cdots\qquad(\text{odd bits uncomputable, even bits computable}).$$
+			\item The same trick: certain \textbf{uncomputable actions} can break Solomonoff \emph{percept} prediction.
+			\item Surprisingly, \textbf{normalising $M$} patches this particular problem.
 		\end{itemize}
 		}
 	\end{block}
+}
+
+\frame{\frametitle{Semimeasure loss}
+	\begin{columns}[T]
+	\begin{column}{0.52\textwidth}
+	\begin{block}{The missing probability mass}
+		{\tiny
+		\begin{itemize}
+			\item $M$ is only a \textbf{semimeasure}: probability can \emph{leak} (as if the sequence may ``stop''),
+			$$\nu(x)\;\ge\;\sum_{a\in\Sigma}\nu(xa)\quad(\text{a measure has equality}).$$
+			\item There are several ways to \emph{complete} / \emph{normalise} a semimeasure: reallocate the leftover gap among the continuations.
+			\item The gap reallocated this way is the \textbf{semimeasure loss}.
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.48\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny]
+	  \fill[blue!45] (0,0.7) rectangle (1.3,1.1); \draw (0,0.7) rectangle (1.3,1.1); \node[white,font=\tiny] at (0.65,0.9) {$M(0|x)$};
+	  \draw[fill=white] (1.3,0.7) rectangle (1.78,1.1);
+	  \fill[red!75] (1.78,0.7) rectangle (2.9,1.1); \draw (1.78,0.7) rectangle (2.9,1.1); \node[white,font=\tiny] at (2.34,0.9) {$M(1|x)$};
+	  \node[font=\tiny] at (1.54,1.32) {gap};
+	  \fill[blue!45] (0,0) rectangle (1.55,0.4); \draw (0,0) rectangle (1.55,0.4);
+	  \fill[red!75] (1.55,0) rectangle (2.9,0.4); \draw (1.55,0) rectangle (2.9,0.4);
+	  \draw[->] (1.45,0.66)--(1.0,0.44); \draw[->] (1.62,0.66)--(2.1,0.44);
+	  \node[font=\tiny] at (1.45,-0.24) {reallocate $=$ semimeasure loss};
+	\end{tikzpicture}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
+
+\frame{\frametitle{Prediction of selected bits}
+	\begin{block}{The semimeasure loss can be large infinitely often}
+		{\tiny
+		\begin{itemize}
+			\item The semimeasure loss can be made \emph{large infinitely often} [Lattimore--Hutter--Gavane].
+			\item \textbf{Theorem 7 (adversarial non-convergence of $\xi^{U}$)} [Wyeth--Hutter]: there exists $e=a\in\mathbb{B}^{\infty}$ such that
+			$$\xi^{U}(e_{1:t}\,\|\,a_{1:t}) \;=\; \xi^{U}(a_{1:t}\,\|\,a_{1:t}) \;\longrightarrow\; 0 \quad\text{as } t\to\infty.$$
+			\item Reading: there are histories where, even though the reward has \emph{always} matched the (binary) value of the action, AIXI \textbf{infinitely often doubts} this will continue.
+			\item \emph{Caution:} we do not know whether these (action) histories are \emph{on-policy} for AIXI. And Theorem 7 \textbf{fails when $M$ is normalised.}
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{AIXI is much ``larger'' than its environment}
+	\begin{columns}[T]
+	\begin{column}{0.57\textwidth}
+	\begin{block}{The agent is not in its own hypothesis class}
+		{\tiny
+		\begin{itemize}
+			\item AIXI believes the environment is \textbf{lower semicomputable} ($\Sigma^0_1$).
+			\item But AIXI's own \emph{policy} is \textbf{not} lower semicomputable -- it sits \emph{higher} in the arithmetical hierarchy:
+			$$\cdots\,\Delta^0_n \subset \Sigma^0_n,\Pi^0_n \subset \Delta^0_{n+1} \subset \Sigma^0_{n+1},\Pi^0_{n+1}\,\cdots$$
+			\item Hence \textbf{``AIXI does not believe the universe contains AIXI agents.''}
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.43\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny]
+	  \node[draw, rounded corners, fill=blue!8, minimum width=3.4cm, minimum height=1.5cm, align=center, label={[font=\tiny]above:hypothesis class $\mathcal{M}$}] (M) {lower-semicomputable\\ environments};
+	  \node[draw, dashed, rounded corners, fill=red!14, font=\tiny, align=center, below=8mm of M] (pi) {AIXI's own policy\\ (higher in the hierarchy)};
+	  \draw[->, dashed] (pi) -- node[right, font=\tiny]{$\notin\mathcal{M}$} (M);
+	\end{tikzpicture}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
+
+%==================================================================
+\section{The grain of truth problem \& reflective oracles}
+%==================================================================
+
+\frame{\frametitle{Modeling multi-player games}
+	\begin{columns}[T]
+	\begin{column}{0.54\textwidth}
+	\begin{block}{Mutual modelling needs same-size agents}
+		{\tiny
+		\begin{itemize}
+			\item Agents which are modelling each other must be of the \textbf{``same size''}.
+			\item Therefore AIXI \textbf{cannot learn} that the environment contains other AIXI instances.
+			\item Note: multi-player games do \emph{not} necessarily involve other embedded-agency problems (``being inside the environment'') -- this obstacle is specifically about \emph{mutual modelling}.
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.46\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny,
+	   b/.style={draw, rounded corners, align=center, inner sep=3pt},
+	   m/.style={draw, dashed, rounded corners, fill=gray!10, inner sep=2pt, font=\tiny}]
+	  \node[b, fill=orange!15] (A) {agent 1};
+	  \node[b, fill=green!12, right=18mm of A] (B) {agent 2};
+	  \node[m, above=4mm of A] (mA) {model of 2};
+	  \node[m, above=4mm of B] (mB) {model of 1};
+	  \draw[->,dashed] (A)--(mA); \draw[->,dashed] (B)--(mB);
+	  \draw[<->] (A)--(B) node[midway,below,font=\tiny]{same size};
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape each must fit a model of the other -- as powerful as itself}
+	\end{center}
+	\end{column}
+	\end{columns}
 }
 
 \frame{\frametitle{The grain of truth problem}
-	\begin{block}{Bayesian agents that are never ``infinitely surprised''}
+	\begin{block}{Correctly-specified subjective models}
 		{\tiny
 		\begin{itemize}
-			\item In a multi-agent game, agents modelling each other must be of \textbf{the same ``size''}. So AIXI cannot learn an environment that contains other AIXIs -- mutual modelling breaks the large-agent assumption.
-			\item \textbf{Grain of truth property:} each player's belief $\xi$ should assign \emph{positive probability to the truth} $\mu$ (the environment generated by the others' actual policies) -- never \emph{infinitely surprised} by something that truly happens. Formally the truth is absolutely continuous w.r.t.\ the belief, $\mu\ll\xi$ (i.e.\ $\xi(x){=}0\Rightarrow\mu(x){=}0$); by Blackwell--Dubins the posteriors then \emph{merge}.
-			\item Naive constructions fail: if policies must \emph{run each other} to predict each other, the mutual calls \textbf{do not halt} (infinite regress). We need a way for same-size agents to predict same-size agents \emph{without hanging}.
+			\item In a multiplayer game we want each Bayesian player to have a \emph{correctly-specified} model of its subjective environment: never \textbf{``infinitely surprised''} by an event that has positive probability under the true history distribution.
+			\item Given a class of games $\mathcal{G}$, a class of strategies $\mathcal{P}$, and subjective beliefs $\xi_i$ for player $i$, the \textbf{grain of truth property} requires:
+			\begin{itemize}\scriptsize
+				\item[--] each optimal policy $\pi^{*}_{\xi_i}\in\mathcal{P}$ (the best response stays in the class), and
+				\item[--] each belief $\xi_i \gg \sigma^{\pi}$ for all $\sigma\in\mathcal{G},\ \pi\in\mathcal{P}^{n}$,
+			\end{itemize}
+			where $\gg$ denotes \textbf{absolute continuity} (the truth is absolutely continuous w.r.t.\ the belief; by Blackwell--Dubins, posteriors then \emph{merge}).
 		\end{itemize}
 		}
 	\end{block}
 }
 
-\frame{\frametitle{Reflective oracles}
+\frame{\frametitle{Solution with reflective oracles (I): the construction}
 	\begin{columns}[T]
 	\begin{column}{0.60\textwidth}
-	\begin{block}{Self-reference without paradox, via randomisation}
+	\begin{block}{Precise access to others, without hanging}
 		{\tiny
 		\begin{itemize}
-			\item A \textbf{reflective oracle} $O$: for a probabilistic machine $T$ (which may call $O$) and rational $p$, it \emph{reflects} the true probability,
-			$$O(T,p)=\begin{cases}1 & \text{if }\mathbb{P}[T^{O}(){=}1]>p\\[-1pt] 0 & \text{if }\mathbb{P}[T^{O}(){=}1]<p\end{cases}\qquad(\text{either if }=p)$$
-			and such $O$ provably exists (Fallenstein--Taylor--Christiano).
-			\item The liar machine ``output $0$ iff $O$ says I output $1$ w.p.\ $>\tfrac12$'' contradicts a \emph{deterministic} oracle; \textbf{randomising} exactly at $=p$ breaks the diagonalisation, so nothing hangs.
-			\item Closed under mutual modelling, so a \textbf{reflective AIXI} has the grain of truth: convergence to Nash equilibria, and (via joint prediction) \textbf{acausal coordination} in the PD.
-			\item \textbf{Bridge:} reflective oracles model each other \emph{semantically} (a shared oracle); open-source games do it \emph{syntactically}.
+			\item This appears to \textbf{fail for AIXI players}. Naively, build games/policies by
+			$$\lambda_T(x_t\mid x_{<t}) = \mathbb{P}[\,T(x_{<t})=x_t\,],$$
+			but \textbf{policies hang} when they call each other (infinite regress).
+			\item Instead, give each machine $T$ a \textbf{reflective oracle} $O$ giving \emph{arbitrarily precise access} to the RHS for all other machines $T'$ that also use $O$:
+			$$\lambda^{O}_T(x_t\mid x_{<t}) = \mathbb{P}[\,T^{O}(x_{<t})=x_t\,].$$
+			\item $O$ \emph{reflects} the true probability and may \textbf{randomise} exactly at the query threshold, so nothing hangs and no liar paradox arises (such $O$ exists -- Fallenstein--Taylor--Christiano). These augmented machines build a \textbf{reflective AIXI} with the grain of truth property.
 		\end{itemize}
 		}
 	\end{block}
@@ -132,18 +347,45 @@
 	\begin{center}
 	\begin{tikzpicture}[>=Stealth, font=\tiny,
 	   b/.style={draw, rounded corners, align=center, inner sep=3pt}]
-	  \node[b, fill=red!12] (T) {machine $T$\\ (uses $O$)};
-	  \node[b, fill=blue!10, below=12mm of T] (Tp) {machine $T'$\\ (uses $O$)};
-	  \node[b, fill=green!14, right=11mm of $(T)!0.5!(Tp)$] (O) {oracle\\ $O$};
-	  \draw[->] (T.east) to[bend left=12] node[above,font=\tiny]{query} (O.north west);
-	  \draw[->] (O.south west) to[bend left=12] node[below,font=\tiny]{$\mathbb{P}(T'{=}1){>}p$?} (Tp.east);
+	  \node[b, fill=red!12] (T) {machine $T$};
+	  \node[b, fill=blue!10, below=12mm of T] (Tp) {machine $T'$};
+	  \node[b, fill=green!14, right=10mm of $(T)!0.5!(Tp)$] (O) {oracle\\ $O$};
+	  \draw[->] (T.east) to[bend left=12] node[above,font=\tiny]{ask} (O.north west);
+	  \draw[->] (O.south west) to[bend left=12] node[below,font=\tiny]{$\mathbb{P}[T'^{O}{=}x]$} (Tp.east);
 	  \draw[->, dashed] (Tp.north) to[bend right=10] node[left,font=\tiny]{models} (T.south);
-	  \node[font=\tiny\itshape, below=8mm of Tp, text width=3.2cm, align=center]
-	    {randomise on the diagonal $\Rightarrow$ no liar paradox};
-	\end{tikzpicture}
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape randomise at the threshold $\Rightarrow$ no hang}
 	\end{center}
 	\end{column}
 	\end{columns}
+}
+
+\frame{\frametitle{Solution with reflective oracles (II): results}
+	\begin{block}{What reflective oracles buy}
+		{\tiny
+		\begin{itemize}
+			\item \textbf{Game-theoretic results:}
+			\begin{itemize}\scriptsize
+				\item[--] in the ``dualistic'' multiplayer setup: convergence to \textbf{Nash equilibrium} in stage games, and generally convergence to optimality for \textbf{Thompson sampling} [Leike--Taylor--Fallenstein; Wyeth et al.];
+				\item[--] if we allow \emph{correlations} between policies (joint prediction): provable \textbf{``acausal'' coordination} in the Prisoner's Dilemma [Meulemans et al.].
+			\end{itemize}
+			\item The \textbf{semimeasure loss is eliminated} and prediction of selected bits \emph{succeeds}.
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Solution with reflective oracles (III): self-modelling}
+	\begin{block}{Using the self-model -- and its limits}
+		{\tiny
+		\begin{itemize}
+			\item An agent can \textbf{exploit its self-model to avoid planning}; in principle this lets it \emph{reason about self-modifications}.
+			\item However, it is \textbf{difficult to prove optimality} (or any other interesting property) of this model. With the oracle-based joint belief $a_1 e_1 a_2 e_2\cdots\sim\xi^{O}$:
+			$$\pi_S(h_{<t}) \in \arg\max_{a_t}\ \xi^{O}\!\Big(\textstyle\sum_{i=t}^{\infty}\gamma_i r_i \,\Big|\, h_{<t}\,a_t\Big).$$
+			\item \textbf{Bridge to the rest of the deck:} reflective oracles solve mutual modelling \emph{semantically} (a shared oracle); open-source game theory does it \emph{syntactically} -- the agents read each other's source code.
+		\end{itemize}
+		}
+	\end{block}
 }
 
 %==================================================================
