@@ -92,33 +92,69 @@
 %==================================================================
 
 \frame{\frametitle{A 60-second primer: Bayesian networks}
+	\begin{columns}[T]
+	\begin{column}{0.58\textwidth}
 	\begin{block}{Encoding ``what depends on what''}
 		{\tiny
 		\begin{itemize}
-			\item A Bayesian network is a directed acyclic graph whose nodes are random variables and whose edges mean ``directly listens to''. The joint distribution \emph{factorises} along the graph:
+			\item A Bayesian network is a directed acyclic graph: nodes are random variables, an edge $X\to Y$ means $Y$ \emph{directly listens to} $X$. The joint distribution \emph{factorises} along the graph:
 			$$P(X_1,\dots,X_n) = \prod_{i=1}^{n} P\big(X_i \mid \mathrm{Pa}(X_i)\big),$$
-			where $\mathrm{Pa}(X_i)$ are the parents (direct causes) of $X_i$.
-			\item Graphically: each variable is independent of its non-descendants given its parents. The graph is a compact, structured stand-in for a huge joint distribution.
+			with $\mathrm{Pa}(X_i)$ the parents (direct causes) of $X_i$.
+			\item Each variable is independent of its non-descendants given its parents: a compact, structured stand-in for a huge joint distribution.
+			\item For the graph on the right:
+			$$P(C)\,P(S\mid C)\,P(R\mid C)\,P(W\mid S,R).$$
 		\end{itemize}
 		}
-		\begin{center}
-			\includegraphics[width=0.16\linewidth]{bayesnet.png}
-		\end{center}
 	\end{block}
+	\end{column}
+	\begin{column}{0.42\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny, node distance=7mm,
+	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0.5pt, minimum size=8.5mm, align=center}]
+	  \node[v] (C) {cloudy\\ $C$};
+	  \node[v, below left=8mm and 3mm of C] (S) {sprink-\\ler $S$};
+	  \node[v, below right=8mm and 3mm of C] (R) {rain\\ $R$};
+	  \node[v, below=21mm of C] (W) {wet\\ grass $W$};
+	  \draw[->] (C)--(S); \draw[->] (C)--(R);
+	  \draw[->] (S)--(W); \draw[->] (R)--(W);
+	\end{tikzpicture}\\[1.5mm]
+	{\tiny\itshape cloud cover is a common cause of sprinkler use and rain}
+	\end{center}
+	\end{column}
+	\end{columns}
 }
 
 \frame{\frametitle{Causal decision theory: seeing vs.\ doing}
+	\begin{columns}[T]
+	\begin{column}{0.60\textwidth}
 	\begin{block}{The $\mathrm{do}$-operator}
 		{\tiny
 		\begin{itemize}
 			\item Pearl's key distinction: \emph{observing} $X{=}x$ (passive evidence) is not the same as \emph{doing} $X{=}x$ (an intervention).
-			\item $\mathrm{do}(X=x)$ models an intervention: \textbf{sever all arrows into $X$} (cut $X$ off from its causes), fix $X=x$, then propagate downstream. Writing $\mathrm{Pa}(X)$ for the direct causes of $X$:
-			$$P\big(Y \mid \mathrm{do}(X{=}x)\big) = \sum_{z} P\big(Y \mid X{=}x,\, \mathrm{Pa}(X){=}z\big)\,P\big(\mathrm{Pa}(X){=}z\big).$$
-			\item Classic example: a barometer reading is correlated with storms (common cause: air pressure). \emph{Seeing} a low reading predicts a storm; \emph{forcing} the needle down (an intervention that severs it from air pressure) tells you nothing about storms.
-			\item \textbf{CDT:} choose $a^{*} = \arg\max_a \mathbb{E}[U \mid \mathrm{do}(A=a)]$. Evaluate each action by the causal consequences of \emph{intervening} on it, holding the rest of the past fixed.
+			\item $\mathrm{do}(X=x)$: \textbf{sever all arrows into $X$} (cut $X$ off from its causes), fix $X=x$, propagate downstream. Adjusting over the direct causes $z=\mathrm{Pa}(X)$:
+			$$P\big(Y \mid \mathrm{do}(X{=}x)\big) = \sum_{z} P(Y\mid x, z)\,P(z).$$
+			\item Sprinkler graph: \emph{seeing} the sprinkler on raises the chance it was cloudy, hence lowers the chance of rain. \emph{Doing} $\mathrm{do}(S{=}\text{on})$ cuts $C\to S$, so it tells you \textbf{nothing} about rain.
+			\item \textbf{CDT:} $a^{*} = \arg\max_a \mathbb{E}[U \mid \mathrm{do}(A=a)]$ -- judge each action by the causal consequences of \emph{intervening} on it, holding the rest of the past fixed.
 		\end{itemize}
 		}
 	\end{block}
+	\end{column}
+	\begin{column}{0.40\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny, node distance=7mm,
+	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0.5pt, minimum size=8.5mm, align=center}]
+	  \node[v] (C) {cloudy\\ $C$};
+	  \node[v, fill=red!15, below left=8mm and 3mm of C] (S) {$S{=}$\\ \textbf{on}};
+	  \node[v, below right=8mm and 3mm of C] (R) {rain\\ $R$};
+	  \node[v, below=21mm of C] (W) {wet\\ grass $W$};
+	  \draw[->, red, dashed] (C)--(S) node[midway, left, font=\tiny, text=red]{cut};
+	  \draw[->] (C)--(R);
+	  \draw[->] (S)--(W); \draw[->] (R)--(W);
+	\end{tikzpicture}\\[1.5mm]
+	{\tiny\itshape $\mathrm{do}(S{=}\text{on})$ severs $S$ from its cause $C$}
+	\end{center}
+	\end{column}
+	\end{columns}
 }
 
 \frame{\frametitle{CDT on Newcomb's problem}
@@ -216,14 +252,17 @@
 \section{Functional \& updateless decision theory}
 %==================================================================
 
-\frame{\frametitle{Functional decision theory: choose the algorithm's output}
-	\begin{block}{Identify with the computation, not the body}
+\frame{\frametitle{Functional decision theory: intervene on the function}
+	\begin{block}{The three rules side by side (Yudkowsky \& Soares 2017)}
 		{\tiny
 		\begin{itemize}
-			\item The shift: you are not just \emph{this physical body about to move}; you are an \textbf{implementation of a decision computation}. Predictors, copies, and simulations elsewhere in the world may be other implementations or correlates of the \emph{same} computation.
-			\item FDT's counterfactual: ``consider the world in which this decision algorithm, on this input, outputs $a$.'' Everything \textbf{logically downstream} of that output changes with it.
-			\item \textbf{Newcomb:} ``my algorithm outputs one-box'' $\Rightarrow$ $\Omega$ (who computed my algorithm) predicted one-box $\Rightarrow$ box full. FDT one-boxes, \emph{for the right reason}. \textbf{Smoking lesion:} ``my algorithm outputs smoke'' does not change the lesion (the lesion isn't running my decision), so FDT smokes. \textbf{FDT gets both right.}
-			\item Slogan: \emph{CDT asks what follows from the act being physically different; EDT, from the act being evidence; FDT, from the decision computation being different.}
+			\item Write $V$ for the outcome's value, $\mathrm{Act}$ for the physical-action node, and $\mathrm{fdt}(P,G,x)$ for the \emph{logical node} representing the output of the agent's decision function on observation $x$:
+			$$\mathrm{EDT}(P,x)=\arg\max_a \mathbb{E}[V\mid \mathrm{Obs}{=}x,\ \mathrm{Act}{=}a],$$
+			$$\mathrm{CDT}(P,G,x)=\arg\max_a \mathbb{E}[V\mid \mathrm{do}(\mathrm{Act}{=}a),\ \mathrm{Obs}{=}x],$$
+			$$\boxed{\ \mathrm{FDT}(P,G,x)=\arg\max_a \mathbb{E}\big[V\mid \mathrm{do}\big(\mathrm{fdt}(P,G,x){=}a\big)\big]\ }$$
+			\item The only change from CDT is \emph{which node you intervene on}. CDT intervenes on the physical act -- Peirce's \textbf{token} (``\emph{my} action is $a$''). FDT intervenes on the \textbf{type} -- the abstract function -- so every predictor, copy, or simulation computing that same function updates with it.
+			\item \textbf{Newcomb:} setting $\mathrm{fdt}{=}$one-box also moves $\Omega$'s earlier prediction $\Rightarrow$ box full; FDT one-boxes. \textbf{Smoking lesion:} the lesion does not compute your decision, so $\mathrm{do}(\mathrm{fdt}{=}\text{smoke})$ leaves it untouched; FDT smokes. \textbf{FDT gets both right.}
+			\item Caveat: the function's output is fixed of \emph{logical necessity}, so FDT must evaluate \emph{counterpossibles} (antecedents that run counter-to-logic) -- still the main open problem (cf.\ the 5-and-10 problem).
 		\end{itemize}
 		}
 	\end{block}
@@ -238,7 +277,7 @@
 			\item You and a psychological \emph{twin} (your exact copy) play a one-shot Prisoner's Dilemma in separate rooms, no communication. You run the \emph{same} decision function.
 			\item \textbf{CDT:} ``I can't causally affect her; defection dominates.'' Both defect, each gets \$1.
 			\item \textbf{FDT:} ``We compute the same function. If it outputs $C$, both cooperate; if $D$, both defect.'' So FDT cooperates -- both get \$3.
-			\item \textbf{Subjunctive dependence:} two physical systems both depend on one \emph{logical} fact (the function's output). FDT acts as if it controls \emph{all} instances of the computation at once.
+			\item \textbf{Subjunctive dependence} (Y\&S): when two physical systems compute the \emph{same} function, their outputs are logically tied -- like two calculators evaluating $6288{+}1048$: see one print $7336$ and you know the other will too. Causal dependence is a \emph{special case}; mere correlation (both calculators happen to be pink) is not. FDT acts as if it controls \emph{all} instances of the computation at once.
 		\end{itemize}
 		}
 	\end{block}
@@ -265,11 +304,12 @@
 	\begin{block}{Paying in a branch you know you're not rewarded in}
 		{\tiny
 		\begin{itemize}
-			\item $\Omega$ flips a fair coin. \textbf{Tails:} it gives you $R=\$10{,}000$ iff it predicted you would pay on heads. \textbf{Heads:} it asks you for $c=\$100$. You wake up, you are asked to pay (so: heads). Pay?
+			\item $\Omega$ flips a fair coin. \textbf{Tails:} you get $R=\$10{,}000$ iff $\Omega$ predicted you'd pay on heads. \textbf{Heads:} $\Omega$ asks for $c=\$100$. You are asked to pay (so: heads). Pay?
 			\item \textbf{Updateful} reasoning conditions on ``I'm in heads'': it sees only the \$100 cost and \textbf{refuses}. But \emph{ex ante} the policy ``pay if asked'' is worth $\tfrac12(R-c)>0$.
-			\item \textbf{UDT:} do not condition away the (tails) branch whose payoff \emph{depended on your policy}. Evaluate the output against the \textbf{prior}. UDT \textbf{pays}.
-			\item Updatelessness is \emph{not} ignorance: you still use the observation; you just refuse to delete branches whose payoffs hinge on your policy. With no predictor, UDT $=$ ordinary EU maximisation.
-			\item \textbf{Reflective stability:} an updateful agent here \emph{wishes it had precommitted} to pay. UDT already follows the policy it would have committed to -- nothing to self-modify.
+			\item \textbf{UDT 1.0:} evaluate the local output against the \textbf{prior} -- keep the (tails) branch whose payoff your policy controls, by dropping the updateful rule's extra $O{=}o$ conditioning:
+			$$\mathrm{choice}(o)=\arg\max_a \mathbb{E}\big[U\mid \mathrm{choice}(o){=}a\big].$$
+			So UDT 1.0 \textbf{pays}.
+			\item Updatelessness is \emph{not} ignorance (no predictor $\Rightarrow$ UDT $=$ ordinary EU max), and it is \emph{reflectively stable}: the agent already follows the policy it would have precommitted to.
 		\end{itemize}
 		}
 	\end{block}
@@ -301,9 +341,10 @@
 		\begin{itemize}
 			\item Even \emph{updateless local-action} selection can be too local. \textbf{Copied-agent anti-coordination}: two copies see index $1$ or $2$, must pick \emph{different} actions to win (10 each), else 0.
 			\item The local question ``if $\mathrm{Alg}(1)=A$, what is $\mathrm{Alg}(2)$?'' is the \emph{wrong type}: both symmetric answers fail. The good object is the \emph{whole table} $\mathrm{Alg}:\{1,2\}\to\{A,B\}$.
-			\item \textbf{UDT 1.1 (Wei Dai):} first choose the entire policy $\pi^{*}=\arg\max_{\pi}\mathbb{E}_{\text{prior}}[U]$, \emph{then} apply $\pi^{*}$ to your actual observation:
-			$$\pi^{*}\in\arg\max_{\pi\in\Pi}\mathbb{E}_{K^{\mathrm{Pol}}_\pi}[U],\qquad \mathrm{UDT1.1}(x)=\pi^{*}(x).$$
-			\item $\pi_{AB},\pi_{BA}$ score 10; a shared tie-breaker coordinates the copies. This is \textbf{global optimisation over branches}, not local optimisation in one branch.
+			\item \textbf{UDT 1.1 (Wei Dai):} first choose the entire \emph{policy} (a map $S:O\to A$) against the prior, \emph{then} apply $S^{*}$ to your actual observation $o$:
+			$$S^{*}\in\arg\max_{S:\,O\to A}\ \mathbb{E}\big[U\mid \mathrm{choice}{=}S\big].$$
+			(UDT 1.0 instead fixes a single \emph{output} and hopes the rest fall out right.)
+			\item $\pi_{AB},\pi_{BA}$ score 10; a shared tie-breaker coordinates the copies. This is \textbf{global optimisation over branches}, not local optimisation.
 		\end{itemize}
 		}
 	\end{block}
@@ -382,40 +423,28 @@
 %==================================================================
 
 \frame{\frametitle{The 5-and-10 problem}
-	\begin{block}{The simplest decision, made impossible by self-knowledge}
+	\begin{block}{The simplest decision, made hard by self-knowledge (Demski \& Garrabrant)}
 		{\tiny
 		\begin{itemize}
-			\item You may take \$5 or \$10; utility $=$ the dollars. Obviously take \$10. Can a fully self-aware agent?
-			\item An embedded agent has its \emph{own source code} and can prove things about it, hence prove facts about \textbf{its own action}. Its action is just another theorem about the world.
-			\item \textbf{Naive proof-based agent:} search for proofs of statements ``$(A{=}\$5)\Rightarrow U{=}x$'' and ``$(A{=}\$10)\Rightarrow U{=}y$'', then take the action with the higher \emph{proven} payoff.
-			\item \textbf{The trap.} The agent is deterministic: it takes exactly one action. For the action it does \emph{not} take -- say \$10 -- the conditional ``$(A{=}\$10)\Rightarrow(U{=}\$0)$'' is \textbf{vacuously true} (false antecedent). If the agent can prove it does not take \$10, it can prove \emph{anything} about that branch -- a \textbf{spurious counterfactual} -- conclude ``\$10 yields \$0'', and take \$5.
+			\item You may take \$5 or \$10; utility $=$ the dollars. A child takes \$10. Can a fully self-aware embedded agent?
+			\item Frame it for an embedded agent. The world is a deterministic program that pays out whatever number you take; the agent has \emph{its own source code} and the world's. It chooses by \textbf{proof search}: look for proofs of ``$(A{=}\$5)\Rightarrow U{=}x$'' and ``$(A{=}\$10)\Rightarrow U{=}y$'', and take the action with the higher \emph{proven} payoff.
+			\item \textbf{The deep issue.} ``If you can know your own behaviour, it becomes hard to reason about what would happen if you behaved \emph{differently}.'' Because the agent is deterministic it takes exactly one action; the other is ruled out \emph{by logic}, so ``what if I did otherwise?'' is a counterfactual with an \textbf{impossible antecedent}.
+			\item \textbf{The trap, concretely.} Suppose the agent can prove it takes \$5. Then $A\neq\$10$, so the material conditional ``$(A{=}\$10)\Rightarrow(U{=}\$0)$'' is \textbf{vacuously true} (a false antecedent implies anything). The agent proves it, ``concludes'' \$10 is worthless, and takes \$5 -- \emph{confirming} the proof. A self-fulfilling \textbf{spurious counterfactual}.
+			\item The fault is not bad logic but \emph{too much self-knowledge}: the action is a fixed fact, and a naive counterfactual over a fixed fact is vacuous.
 		\end{itemize}
 		}
 	\end{block}
 }
 
-\frame{\frametitle{A self-contained look at L\"ob's theorem}
-	\begin{block}{When ``provable'' is allowed to behave like ``true''}
+\frame{\frametitle{Spurious proofs and L\"ob's theorem}
+	\begin{block}{Why a naive proof-searcher is genuinely unsafe}
 		{\tiny
 		\begin{itemize}
-			\item Fix a formal system (e.g.\ PA). Write $\Box P$ for the \emph{sentence} ``$P$ is provable''. Keep two things distinct: $\Box P$ is a statement \emph{inside} the system; ``the system proves $P$'' (written $\vdash P$) is a fact \emph{about} the system.
-			\item Naively one expects the reflection schema $\Box P \to P$ (``if it's provable, it's true''). \textbf{L\"ob's theorem} says the system can prove $\Box P \to P$ \emph{only for $P$ it can already prove}:
+			\item \textbf{L\"ob's theorem (formula + intuition).} Write $\Box P$ for ``$P$ is provable''. Then
 			$$\text{if } \vdash (\Box P \to P)\ \text{ then } \vdash P; \qquad\text{equivalently}\qquad \vdash \Box(\Box P \to P)\to\Box P.$$
-			\item Intuition (Curry-style): the self-referential sentence ``\emph{if this sentence is provable, then $P$}'' forces $\vdash P$ whenever the system trusts its own proofs about $P$.
-			\item Special case $P=\bot$: a consistent system \textbf{cannot prove its own consistency} ($\Box\bot\to\bot$), recovering G\"odel's second incompleteness theorem.
-		\end{itemize}
-		}
-	\end{block}
-}
-
-\frame{\frametitle{Why L\"ob makes the spurious proof available}
-	\begin{block}{The self-fulfilling proof}
-		{\tiny
-		\begin{itemize}
-			\item Let $S := \big((A{=}\$10)\Rightarrow(U{=}\$0)\big)$. The agent is built so that \emph{proving} $S$ leads it to take \$5.
-			\item Then $\Box S \to S$ is provable: if it is provable that \$10 yields \$0, the agent takes \$5, so $A\neq\$10$, so $S$ is vacuously true. By \textbf{L\"ob's theorem}, $\vdash S$. The agent proves the spurious counterfactual and takes \$5, getting \$5.
-			\item So L\"ob shows the bad statement \emph{is genuinely provable} -- a naive proof search is \textbf{not safe} from being driven to the worse action. Ruling out spurious proofs needs extra machinery (e.g.\ ``playing chicken with the universe''), and a general theory of \emph{logical counterfactuals} (counterpossibles) remains \textbf{open}.
-			\item \textbf{Embedded-agency moral:} the agent's action is just another fact it can prove about the world; its self-knowledge \emph{undermines the very counterfactuals} decision-making needs. (The same L\"obian obstacle blocks an agent from fully trusting a successor's proofs -- a reflective-stability problem.)
+			Intuition: a system may treat ``provable $\Rightarrow$ true'' as safe \emph{only for what it already proves} -- so strongly that it cannot even prove its own consistency ($\Box\bot\to\bot$, i.e.\ G\"odel~II).
+			\item \textbf{The spurious proof is available.} Let $S := \big((A{=}\$10)\Rightarrow(U{=}\$0)\big)$. The agent is built so that \emph{proving} $S$ makes it take \$5; then $A\neq\$10$, so $S$ holds vacuously, giving $\vdash(\Box S\to S)$. By L\"ob, $\vdash S$. A naive proof search can therefore prove the bad statement and take \$5.
+			\item \textbf{Moral.} Ruling out spurious proofs needs extra structure (e.g.\ ``playing chicken with the universe''); a general account of \emph{logical counterfactuals} (counterpossibles) is open. The same L\"obian obstacle blocks an agent from fully trusting a successor's proofs -- a reflective-stability problem.
 		\end{itemize}
 		}
 	\end{block}

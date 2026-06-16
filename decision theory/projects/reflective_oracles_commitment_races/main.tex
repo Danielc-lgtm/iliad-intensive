@@ -59,13 +59,30 @@
 }
 
 \frame{\frametitle{AIXI: the ideal large agent}
-	\begin{block}{Optimal planning against a universal mixture}
+	\begin{block}{Optimal planning against a universal mixture (Hutter)}
 		{\tiny
 		\begin{itemize}
-			\item History-based RL: model very general tasks as an agent emitting actions and receiving percepts/rewards over time.
-			\item \textbf{AIXI} (Hutter) is the optimal history-based agent for \emph{computable} environments. It plans optimally against a \textbf{Bayesian mixture over all programs}, weighting each candidate environment by its simplicity (Solomonoff prior, weight $\sim 2^{-\text{length}}$).
-			\item One-line idea: \emph{try every program that could be the world, weight it by simplicity, and act to maximise expected reward under the mixture.}
-			\item AIXI is the gold standard of an idealised \emph{dualistic} agent. The question of this section: is it ready to be \emph{embedded}?
+			\item History-based RL: the agent emits actions $a_t$, gets percepts $e_t=(o_t,r_t)$; history $h_{<t}$.
+			\item \textbf{Universal mixture} over (lower semicomputable) environments $\nu\in\mathcal{M}$, Solomonoff weights $w_\nu=2^{-K(\nu)}$ ($\|$: percepts given actions):
+			$$\xi(e_{1:m}\,\|\,a_{1:m}) \;=\; \sum_{\nu\in\mathcal{M}} w_\nu\,\nu(e_{1:m}\,\|\,a_{1:m}).$$
+			\item \textbf{AIXI} acts by expectimax against $\xi$ (optimal policy $\pi^{*}=\arg\max_\pi V^{\pi}_\xi$):
+			$$a_t \;=\; \arg\max_{a_t}\sum_{e_t}\cdots\max_{a_m}\sum_{e_m}\Big(\textstyle\sum_{k=t}^{m} r_k\Big)\;\xi(e_{t:m}\,\|\,h_{<t}a_{t:m}).$$
+			\item In words: \emph{try every program that could be the world, weight by simplicity $2^{-K(\nu)}$, act to maximise expected reward.} The ideal \emph{dualistic} agent -- but is it \emph{embedded}-ready?
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Joint prediction, semimeasures, and selected bits}
+	\begin{block}{Going beyond the cybernetic split -- and where it breaks}
+		{\tiny
+		\begin{itemize}
+			\item Idea: instead of treating actions as given, \textbf{jointly predict the whole history} (actions \emph{and} percepts) with Solomonoff's universal distribution
+			$$M(x) \;=\!\! \sum_{p:\,U(p)=x*}\!\! 2^{-\ell(p)}\qquad(\text{sum over programs whose output starts with } x).$$
+			The cybernetic assumption is the special case where actions are \emph{conditioned on}, not predicted.
+			\item $M$ is only a \textbf{semimeasure}: probability can leak (the sequence may ``stop''),
+			$$\nu(x)\;\ge\;\sum_{a\in\Sigma}\nu(xa)\qquad(\text{a measure has equality}).$$
+			\item \textbf{Prediction of selected bits fails} (Lattimore--Hutter--Gavane; Wyeth--Hutter): there is $\omega\in\mathbb{B}^\infty$ with $\omega_{2n}=\omega_{2n-1}$ for all $n$, yet $\;\liminf_n M(\omega_{2n}\mid\omega_{1:2n-1})<1$. Reading: even when the reward has \emph{always} equalled the action bit, AIXI \emph{infinitely often doubts} it will continue. (Normalising $M$ closes the semimeasure gap and repairs \emph{this}.)
 		\end{itemize}
 		}
 	\end{block}
@@ -75,9 +92,9 @@
 	\begin{block}{``AIXI does not believe the universe contains AIXI''}
 		{\tiny
 		\begin{itemize}
-			\item To go beyond the cybernetic split, try \textbf{jointly predicting the whole history} (actions \emph{and} percepts) with a Solomonoff mixture. Problem: joint prediction does not transfer cleanly to RL, and learning may fail to converge even when the environment is computable.
-			\item AIXI believes its environment is lower semi-computable, but \textbf{AIXI's own optimal policy is \emph{not} lower semi-computable} (it sits higher in the computational hierarchy). So AIXI's hypothesis class \emph{cannot contain a copy of itself}.
-			\item \textbf{Self-modelling failure} (Wyeth--Hutter): there are histories where, even though the reward has \emph{always} matched the value of the action bit, AIXI \emph{infinitely often doubts} the pattern will continue (failure of ``prediction of selected bits''). Normalising the mixture repairs some, but not all, of this.
+			\item AIXI believes its environment is lower semicomputable, but \textbf{AIXI's own optimal policy is \emph{not} lower semicomputable} (it sits higher in the hierarchy). So AIXI's hypothesis class $\mathcal{M}$ \emph{cannot contain a copy of itself}.
+			\item AIXI is a \textbf{Cartesian dualist}: it believes its policy is \emph{fixed} and interacts with the world from the outside, never overwritten by anything inside it. An embedded agent's computation is, by contrast, just more physics.
+			\item Consequence for multi-agent settings: AIXI cannot represent another agent as powerful as itself -- which is exactly what the grain of truth problem (next) demands.
 		\end{itemize}
 		}
 	\end{block}
@@ -88,7 +105,7 @@
 		{\tiny
 		\begin{itemize}
 			\item In a multi-agent game, agents modelling each other must be of \textbf{the same ``size''}. So AIXI cannot learn an environment that contains other AIXIs -- mutual modelling breaks the large-agent assumption.
-			\item \textbf{Grain of truth property:} each player's prior should assign \emph{positive probability to the truth} (the other agents' actual policies) -- it should never be \emph{infinitely surprised} by an event that truly has positive probability. (Formally: the \emph{true} distribution is absolutely continuous w.r.t.\ the agent's beliefs.)
+			\item \textbf{Grain of truth property:} each player's belief $\xi$ should assign \emph{positive probability to the truth} $\mu$ (the environment generated by the others' actual policies) -- never \emph{infinitely surprised} by something that truly happens. Formally the truth is absolutely continuous w.r.t.\ the belief, $\mu\ll\xi$ (i.e.\ $\xi(x){=}0\Rightarrow\mu(x){=}0$); by Blackwell--Dubins the posteriors then \emph{merge}.
 			\item Naive constructions fail: if policies must \emph{run each other} to predict each other, the mutual calls \textbf{do not halt} (infinite regress). We need a way for same-size agents to predict same-size agents \emph{without hanging}.
 		\end{itemize}
 		}
@@ -101,10 +118,12 @@
 	\begin{block}{Self-reference without paradox, via randomisation}
 		{\tiny
 		\begin{itemize}
-			\item Give each machine a \textbf{reflective oracle} $O$: it answers queries ``\emph{is} $\;\mathbb{P}(\text{machine } T \text{ outputs } 1) > p$?'' for machines $T$ that may themselves call $O$.
-			\item The liar machine ``output $0$ iff $O$ says I output $1$ with prob.\ $>\tfrac12$'' would contradict a deterministic oracle. A reflective oracle is allowed to \textbf{randomise} on such borderline cases (when the true probability equals the threshold), so no machine hangs and no contradiction arises.
-			\item Reflective-oracle-computable strategies are \emph{closed under mutual modelling}, so a \textbf{reflective AIXI} satisfies the grain of truth property. Consequences: convergence to Nash equilibria in repeated games; with joint prediction, \textbf{acausal coordination} in the Prisoner's Dilemma; the self-modelling/semimeasure failures vanish.
-			\item \textbf{Bridge:} reflective oracles solve mutual modelling \emph{semantically} (a shared oracle). Open-source game theory does it \emph{syntactically} -- the agents simply read each other's source code.
+			\item A \textbf{reflective oracle} $O$: for a probabilistic machine $T$ (which may call $O$) and rational $p$, it \emph{reflects} the true probability,
+			$$O(T,p)=\begin{cases}1 & \text{if }\mathbb{P}[T^{O}(){=}1]>p\\[-1pt] 0 & \text{if }\mathbb{P}[T^{O}(){=}1]<p\end{cases}\qquad(\text{either if }=p)$$
+			and such $O$ provably exists (Fallenstein--Taylor--Christiano).
+			\item The liar machine ``output $0$ iff $O$ says I output $1$ w.p.\ $>\tfrac12$'' contradicts a \emph{deterministic} oracle; \textbf{randomising} exactly at $=p$ breaks the diagonalisation, so nothing hangs.
+			\item Closed under mutual modelling, so a \textbf{reflective AIXI} has the grain of truth: convergence to Nash equilibria, and (via joint prediction) \textbf{acausal coordination} in the PD.
+			\item \textbf{Bridge:} reflective oracles model each other \emph{semantically} (a shared oracle); open-source games do it \emph{syntactically}.
 		\end{itemize}
 		}
 	\end{block}
@@ -301,10 +320,41 @@
 			\item Setup (Oesterheld--Conitzer; DiGiovanni--Clifton--Mac\'e, arXiv:2403.05103): players delegate to \emph{representative} programs. The \emph{default} instruction is ``play the original game as best you can''.
 			\item An \textbf{SPI} is a re-instruction (restrict the strategy set, or re-map utilities) that is \textbf{guaranteed to make \emph{every} player weakly better off} -- with \emph{no} probabilistic assumptions about how the representatives play. A Pareto improvement that is \emph{safe} because it improves \emph{regardless} of the opponent.
 			\item Example: a game heading for costly conflict (Chicken-style). Agree on a transformation that strips out the mutually destructive outcome; each player does at least as well, whatever happens.
-			\item The paper proves a clean guarantee (each player gets at least their lowest payoff in any \emph{efficient} outcome) -- but under a strong assumption.
+			\item The paper proves a clean guarantee -- the \textbf{Pareto Meet Minimum (PMM)}: each player gets at least their \emph{lowest payoff over efficient (Pareto-optimal) outcomes}, and this bound is \emph{tight} (renegotiation cannot promise more). Next slide: why. Caveat: it needs a strong assumption.
 		\end{itemize}
 		}
 	\end{block}
+}
+
+\frame{\frametitle{Why an SPI guarantees a floor: the Pareto Meet Minimum}
+	\begin{columns}[T]
+	\begin{column}{0.58\textwidth}
+	\begin{block}{The shape of the renegotiation set controls exploitation}
+		{\tiny
+		\begin{itemize}
+			\item Each agent's \emph{renegotiation set} is the Pareto-improvements it will accept. On the frontier, ``better for the opponent'' \emph{means} ``worse for me''.
+			\item Let $A$ be the frontier point \textbf{best for me} (worst for the opponent). I have every reason to include points \emph{up to} $A$: pushing the opponent below $A$'s level cannot help me -- by definition $A$ already maximises \emph{my} payoff on the frontier.
+			\item But including points \emph{beyond} $A$ (where I would accept being worse than at $A$) enables \textbf{exploitation}: the opponent could make herself better off by making me worse off.
+			\item So rational renegotiation sets stop at each player's $A$-point. The worst the agreed outcome can be for me is the \emph{opponent's} $A$-point -- my \textbf{lowest efficient payoff}. That guaranteed floor is the \textbf{PMM} (and it is tight).
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.42\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny]
+	  \draw[->] (0,0)--(3.2,0) node[right]{$u_{1}$};
+	  \draw[->] (0,0)--(0,3.2) node[above]{$u_{2}$};
+	  \draw[blau-upc, very thick] (0.6,2.6) to[bend left=18] (2.6,0.6);
+	  \fill[red] (2.6,0.6) circle (1.6pt); \node[above right,font=\tiny,text=red!70!black] at (2.45,0.62) {$A$: best for me};
+	  \fill[blue] (0.6,2.6) circle (1.6pt); \node[above right,font=\tiny,text=blue!70!black] at (0.6,2.55) {$A'$: best for opp.};
+	  \draw[dashed,gray] (0.6,2.6)--(0.6,0);
+	  \node[font=\tiny,align=center] at (1.35,0.2) {my floor\\ $u_1(A')$};
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape accept the frontier between $A'$ and $A$, never beyond}
+	\end{center}
+	\end{column}
+	\end{columns}
 }
 
 \frame{\frametitle{The assumption SPI relies on -- and the cheating problem}
@@ -372,7 +422,7 @@
 		\begin{itemize}
 			\item Usually, a sequential structure creates an influencer-responder race (the first mover grabs the frontier). Here the first move (renegotiation) can \emph{only Pareto-improve}, so it \textbf{cannot exploit} -- no new commitment race is introduced.
 			\item Net result: entanglement-free SPI \textbf{solves the cheating problem} and \textbf{drops the participation-independence assumption} (the renegotiation program conditions on the defaults to catch cheating), while the sequential structure \textbf{avoids introducing its own commitment race}.
-			\item \textbf{The trade-off:} the original SPI's clean minimum-payoff bound relied on participation independence. Dropping that assumption, entanglement-free SPI \emph{cannot prove the same bound}. Weaker (more realistic) assumptions buy a weaker guarantee.
+			\item \textbf{The trade-off -- no tight PMM.} The renegotiation program conditions on the default program, so it can create an \emph{incentive gradient}: ``more cooperative default $\Rightarrow$ I offer more Pareto-improvement; more hawkish $\Rightarrow$ less''. Because it may \emph{withhold} improvement to shape the opponent's default, the agreed set is no longer the full ``up-to-$A$'' set, and the tight \textbf{Pareto Meet Minimum} floor is lost. Weaker (more realistic) assumptions buy a weaker guarantee.
 		\end{itemize}
 		}
 	\end{block}
