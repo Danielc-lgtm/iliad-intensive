@@ -42,6 +42,62 @@
 
 ### Slide: Reasoning About Ideal Intelligence
 
+<div>
+Remove the entire bit about coherence and dominated strategies.
+Instead have slides on the following content:
+- First briefly mention that coherence theorems give *some* justifications for 
+why it's useful to model agents as expected utility maximizers
+- Point out the objection that "anything can be modelled as a utility maximizer"
+e.g. "a rock is an expected utility maximizer whose utility is maximized by sitting on the floor"
+- Utility maximization is more predictive when we claim that a physical system is
+well modelled as a utility maximizer over "specific resources" like money or energy,
+we say that a physical system "prefer" state A over state B if it expends
+resources to move from state A to state B.
+- Under this frame, coherence theorems make more concrete predictions like:
+An "efficient" agent won't expend resources to move from state A to state B
+but also expend resource to move from state B to state A.
+Coherence theorems tells us that it's useful to model systems as efficient agents
+if it doesn't "throw away resources" unnecessarily.
+-In particular, for any given physical system and "resource", we can check
+if this is actually true. E.g. we can check if a cell expends energy converting 
+compound X to compound Y and also spend energy converting compounding Y to compound X
+
+Why care about resources at all?
+- Instrumental convergence: For a wide variety of goals that an agent may have,
+there are a lot of "resources" that would be useful for achieving a wide variety of goals.
+So that all else equal accumulating resources is "good" (by the agent's own lights) no matter what
+terminal goals an agent has
+- Ex: Resource theory in physics attemtps to formalize resources as "monotone state function"
+(e.g. entropy). Where "having" more resources allows you to have more "optionality" over the future
+(you have more possibility of being able to steer towards a wider variety of future states)
+
+</div>
+
+
+
+<div>
+Another slide on general purpose search:
+- Why do we expect intelligence to be "general purpose", in the sense of being able to
+steer towards a wide variety of possible goals
+- Suppose that you have some terminal goal X, but your world model is currently incomplete, 
+maybe there's a node/object Y in your world model that causally influences your terminal goal,
+but currently you aren't aware of that causal pathway
+- As you learn more about the world and update your world model correspondingly,
+you might learn about the causal path way from Y to X. In other words, you have learned that
+Y is an "instrumental subgoal" for X
+- Similarly, many things in your world model might "turn out" to be an instrumental subgoal
+- Suppose that the agent has an internal algorithm (general purpose search) which: 1. Takes the description of any goal
+2. Returns a plan to achieve that goal. Having this algorithm would mean that 
+if the agent "discovers" a new instrumental subgoal (by discovering new causal pathways)
+it can use the general purpose search algorithm to optimize for that instrumental subgoal on the fly
+- Create diagrams involving a bayesian network with terminal goal X and node Y, one diagram 
+has "missing" causal pathway and the other where the causal pathway is present
+(the agent has learned about the causal pathway), and then General purpose search
+algorithm can then optimize for Y
+</div>
+
+
+
 **Block: Coherence and dominated strategies**
 
 - An agent with circular preferences (A $\succ$ B $\succ$ C $\succ$ A) can be *money-pumped*: an adversary cycles them through trades, extracting a small fee each round, leaving the agent strictly worse off after every cycle
@@ -175,8 +231,11 @@
 **Block: Ground truth vs. a time-bounded approximator**
 
 - **Ground truth:** a computable function $f$ from inputs to outputs (or output distributions)
+
 - **Approximator:** a program $g$ that receives the input *and* a string of random bits, and must answer within a fixed **time bound**. The random bits induce a distribution over $g$'s outputs; its quality is how close that distribution is to $f$
+
 - **The tradeoff.** If computing $f$ needs a subroutine $h$ that $g$ cannot afford in time, a sensible move is to use the random bits to *sample* a value $\hat h$ from a distribution over $h$'s output, and propagate that uncertainty forward
+
 - As the time bound grows, $g$ can just compute $f$ directly and the random bits become irrelevant -- *uncertainty shrinks as we spend computation*
 
 - [Diagram: top row "f": input x -> compute h(x) -> output f(x); bottom row "g": input x -> sample h-hat ~ D (cannot afford h), fed by "random bits" -> output distribution]
@@ -238,6 +297,11 @@
 - **Planning:** General-purpose search exploits modularity -- if the world is modular, an agent can pursue decoupled subgoals independently, rather than having to plan everything jointly
 
 ### Slide: Optimization and Thermodynamics
+
+<div>
+Add the idea from optimization and thermodynamics lecture note that even if you only care about prediction, it would be useful for you
+to care about "optimizers" in the world. Span multiple slides if needed, make sure that text doesn't overflow
+</div>
 
 **Block: Optimization as local entropy reduction**
 
