@@ -84,21 +84,80 @@
 
 \section{Coherence}
 \frame{\frametitle{Reasoning About Ideal Intelligence}
-	\begin{block}{Coherence and dominated strategies}
+	\begin{block}{Coherence theorems -- and a too-cheap objection}
 		{\tiny
 		\begin{itemize}
-			\item An agent with circular preferences (A $\succ$ B $\succ$ C $\succ$ A) can be \textit{money-pumped}: an adversary cycles them through trades, extracting a small fee each round, leaving the agent strictly worse off after every cycle
-			\item \textbf{Dutch book setup:} formalize an agent's degrees of belief as \textit{betting prices} -- for each event $X$, the agent posts a price $p \in [0,1]$, meaning they are willing to buy or sell a contract that pays \$1 if $X$ turns out to be true and \$0 otherwise, at price $p$
-			\item The agent's price $p$ for $X$ thus represents their subjective probability that $X$ is true
-			\item A Dutch book is a combination of such contracts, bought or sold at the agent's own posted prices, that guarantees the agent a net loss regardless of how the world turns out
-			\item An agent whose prices violate the probability axioms executes a \textit{dominated strategy} -- a Dutch book can always be constructed against them, and they can be exploited indefinitely
-			\item \textbf{Key result:} an agent is immune to Dutch books if and only if their betting prices satisfy the axioms of probability -- Bayesianism and Expected utility maximization falls out of the requirement to avoid dominated strategies
+			\item Coherence theorems (money-pump / Dutch-book arguments) give \textit{some} justification for modelling a capable agent as an \textbf{expected-utility maximiser}: an agent with exploitable, incoherent preferences leaves value on the table, so optimisation pressure pushes towards coherence
+			\item But as stated this is \textbf{almost vacuous}: \textit{anything} can be cast as a utility maximiser. A rock is an expected-utility maximiser whose utility is maximised by ``sitting on the floor''
+			\item A frame that fits \textit{every} system equally makes \textit{no} predictions. To get predictive content we must say what the agent is coherent \textbf{over}
 		\end{itemize}
 		}
 	\end{block}
-    
 }
 
+\frame{\frametitle{Reasoning About Ideal Intelligence}
+	\begin{block}{Coherence over resources makes concrete predictions}
+		{\tiny
+		\begin{itemize}
+			\item Utility maximisation becomes \textit{predictive} once we claim a physical system is well modelled as a maximiser over \textbf{specific resources} -- money, energy, free energy, \dots
+			\item Define preference operationally: the system \textbf{prefers} state $A$ to state $B$ if it \textit{expends resources} to move from $B$ to $A$
+			\item Coherence then predicts something \textbf{falsifiable}: an \textit{efficient} agent will not spend resources to go $A\to B$ \emph{and also} spend resources to go $B\to A$ -- it does not ``throw away resources'' by pumping itself around a cycle
+			\item And this is \textbf{checkable}: for a given system and resource, just look. Does a cell spend energy converting compound $X\to Y$ \emph{and} energy converting $Y\to X$? Coherence theorems say it is useful to model a system as an efficient agent exactly when it does not waste resources like this
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Why care about resources?}
+	\begin{block}{Instrumental convergence}
+		{\tiny
+		\begin{itemize}
+			\item Why single out ``resources'' at all? \textbf{Instrumental convergence:} for a \textit{wide variety} of terminal goals, a wide variety of resources are useful for achieving them
+			\item So, all else equal, \textbf{accumulating resources is ``good'' by the agent's own lights} -- no matter what its terminal goal is. Resources are the goal-independent currency of getting things done
+			\item Physics echoes this: \textbf{resource theory} formalises a resource as a \textit{monotone} -- a state function (e.g.\ free energy, negentropy) that cannot increase under the cheap/``free'' operations
+			\item Having more of the resource buys more \textbf{optionality}: a wider set of future states you can still steer towards. More resources $=$ more control over the future
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{General-purpose search}
+	\begin{columns}[T]
+	\begin{column}{0.56\textwidth}
+	\begin{block}{Why intelligence is ``general purpose''}
+		{\tiny
+		\begin{itemize}
+			\item Why expect a capable mind to be \textit{general-purpose} -- able to steer towards a \textit{wide variety} of goals, not just one fixed task?
+			\item Suppose you hold a terminal goal $X$, but your world model is \textbf{incomplete}: some variable $Y$ causally influences $X$, yet you are not (yet) aware of that pathway
+			\item As you learn and update your world model, you discover the path $Y\to X$ -- i.e.\ $Y$ is revealed to be an \textbf{instrumental subgoal} for $X$. Many variables may ``turn out'' this way
+			\item Now suppose the agent runs a \textbf{general-purpose search}: an internal algorithm that (1) takes \textit{any} goal description and (2) returns a plan to achieve it. Then the moment a new instrumental subgoal is discovered, the agent can optimise for it \textbf{on the fly} -- it need not have anticipated it
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.44\textwidth}
+	\begin{center}
+	\begin{tikzpicture}[>=Stealth, font=\tiny,
+	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0.5pt, minimum size=6.5mm, align=center}]
+	  \node[v] (Y1) at (0,0) {$Y$};
+	  \node[v] (X1) at (1.6,0) {$X$};
+	  \node[font=\tiny\itshape] at (0.8,-0.7) {$Y$'s effect on $X$};
+	  \node[font=\tiny\itshape] at (0.8,-1.0) {not yet in the model};
+	\end{tikzpicture}\\[3mm]
+	\begin{tikzpicture}[>=Stealth, font=\tiny,
+	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0.5pt, minimum size=6.5mm, align=center}]
+	  \node[draw, rounded corners, fill=orange!18, font=\tiny, align=center] (gps) at (0,1.0) {general-purpose\\ search};
+	  \node[v, fill=green!15] (Y2) at (0,0) {$Y$};
+	  \node[v] (X2) at (1.6,0) {$X$};
+	  \draw[->] (Y2)--(X2);
+	  \draw[->] (gps)--(Y2);
+	  \node[font=\tiny\itshape] at (0.95,-0.7) {learned $Y\to X$:};
+	  \node[font=\tiny\itshape] at (0.95,-1.0) {search optimises $Y$};
+	\end{tikzpicture}
+	\end{center}
+	\end{column}
+	\end{columns}
+}
 
 \frame{\frametitle{Dualistic agents}
 	\begin{block}{The cybernetic picture: Alexei plays a video game}
@@ -393,6 +452,33 @@
 			\item  For instance, a key property of the world is \textbf{modularity}: the world decomposes into subsystems that interact sparsely. This should make both planning and world-modelling easier for any agent that exploits it
 			\item \textbf{World-modelling:} Bayesian networks exploit modularity -- instead of maintaining a full joint hypothesis over every possible world, updates about variables are only propagated locally along edges in the graph
 			\item \textbf{Planning:} General-purpose search exploits modularity -- if the world is modular, an agent can pursue decoupled subgoals independently, rather than having to plan everything jointly
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Optimization and Thermodynamics}
+	\begin{block}{Optimizers create convergent attractors}
+		{\tiny
+		\begin{itemize}
+			\item Keep two things apart: the \textbf{system being optimized} (its configuration could end up many ways) and the \textbf{optimizer} (a separate physical thing whose presence drives that system to a narrow target). The optimizer is not the attractor -- it is its \textit{cause}
+			\item Operationally: an optimizer is something such that, once you \textbf{condition on its being present}, your uncertainty about where the optimized system ends up becomes \textit{small}
+			\item Example -- a \textbf{courier} delivering a package. Left alone the package goes nowhere; the courier drives it to a fixed address from \textit{any} starting point in the city, and \textbf{reroutes} around closures -- making that address a \textit{convergent attractor} for the package
+			\item Two load-bearing features: a \textbf{broad range of initial conditions} all funnelled to the target, and \textbf{robustness to perturbation}. (Goals, preferences, internal representations are \textit{not} required -- this is a fact about the effect on the world)
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Optimization and Thermodynamics}
+	\begin{block}{Even a pure predictor should attend to optimizers}
+		{\tiny
+		\begin{itemize}
+			\item Suppose you care \textit{only} about predicting the end state. Optimizers turn out to be, information-theoretically, the \textbf{cheapest things to know about}
+			\item \textbf{No optimizer:} to predict where the system lands you must pin down the initial condition in detail ($\approx H(X)$ bits, enormous) \emph{and} integrate the dynamics -- and the forecast \textit{degrades} over time as chaos amplifies any error
+			\item \textbf{With an optimizer:} two wins. (1) the initial condition no longer matters -- every start is driven to the target $T$, so uncertainty in $X$ does not propagate to the outcome; (2) \textbf{naming the target \textit{is} the forecast} -- ``it ends at $T$'' is a handful of bits, and \textit{robust} (it survives perturbations you never modelled)
+			\item Courier: tracking every vehicle and traffic light and integrating forward is hopeless; learning ``the courier delivers to 14 Elm Street'' is a few bits and a confident prediction
+			\item \textbf{Upshot:} the bare aim of prediction already singles out optimizers -- for \textit{every} predictor, whatever its goals. So optimization is an \textbf{objective, observer-independent} feature of the world, worth a precise ``true name''
 		\end{itemize}
 		}
 	\end{block}

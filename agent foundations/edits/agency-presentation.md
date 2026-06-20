@@ -42,70 +42,38 @@
 
 ### Slide: Reasoning About Ideal Intelligence
 
-<div>
-Remove the entire bit about coherence and dominated strategies.
-Instead have slides on the following content:
-- First briefly mention that coherence theorems give *some* justifications for 
-why it's useful to model agents as expected utility maximizers
-- Point out the objection that "anything can be modelled as a utility maximizer"
-e.g. "a rock is an expected utility maximizer whose utility is maximized by sitting on the floor"
-- Utility maximization is more predictive when we claim that a physical system is
-well modelled as a utility maximizer over "specific resources" like money or energy,
-we say that a physical system "prefer" state A over state B if it expends
-resources to move from state A to state B.
-- Under this frame, coherence theorems make more concrete predictions like:
-An "efficient" agent won't expend resources to move from state A to state B
-but also expend resource to move from state B to state A.
-Coherence theorems tells us that it's useful to model systems as efficient agents
-if it doesn't "throw away resources" unnecessarily.
--In particular, for any given physical system and "resource", we can check
-if this is actually true. E.g. we can check if a cell expends energy converting 
-compound X to compound Y and also spend energy converting compounding Y to compound X
+**Block: Coherence theorems -- and a too-cheap objection**
 
-Why care about resources at all?
-- Instrumental convergence: For a wide variety of goals that an agent may have,
-there are a lot of "resources" that would be useful for achieving a wide variety of goals.
-So that all else equal accumulating resources is "good" (by the agent's own lights) no matter what
-terminal goals an agent has
-- Ex: Resource theory in physics attemtps to formalize resources as "monotone state function"
-(e.g. entropy). Where "having" more resources allows you to have more "optionality" over the future
-(you have more possibility of being able to steer towards a wider variety of future states)
+- coherence theorems (money-pump / Dutch book) give *some* justification for modelling a capable agent as an expected-utility maximizer (incoherent preferences leave value on the table)
+- objection: almost vacuous -- *anything* can be cast as a utility maximizer (a rock maximizes utility by "sitting on the floor")
+- a frame that fits every system equally makes no predictions; we must say what the agent is coherent *over*
 
-</div>
+### Slide: Reasoning About Ideal Intelligence
 
+**Block: Coherence over resources makes concrete predictions**
 
+- model the system as a maximizer over *specific resources* (money, energy, free energy)
+- operational preference: the system prefers A to B if it expends resources to move B -> A
+- falsifiable prediction: an *efficient* agent won't spend resources A->B *and also* B->A (no wasteful cycles)
+- checkable for any system + resource: e.g. does a cell spend energy converting X->Y and also Y->X?
 
-<div>
-Another slide on general purpose search:
-- Why do we expect intelligence to be "general purpose", in the sense of being able to
-steer towards a wide variety of possible goals
-- Suppose that you have some terminal goal X, but your world model is currently incomplete, 
-maybe there's a node/object Y in your world model that causally influences your terminal goal,
-but currently you aren't aware of that causal pathway
-- As you learn more about the world and update your world model correspondingly,
-you might learn about the causal path way from Y to X. In other words, you have learned that
-Y is an "instrumental subgoal" for X
-- Similarly, many things in your world model might "turn out" to be an instrumental subgoal
-- Suppose that the agent has an internal algorithm (general purpose search) which: 1. Takes the description of any goal
-2. Returns a plan to achieve that goal. Having this algorithm would mean that 
-if the agent "discovers" a new instrumental subgoal (by discovering new causal pathways)
-it can use the general purpose search algorithm to optimize for that instrumental subgoal on the fly
-- Create diagrams involving a bayesian network with terminal goal X and node Y, one diagram 
-has "missing" causal pathway and the other where the causal pathway is present
-(the agent has learned about the causal pathway), and then General purpose search
-algorithm can then optimize for Y
-</div>
+### Slide: Why care about resources?
 
+**Block: Instrumental convergence**
 
+- instrumental convergence: for a wide variety of terminal goals, a wide variety of resources are useful
+- so accumulating resources is "good" by the agent's own lights regardless of terminal goal
+- resource theory (physics): a resource is a *monotone* state function (free energy, negentropy) that can't increase under "free" operations
+- more resources = more optionality (ability to steer toward a wider set of future states)
 
-**Block: Coherence and dominated strategies**
+### Slide: General-purpose search
 
-- An agent with circular preferences (A $\succ$ B $\succ$ C $\succ$ A) can be *money-pumped*: an adversary cycles them through trades, extracting a small fee each round, leaving the agent strictly worse off after every cycle
-- **Dutch book setup:** formalize an agent's degrees of belief as *betting prices* -- for each event $X$, the agent posts a price $p \in [0,1]$, meaning they are willing to buy or sell a contract that pays \$1 if $X$ turns out to be true and \$0 otherwise, at price $p$
-- The agent's price $p$ for $X$ thus represents their subjective probability that $X$ is true
-- A Dutch book is a combination of such contracts, bought or sold at the agent's own posted prices, that guarantees the agent a net loss regardless of how the world turns out
-- An agent whose prices violate the probability axioms executes a *dominated strategy* -- a Dutch book can always be constructed against them, and they can be exploited indefinitely
-- **Key result:** an agent is immune to Dutch books if and only if their betting prices satisfy the axioms of probability -- Bayesianism and Expected utility maximization falls out of the requirement to avoid dominated strategies
+**Block: Why intelligence is "general purpose"** (+ two Bayesian-network diagrams: before, Y and X unlinked; after, Y -> X with general-purpose search optimizing Y)
+
+- why expect a capable mind to be able to steer toward a wide variety of goals?
+- terminal goal X; incomplete world model where some variable Y causally influences X but the pathway isn't yet known
+- learning the pathway Y -> X reveals Y as an instrumental subgoal; many variables may "turn out" this way
+- a general-purpose search algorithm (input: any goal description; output: a plan) lets the agent optimize a newly-discovered instrumental subgoal on the fly
 
 ### Slide: Dualistic agents
 
@@ -298,10 +266,24 @@ algorithm can then optimize for Y
 
 ### Slide: Optimization and Thermodynamics
 
-<div>
-Add the idea from optimization and thermodynamics lecture note that even if you only care about prediction, it would be useful for you
-to care about "optimizers" in the world. Span multiple slides if needed, make sure that text doesn't overflow
-</div>
+**Block: Optimizers create convergent attractors**
+
+- keep apart the *system being optimized* and the *optimizer* (a separate physical thing whose presence is the *cause* of the funnelling)
+- operational: conditioning on the optimizer's presence makes your uncertainty about where the system ends up small
+- courier delivering a package: drives it to a fixed address from any start, reroutes around closures -> the address is a convergent attractor for the package
+- two features: broad range of initial conditions funnelled to the target; robustness to perturbation (no goals/representations required)
+
+### Slide: Optimization and Thermodynamics
+
+**Block: Even a pure predictor should attend to optimizers**
+
+- even if you only want to predict the end state, optimizers are the cheapest things to know about
+- no optimizer: must pin down the initial condition (~H(X) bits) and integrate chaotic dynamics; the forecast degrades over time
+- with an optimizer: the initial condition no longer matters (all starts driven to target T); naming the target *is* the forecast (a few bits, robust to perturbation)
+- courier: tracking every vehicle/traffic light is hopeless vs learning "delivers to 14 Elm Street" = a few bits
+- upshot: prediction alone singles out optimizers -> optimization is an objective, observer-independent feature of the world
+
+### Slide: Optimization and Thermodynamics
 
 **Block: Optimization as local entropy reduction**
 
