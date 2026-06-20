@@ -25,6 +25,29 @@ Folder names contain spaces (e.g. `agent foundations/`, `decision theory/`). Quo
 - When creating exercise sheets: hints should guide without revealing; progressive hint sequences should increase in specificity, but the last hint should not give away the answer.
 - Careful about conceptual distinctions (e.g. $\Box P$ as a statement within $L$ vs $L \vdash P$ as a metalinguistic fact).
 
+## Self-critique after each update (harshest-critic pass)
+
+After completing any content change (slides, lecture notes, exercises), run a harshest,
+most nit-picking critic pass, then improve the work along these dimensions:
+
+- **No LLM prose.** The result must be indistinguishable from strong human academic
+  writing, or from a rigorous expository LessWrong/Arbital post (match the register to
+  the purpose). Calibrate against the best: pull up exemplary expository writing on the
+  topic (e.g. Arbital / LessWrong articles; for slides, the best existing slide decks on
+  the topic) and check the output for any tell of LLM writing -- hedging, filler
+  transitions ("crucially", "notably", "it is worth noting"), inflated topic sentences,
+  em-dash padding, vacuous summaries -- then remove them.
+- **Self-containedness.** Assume zero prior knowledge of agent foundations. Every term
+  and step must be introduced, or recoverable from the slide/note itself.
+- **Conceptual rigour and holes.** State the precise goal of the slide/section, then test
+  every argument and example against it: is each one sound, clearly phrased, and well
+  justified, and does it efficiently and validly serve that goal? Fix or cut anything
+  unsound, unclear, unjustified, or off-target.
+- **Reverse-engineer the author's goal** for the change and judge the work by whether it
+  achieves that goal.
+
+Apply the resulting fixes before committing.
+
 ## The three edit interfaces
 
 Each module's `edits/` folder contains three interfaces the author uses to drive changes:

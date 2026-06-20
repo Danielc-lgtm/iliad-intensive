@@ -480,6 +480,44 @@
 \section{The 5-and-10 problem}
 %==================================================================
 
+\frame{\frametitle{The 5-and-10 problem: agent and world as code}
+	\begin{columns}[T]
+	\begin{column}{0.45\textwidth}
+	\begin{block}{Two programs (Demski \& Garrabrant)}
+		{\tiny
+		Take \$5 or \$10; utility is the dollars taken, so take \$10. The agent has its own source code and the world's, and chooses by proof search.\\[1.5mm]
+		{\ttfamily\scriptsize
+		\begin{tabular}{@{}l@{}}
+		U():\\
+		~~if A() = 10: return 10\\
+		~~if A() = 5:~~return 5\\[1.6mm]
+		A():\\
+		~~search for a proof of\\
+		~~~~[A()=5 -> U()=x] and\\
+		~~~~[A()=10 -> U()=y],\\
+		~~~~for x,y in \{0,5,10\}\\
+		~~if found, x>y: return 5\\
+		~~else: return 10\\
+		\end{tabular}}
+		}
+	\end{block}
+	\end{column}
+	\begin{column}{0.55\textwidth}
+	\begin{block}{Why it returns \$5}
+		{\tiny
+		\begin{itemize}
+			\item The world returns whatever the agent returns, so \$10 genuinely beats \$5. Yet with enough search time \texttt{A} returns \$5.
+			\item Let $P$ be the sentence ``$[\texttt{A()=5}\Rightarrow\texttt{U()=5}]$ and $[\texttt{A()=10}\Rightarrow\texttt{U()=0}]$''.
+			\item \textbf{A proof of $P$ makes $P$ true.} If $P$ is proved, \texttt{A} finds it ($x{=}5>y{=}0$) and returns \$5. Then \texttt{A()=5}, so the first conjunct holds; and \texttt{A()=10} is false, so the second holds \emph{vacuously} (a false ``if'' implies anything). Hence $P$.
+			\item So $\Box P\to P$ is itself provable ($\Box X$ means ``$X$ is provable''). \textbf{L\"ob's theorem} ($\Box(\Box P\to P)\to\Box P$) then makes $P$ provable; the search finds it and returns \$5.
+			\item \textbf{Spurious proof:} \texttt{A} takes \$5 because it proves that taking \$10 pays \$0, and that holds \emph{only because} it takes \$5. The action not taken is provably false, and an ``if'' with a false premise carries no information, so ordinary counterfactuals over one's own action break down.
+		\end{itemize}
+		}
+	\end{block}
+	\end{column}
+	\end{columns}
+}
+
 \frame{\frametitle{The 5-and-10 problem}
 	\begin{block}{The simplest decision, made hard by self-knowledge (Demski \& Garrabrant)}
 		{\tiny
