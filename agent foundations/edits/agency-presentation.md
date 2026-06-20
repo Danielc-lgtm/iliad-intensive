@@ -42,11 +42,11 @@
 
 ### Slide: Reasoning About Ideal Intelligence
 
-**Block: Coherence theorems -- and a too-cheap objection**
+**Block: Coherence theorems, and their limits**
 
-- coherence theorems (money-pump / Dutch book) give *some* justification for modelling a capable agent as an expected-utility maximizer (incoherent preferences leave value on the table)
-- objection: almost vacuous -- *anything* can be cast as a utility maximizer (a rock maximizes utility by "sitting on the floor")
-- a frame that fits every system equally makes no predictions; we must say what the agent is coherent *over*
+- coherence theorems (money-pump / Dutch book) give *some* justification for modelling a capable agent as an expected-utility maximizer (incoherent preferences can be money-pumped)
+- almost vacuous as stated: anything can be cast as a utility maximizer (a rock maximizes utility by sitting on the floor)
+- a frame that fits every system equally makes no predictions; we must specify what the agent is coherent *over*
 
 ### Slide: Reasoning About Ideal Intelligence
 
@@ -54,26 +54,26 @@
 
 - model the system as a maximizer over *specific resources* (money, energy, free energy)
 - operational preference: the system prefers A to B if it expends resources to move B -> A
-- falsifiable prediction: an *efficient* agent won't spend resources A->B *and also* B->A (no wasteful cycles)
-- checkable for any system + resource: e.g. does a cell spend energy converting X->Y and also Y->X?
+- falsifiable prediction: an *efficient* agent does not spend resources A->B and also B->A
+- checkable for a given system + resource: e.g. does a cell spend energy converting X->Y and also Y->X?
 
 ### Slide: Why care about resources?
 
 **Block: Instrumental convergence**
 
-- instrumental convergence: for a wide variety of terminal goals, a wide variety of resources are useful
-- so accumulating resources is "good" by the agent's own lights regardless of terminal goal
-- resource theory (physics): a resource is a *monotone* state function (free energy, negentropy) that can't increase under "free" operations
-- more resources = more optionality (ability to steer toward a wider set of future states)
+- some resources (energy, money, compute) are useful across a wide variety of goals
+- so accumulating such resources is good by the agent's own lights, whatever its terminal goal
+- resource theories in physics formalize a resource as a *monotone* state function (free energy, negentropy) that can't increase under the free operations
+- more of the resource gives more optionality (a wider set of future states the agent can still reach)
 
 ### Slide: General-purpose search
 
-**Block: Why intelligence is "general purpose"** (+ two Bayesian-network diagrams: before, Y and X unlinked; after, Y -> X with general-purpose search optimizing Y)
+**Block: Why intelligence is "general purpose"** (+ two richer Bayesian-network diagrams: a known causal network A,B,C,D -> X with Y unlinked; then a learned edge Y -> D -> X with general-purpose search targeting Y)
 
-- why expect a capable mind to be able to steer toward a wide variety of goals?
-- terminal goal X; incomplete world model where some variable Y causally influences X but the pathway isn't yet known
-- learning the pathway Y -> X reveals Y as an instrumental subgoal; many variables may "turn out" this way
-- a general-purpose search algorithm (input: any goal description; output: a plan) lets the agent optimize a newly-discovered instrumental subgoal on the fly
+- why expect a capable mind to steer toward many different goals rather than one fixed task?
+- terminal goal X; incomplete world model where some variable Y causally influences X through a pathway not yet represented
+- on learning that pathway, Y becomes an instrumental subgoal for X; many variables can become instrumental subgoals as the world model fills in
+- a general-purpose search algorithm (any goal description -> a plan) lets a newly-discovered instrumental subgoal be optimized immediately, without having been anticipated
 
 ### Slide: Dualistic agents
 
@@ -266,31 +266,21 @@
 
 ### Slide: Optimization and Thermodynamics
 
-**Block: Optimizers create convergent attractors**
-
-- keep apart the *system being optimized* and the *optimizer* (a separate physical thing whose presence is the *cause* of the funnelling)
-- operational: conditioning on the optimizer's presence makes your uncertainty about where the system ends up small
-- courier delivering a package: drives it to a fixed address from any start, reroutes around closures -> the address is a convergent attractor for the package
-- two features: broad range of initial conditions funnelled to the target; robustness to perturbation (no goals/representations required)
-
-### Slide: Optimization and Thermodynamics
-
-**Block: Even a pure predictor should attend to optimizers**
-
-- even if you only want to predict the end state, optimizers are the cheapest things to know about
-- no optimizer: must pin down the initial condition (~H(X) bits) and integrate chaotic dynamics; the forecast degrades over time
-- with an optimizer: the initial condition no longer matters (all starts driven to target T); naming the target *is* the forecast (a few bits, robust to perturbation)
-- courier: tracking every vehicle/traffic light is hopeless vs learning "delivers to 14 Elm Street" = a few bits
-- upshot: prediction alone singles out optimizers -> optimization is an objective, observer-independent feature of the world
-
-### Slide: Optimization and Thermodynamics
-
 **Block: Optimization as local entropy reduction**
 
 - Powerful agents reliably steer the world towards narrow regions of target configurations -- outcomes that would be extremely unlikely to arise under any random process
 - This is a form of *local entropy reduction*: concentrating probability mass from a broad initial distribution onto a narrow final distribution around a target
 - Irreversible transitions: funnelling many initial states into the same targets
 - Existing results in stochastic thermodynamics such as fluctuation theorems (Second law of thermodynamics), cost of information erasure and information thermodynamics directly constrains the shape of optimization processes and hold far from equilibrium
+
+### Slide: Optimization and Thermodynamics
+
+**Block: Even a pure predictor should attend to optimizers**
+
+- even if you only want to predict the system's end state, it is useful to model the optimizers acting on it
+- without an optimizer: you must know the initial condition in detail and integrate the dynamics forward, and prediction error grows over time
+- with an optimizer: the initial condition becomes irrelevant (it drives any starting state to its target), and the target itself is the prediction, robust to perturbations
+- prediction alone makes optimizers worth identifying: whether a system is being steered to a narrow target is an objective feature, not observer-relative
 
 ### Slide: Optimization and Thermodynamics
 
@@ -324,17 +314,6 @@
 - **Beliefs → mutual information.** If the agent's memory $a$ encodes a belief $q$ over environments, the true state $s$ has a Shannon codeword of length $\approx \log\frac{1}{q(s)}$, so $K(s\mid a) \le \log\frac{1}{q(s)}$, hence $I(a;s) = K(s) - K(s\mid a) \ge K(s) - \log\frac{1}{q(s)}$
 - **Mutual information → optimization.** By (the algorithmic) Touchette & Lloyd, the agent can reduce the environment's entropy by up to $I(a;s)$
 - **Together:** assigning more probability to the *true* environment ⇒ shorter description ⇒ more mutual information ⇒ more optimization. *Knowing more is being able to do more* -- now a theorem, with a fixed exchange rate
-
-### Slide: Conclusion
-
-**Block: Conclusion**
-
-- We need robust concepts about agency to reason about systems far more capable than anything we have seen, and we need safety properties that are invariant under self-modification.
-- **Tiling agents:** directly about making safety a reflectively stable property -- ensuring that an agent's successors preserve the same guarantees, indefinitely
-- **Logical uncertainty:** reasoning about mathematical and computational facts you have not yet had the compute to settle, in an environment larger than yourself. Also relevant for reasoning about your own future, more-computed beliefs -- a form of self-reference. Logical induction is one concrete realisation
-- **Decision theory** (treated separately): a further embedded subproblem -- counterfactuals are not well-defined when you are part of the environment, which may contain copies of you or predictors modelling your decision procedure
-- **Descriptive agent foundations:** starts from properties of the world (modularity, selection pressures, thermodynamic constraints) and derives what kinds of optimization processes arise -- what agents embedded in the physical world would look like mechanistically
-- **Connecting the two viewpoints:** reasoning about how properties of the world constrain the structure of optimization processes may tell us how an ideal agent *should* model the world and plan its actions from its subjective point of view
 
 ---
 

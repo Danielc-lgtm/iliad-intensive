@@ -22,12 +22,7 @@
 \begin{document}
 
 
-
-
-
-
 \frame{\titlepage}\section{Introduction}
-
 
 
 \frame{\frametitle{Why Agent Foundations?}
@@ -42,7 +37,6 @@
 		}
 	\end{block}
 }
-
 
 
 \section{Reflective Stability}
@@ -84,12 +78,12 @@
 
 \section{Coherence}
 \frame{\frametitle{Reasoning About Ideal Intelligence}
-	\begin{block}{Coherence theorems -- and a too-cheap objection}
+	\begin{block}{Coherence theorems, and their limits}
 		{\tiny
 		\begin{itemize}
-			\item Coherence theorems (money-pump / Dutch-book arguments) give \textit{some} justification for modelling a capable agent as an \textbf{expected-utility maximiser}: an agent with exploitable, incoherent preferences leaves value on the table, so optimisation pressure pushes towards coherence
-			\item But as stated this is \textbf{almost vacuous}: \textit{anything} can be cast as a utility maximiser. A rock is an expected-utility maximiser whose utility is maximised by ``sitting on the floor''
-			\item A frame that fits \textit{every} system equally makes \textit{no} predictions. To get predictive content we must say what the agent is coherent \textbf{over}
+			\item Coherence theorems (money-pump / Dutch-book arguments) give \textit{some} justification for modelling a capable agent as an \textbf{expected-utility maximiser}: an agent with incoherent preferences can be money-pumped, so optimisation pressure favours coherence
+			\item The claim is almost \textbf{vacuous} as stated: anything can be cast as a utility maximiser. A rock is an expected-utility maximiser whose utility is maximised by sitting on the floor
+			\item A frame that fits every system equally makes no predictions. For predictive content we must specify what the agent is coherent \textbf{over}
 		\end{itemize}
 		}
 	\end{block}
@@ -99,10 +93,10 @@
 	\begin{block}{Coherence over resources makes concrete predictions}
 		{\tiny
 		\begin{itemize}
-			\item Utility maximisation becomes \textit{predictive} once we claim a physical system is well modelled as a maximiser over \textbf{specific resources} -- money, energy, free energy, \dots
-			\item Define preference operationally: the system \textbf{prefers} state $A$ to state $B$ if it \textit{expends resources} to move from $B$ to $A$
-			\item Coherence then predicts something \textbf{falsifiable}: an \textit{efficient} agent will not spend resources to go $A\to B$ \emph{and also} spend resources to go $B\to A$ -- it does not ``throw away resources'' by pumping itself around a cycle
-			\item And this is \textbf{checkable}: for a given system and resource, just look. Does a cell spend energy converting compound $X\to Y$ \emph{and} energy converting $Y\to X$? Coherence theorems say it is useful to model a system as an efficient agent exactly when it does not waste resources like this
+			\item Utility maximisation becomes \textit{predictive} once a physical system is modelled as a maximiser over \textbf{specific resources} (money, energy, free energy)
+			\item Operational preference: the system \textbf{prefers} state $A$ to state $B$ if it expends resources to move from $B$ to $A$
+			\item Coherence then makes a \textbf{falsifiable} prediction: an \textit{efficient} agent does not spend resources to go $A\to B$ and also spend resources to go $B\to A$
+			\item This is \textbf{checkable} for a given system and resource. Example: does a cell spend energy converting compound $X\to Y$ and also energy converting $Y\to X$?
 		\end{itemize}
 		}
 	\end{block}
@@ -112,10 +106,10 @@
 	\begin{block}{Instrumental convergence}
 		{\tiny
 		\begin{itemize}
-			\item Why single out ``resources'' at all? \textbf{Instrumental convergence:} for a \textit{wide variety} of terminal goals, a wide variety of resources are useful for achieving them
-			\item So, all else equal, \textbf{accumulating resources is ``good'' by the agent's own lights} -- no matter what its terminal goal is. Resources are the goal-independent currency of getting things done
-			\item Physics echoes this: \textbf{resource theory} formalises a resource as a \textit{monotone} -- a state function (e.g.\ free energy, negentropy) that cannot increase under the cheap/``free'' operations
-			\item Having more of the resource buys more \textbf{optionality}: a wider set of future states you can still steer towards. More resources $=$ more control over the future
+			\item \textbf{Instrumental convergence:} some resources (energy, money, compute) are useful across a \textit{wide variety} of goals
+			\item So accumulating such resources is good by the agent's own lights, whatever its terminal goal
+			\item \textbf{Resource theories} in physics formalise a resource as a \textit{monotone}: a state function (e.g.\ free energy, negentropy) that cannot increase under the free operations
+			\item More of the resource gives more \textbf{optionality}: a wider set of future states the agent can still reach
 		\end{itemize}
 		}
 	\end{block}
@@ -127,10 +121,10 @@
 	\begin{block}{Why intelligence is ``general purpose''}
 		{\tiny
 		\begin{itemize}
-			\item Why expect a capable mind to be \textit{general-purpose} -- able to steer towards a \textit{wide variety} of goals, not just one fixed task?
-			\item Suppose you hold a terminal goal $X$, but your world model is \textbf{incomplete}: some variable $Y$ causally influences $X$, yet you are not (yet) aware of that pathway
-			\item As you learn and update your world model, you discover the path $Y\to X$ -- i.e.\ $Y$ is revealed to be an \textbf{instrumental subgoal} for $X$. Many variables may ``turn out'' this way
-			\item Now suppose the agent runs a \textbf{general-purpose search}: an internal algorithm that (1) takes \textit{any} goal description and (2) returns a plan to achieve it. Then the moment a new instrumental subgoal is discovered, the agent can optimise for it \textbf{on the fly} -- it need not have anticipated it
+			\item Why expect a capable mind to steer towards many different goals rather than one fixed task?
+			\item You hold a terminal goal $X$, but your world model is \textbf{incomplete}: some variable $Y$ causally influences $X$ through a pathway you have not yet represented
+			\item On learning that pathway, $Y$ becomes an \textbf{instrumental subgoal} for $X$; many variables can become instrumental subgoals as the world model fills in
+			\item A \textbf{general-purpose search} algorithm takes any goal description and returns a plan for it. With it, a newly discovered instrumental subgoal can be optimised immediately, without having been anticipated
 		\end{itemize}
 		}
 	\end{block}
@@ -138,22 +132,32 @@
 	\begin{column}{0.44\textwidth}
 	\begin{center}
 	\begin{tikzpicture}[>=Stealth, font=\tiny,
-	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0.5pt, minimum size=6.5mm, align=center}]
-	  \node[v] (Y1) at (0,0) {$Y$};
-	  \node[v] (X1) at (1.6,0) {$X$};
-	  \node[font=\tiny\itshape] at (0.8,-0.7) {$Y$'s effect on $X$};
-	  \node[font=\tiny\itshape] at (0.8,-1.0) {not yet in the model};
-	\end{tikzpicture}\\[3mm]
+	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0pt, minimum size=5mm},
+	   g/.style={draw, circle, fill=green!18, inner sep=0pt, minimum size=5mm}]
+	  \node[v] (A) at (0,0) {$A$};
+	  \node[v] (B) at (0,0.9) {$B$};
+	  \node[v] (C) at (0.95,0.2) {$C$};
+	  \node[v] (D) at (0.95,1.0) {$D$};
+	  \node[g] (X) at (1.95,0.6) {$X$};
+	  \node[v] (Y) at (1.95,1.6) {$Y$};
+	  \draw[->] (A)--(C); \draw[->] (B)--(C); \draw[->] (A)--(D); \draw[->] (B)--(D); \draw[->] (C)--(X); \draw[->] (D)--(X);
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape known pathways into $X$; $Y$ unlinked}\\[2.5mm]
 	\begin{tikzpicture}[>=Stealth, font=\tiny,
-	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0.5pt, minimum size=6.5mm, align=center}]
-	  \node[draw, rounded corners, fill=orange!18, font=\tiny, align=center] (gps) at (0,1.0) {general-purpose\\ search};
-	  \node[v, fill=green!15] (Y2) at (0,0) {$Y$};
-	  \node[v] (X2) at (1.6,0) {$X$};
-	  \draw[->] (Y2)--(X2);
-	  \draw[->] (gps)--(Y2);
-	  \node[font=\tiny\itshape] at (0.95,-0.7) {learned $Y\to X$:};
-	  \node[font=\tiny\itshape] at (0.95,-1.0) {search optimises $Y$};
-	\end{tikzpicture}
+	   v/.style={draw, circle, fill=blau-upc!12, inner sep=0pt, minimum size=5mm},
+	   g/.style={draw, circle, fill=green!18, inner sep=0pt, minimum size=5mm}]
+	  \node[v] (A) at (0,0) {$A$};
+	  \node[v] (B) at (0,0.9) {$B$};
+	  \node[v] (C) at (0.95,0.2) {$C$};
+	  \node[v] (D) at (0.95,1.0) {$D$};
+	  \node[g] (X) at (1.95,0.6) {$X$};
+	  \node[v, fill=orange!30] (Y) at (1.95,1.6) {$Y$};
+	  \draw[->] (A)--(C); \draw[->] (B)--(C); \draw[->] (A)--(D); \draw[->] (B)--(D); \draw[->] (C)--(X); \draw[->] (D)--(X);
+	  \draw[->, red, thick] (Y)--(D);
+	  \node[draw, rounded corners, fill=orange!18, font=\tiny, align=center] (gps) at (0.55,2.0) {gen.-purpose\\ search};
+	  \draw[->] (gps)--(Y);
+	\end{tikzpicture}\\[1mm]
+	{\tiny\itshape learn $Y\!\to\!D\!\to\!X$; search targets $Y$}
 	\end{center}
 	\end{column}
 	\end{columns}
@@ -211,7 +215,6 @@
 		}
 	\end{block}
 }
-
 
 
 \frame{\frametitle{Self-Modification and Vingean Reflection}
@@ -457,32 +460,6 @@
 	\end{block}
 }
 
-\frame{\frametitle{Optimization and Thermodynamics}
-	\begin{block}{Optimizers create convergent attractors}
-		{\tiny
-		\begin{itemize}
-			\item Keep two things apart: the \textbf{system being optimized} (its configuration could end up many ways) and the \textbf{optimizer} (a separate physical thing whose presence drives that system to a narrow target). The optimizer is not the attractor -- it is its \textit{cause}
-			\item Operationally: an optimizer is something such that, once you \textbf{condition on its being present}, your uncertainty about where the optimized system ends up becomes \textit{small}
-			\item Example -- a \textbf{courier} delivering a package. Left alone the package goes nowhere; the courier drives it to a fixed address from \textit{any} starting point in the city, and \textbf{reroutes} around closures -- making that address a \textit{convergent attractor} for the package
-			\item Two load-bearing features: a \textbf{broad range of initial conditions} all funnelled to the target, and \textbf{robustness to perturbation}. (Goals, preferences, internal representations are \textit{not} required -- this is a fact about the effect on the world)
-		\end{itemize}
-		}
-	\end{block}
-}
-
-\frame{\frametitle{Optimization and Thermodynamics}
-	\begin{block}{Even a pure predictor should attend to optimizers}
-		{\tiny
-		\begin{itemize}
-			\item Suppose you care \textit{only} about predicting the end state. Optimizers turn out to be, information-theoretically, the \textbf{cheapest things to know about}
-			\item \textbf{No optimizer:} to predict where the system lands you must pin down the initial condition in detail ($\approx H(X)$ bits, enormous) \emph{and} integrate the dynamics -- and the forecast \textit{degrades} over time as chaos amplifies any error
-			\item \textbf{With an optimizer:} two wins. (1) the initial condition no longer matters -- every start is driven to the target $T$, so uncertainty in $X$ does not propagate to the outcome; (2) \textbf{naming the target \textit{is} the forecast} -- ``it ends at $T$'' is a handful of bits, and \textit{robust} (it survives perturbations you never modelled)
-			\item Courier: tracking every vehicle and traffic light and integrating forward is hopeless; learning ``the courier delivers to 14 Elm Street'' is a few bits and a confident prediction
-			\item \textbf{Upshot:} the bare aim of prediction already singles out optimizers -- for \textit{every} predictor, whatever its goals. So optimization is an \textbf{objective, observer-independent} feature of the world, worth a precise ``true name''
-		\end{itemize}
-		}
-	\end{block}
-}
 
 \frame{\frametitle{Optimization and Thermodynamics}
 	\begin{block}{Optimization as local entropy reduction}
@@ -492,6 +469,19 @@
 			\item This is a form of \textit{local entropy reduction}: concentrating probability mass from a broad initial distribution onto a narrow final distribution around a target
 			\item Irreversible transitions: funnelling many initial states into the same targets
 			\item Existing results in stochastic thermodynamics such as fluctuation theorems (Second law of thermodynamics), cost of information erasure and information thermodynamics directly constrains the shape of optimization processes and hold far from equilibrium
+		\end{itemize}
+		}
+	\end{block}
+}
+
+\frame{\frametitle{Optimization and Thermodynamics}
+	\begin{block}{Even a pure predictor should attend to optimizers}
+		{\tiny
+		\begin{itemize}
+			\item Even if you only want to predict the system's end state, it is useful to model the optimizers acting on it
+			\item Without an optimizer: you must know the initial condition in detail and integrate the dynamics forward, and prediction error grows over time
+			\item With an optimizer: the initial condition becomes irrelevant (it drives any starting state to its target), and the target itself is the prediction, robust to perturbations
+			\item So prediction alone makes optimizers worth identifying: whether a system is being steered to a narrow target is an objective feature, not observer-relative
 		\end{itemize}
 		}
 	\end{block}
@@ -545,22 +535,6 @@
 			$$I(a; s) = K(s) - K(s\mid a) \;\geq\; K(s) - \log\tfrac{1}{q(s)}$$
 			\item \textbf{Mutual information $\to$ optimization.} By (the algorithmic) Touchette \& Lloyd, the agent can reduce the environment's entropy by up to $I(a; s)$
 			\item \textbf{Together:} assigning more probability to the \textit{true} environment $\Rightarrow$ shorter description $\Rightarrow$ more mutual information $\Rightarrow$ more optimization. \emph{Knowing more is being able to do more} -- now a theorem, with a fixed exchange rate
-		\end{itemize}
-		}
-	\end{block}
-}
-
-
-\frame{\frametitle{Conclusion}
-	\begin{block}{Conclusion}
-		{\tiny
-		\begin{itemize}
-			\item We need robust concepts about agency to reason about systems far more capable than anything we have seen, and we need safety properties that are invariant under self-modification.
-			\item \textbf{Tiling agents:} directly about making safety a reflectively stable property -- ensuring that an agent's successors preserve the same guarantees, indefinitely
-			\item \textbf{Logical uncertainty:} reasoning about mathematical and computational facts you have not yet had the compute to settle, in an environment larger than yourself. Also relevant for reasoning about your own future, more-computed beliefs -- a form of self-reference. Logical induction is one concrete realisation
-			\item \textbf{Decision theory} (treated separately): a further embedded subproblem -- counterfactuals are not well-defined when you are part of the environment, which may contain copies of you or predictors modelling your decision procedure
-			\item \textbf{Descriptive agent foundations:} starts from properties of the world (modularity, selection pressures, thermodynamic constraints) and derives what kinds of optimization processes arise -- what agents embedded in the physical world would look like mechanistically
-			\item \textbf{Connecting the two viewpoints:} reasoning about how properties of the world constrain the structure of optimization processes may tell us how an ideal agent \textit{should} model the world and plan its actions from its subjective point of view
 		\end{itemize}
 		}
 	\end{block}
