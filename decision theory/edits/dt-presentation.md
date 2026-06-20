@@ -4,7 +4,7 @@ Title: **Decision Theory**
 Author: Daniel C
 Date: (placeholder)
 
-Markdown mirror of `projects/dt-presentation/main.tex` (29 slides). Add `<div>...</div>`
+Markdown mirror of `projects/dt-presentation/main.tex` (27 slides). Add `<div>...</div>`
 edit markers after any line to request a change.
 
 ---
@@ -137,18 +137,10 @@ edit markers after any line to request a change.
 
 # Section: The 5-and-10 problem
 
-## The 5-and-10 problem: agent and world as code
+## The 5-and-10 problem
 
 - **Block: Two programs (Demski & Garrabrant)** — source code of the world `U()` (returns whatever the agent returns: 10 for 10, 5 for 5) and the agent `A()` (proof-searches for `[A()=5 -> U()=x]` and `[A()=10 -> U()=y]`, x,y in {0,5,10}; returns 5 if found with x>y, else 10)
 - **Block: Why it returns $5** — let P = "[A()=5 => U()=5] and [A()=10 => U()=0]"; a proof of P makes P true (A returns 5, so A()=10 is false and the second conjunct holds vacuously); so Box P -> P is provable, Löb gives P provable, the search finds it and returns $5; spurious proof — counterfactuals over one's own action break down
-
-## The 5-and-10 problem
-
-- **Block: The simplest decision, made hard by self-knowledge (Demski & Garrabrant)** — proof search; knowing your own behaviour; vacuous conditional; self-fulfilling spurious counterfactual
-
-## Spurious proofs and Löb's theorem
-
-- **Block: Why a naive proof-searcher is genuinely unsafe** — Löb (formula + intuition); S = "(A=$10)=>U=$0"; Box S -> S so |- S; counterpossibles open; successor-trust / reflective stability
 
 # Section: A formal criterion for decision theories
 

@@ -480,7 +480,7 @@
 \section{The 5-and-10 problem}
 %==================================================================
 
-\frame{\frametitle{The 5-and-10 problem: agent and world as code}
+\frame{\frametitle{The 5-and-10 problem}
 	\begin{columns}[T]
 	\begin{column}{0.45\textwidth}
 	\begin{block}{Two programs (Demski \& Garrabrant)}
@@ -518,33 +518,6 @@
 	\end{columns}
 }
 
-\frame{\frametitle{The 5-and-10 problem}
-	\begin{block}{The simplest decision, made hard by self-knowledge (Demski \& Garrabrant)}
-		{\tiny
-		\begin{itemize}
-			\item You may take \$5 or \$10; utility $=$ the dollars. A child takes \$10. Can a fully self-aware embedded agent?
-			\item Frame it for an embedded agent. The world is a deterministic program that pays out whatever number you take; the agent has \emph{its own source code} and the world's. It chooses by \textbf{proof search}: look for proofs of ``$(A{=}\$5)\Rightarrow U{=}x$'' and ``$(A{=}\$10)\Rightarrow U{=}y$'', and take the action with the higher \emph{proven} payoff.
-			\item \textbf{The deep issue.} ``If you can know your own behaviour, it becomes hard to reason about what would happen if you behaved \emph{differently}.'' Because the agent is deterministic it takes exactly one action; the other is ruled out \emph{by logic}, so ``what if I did otherwise?'' is a counterfactual with an \textbf{impossible antecedent}.
-			\item \textbf{The trap, concretely.} Suppose the agent can prove it takes \$5. Then $A\neq\$10$, so the material conditional ``$(A{=}\$10)\Rightarrow(U{=}\$0)$'' is \textbf{vacuously true} (a false antecedent implies anything). The agent proves it, ``concludes'' \$10 is worthless, and takes \$5 -- \emph{confirming} the proof. A self-fulfilling \textbf{spurious counterfactual}.
-			\item The fault is not bad logic but \emph{too much self-knowledge}: the action is a fixed fact, and a naive counterfactual over a fixed fact is vacuous.
-		\end{itemize}
-		}
-	\end{block}
-}
-
-\frame{\frametitle{Spurious proofs and L\"ob's theorem}
-	\begin{block}{Why a naive proof-searcher is genuinely unsafe}
-		{\tiny
-		\begin{itemize}
-			\item \textbf{L\"ob's theorem (formula + intuition).} Write $\Box P$ for ``$P$ is provable''. Then
-			$$\text{if } \vdash (\Box P \to P)\ \text{ then } \vdash P; \qquad\text{equivalently}\qquad \vdash \Box(\Box P \to P)\to\Box P.$$
-			Intuition: a system may treat ``provable $\Rightarrow$ true'' as safe \emph{only for what it already proves} -- so strongly that it cannot even prove its own consistency ($\Box\bot\to\bot$, i.e.\ G\"odel~II).
-			\item \textbf{The spurious proof is available.} Let $S := \big((A{=}\$10)\Rightarrow(U{=}\$0)\big)$. The agent is built so that \emph{proving} $S$ makes it take \$5; then $A\neq\$10$, so $S$ holds vacuously, giving $\vdash(\Box S\to S)$. By L\"ob, $\vdash S$. A naive proof search can therefore prove the bad statement and take \$5.
-			\item \textbf{Moral.} Ruling out spurious proofs needs extra structure (e.g.\ ``playing chicken with the universe''); a general account of \emph{logical counterfactuals} (counterpossibles) is open. The same L\"obian obstacle blocks an agent from fully trusting a successor's proofs -- a reflective-stability problem.
-		\end{itemize}
-		}
-	\end{block}
-}
 
 %==================================================================
 \section{A formal criterion for decision theories}
