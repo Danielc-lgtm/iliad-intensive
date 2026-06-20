@@ -70,10 +70,10 @@
 
 **Block: Why intelligence is "general purpose"** (+ two richer Bayesian-network diagrams: a known causal network A,B,C,D -> X with Y unlinked; then a learned edge Y -> D -> X with general-purpose search targeting Y)
 
-- why expect a capable mind to steer toward many different goals rather than one fixed task?
-- terminal goal X; incomplete world model where some variable Y causally influences X through a pathway not yet represented
-- on learning that pathway, Y becomes an instrumental subgoal for X; many variables can become instrumental subgoals as the world model fills in
-- a general-purpose search algorithm (any goal description -> a plan) lets a newly-discovered instrumental subgoal be optimized immediately, without having been anticipated
+- why expect a capable mind to be able to steer toward a wide variety of goals?
+- terminal goal X; incomplete world model where some variable Y causally influences X but the pathway isn't yet known
+- learning the pathway Y -> X reveals Y as an instrumental subgoal; many variables may "turn out" this way
+- a general-purpose search algorithm (input: any goal description; output: a plan) lets the agent optimize a newly-discovered instrumental subgoal on the fly
 
 ### Slide: Dualistic agents
 
@@ -280,7 +280,7 @@
 - even if you only want to predict the system's end state, it is useful to model the optimizers acting on it
 - without an optimizer: you must know the initial condition in detail and integrate the dynamics forward, and prediction error grows over time
 - with an optimizer: the initial condition becomes irrelevant (it drives any starting state to its target), and the target itself is the prediction, robust to perturbations
-- prediction alone makes optimizers worth identifying: whether a system is being steered to a narrow target is an objective feature, not observer-relative
+- paying attention to optimizers is efficient in terms of the information you have to learn vs what you get to predict
 
 ### Slide: Optimization and Thermodynamics
 

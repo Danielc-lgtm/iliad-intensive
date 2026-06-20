@@ -121,10 +121,10 @@
 	\begin{block}{Why intelligence is ``general purpose''}
 		{\tiny
 		\begin{itemize}
-			\item Why expect a capable mind to steer towards many different goals rather than one fixed task?
-			\item You hold a terminal goal $X$, but your world model is \textbf{incomplete}: some variable $Y$ causally influences $X$ through a pathway you have not yet represented
-			\item On learning that pathway, $Y$ becomes an \textbf{instrumental subgoal} for $X$; many variables can become instrumental subgoals as the world model fills in
-			\item A \textbf{general-purpose search} algorithm takes any goal description and returns a plan for it. With it, a newly discovered instrumental subgoal can be optimised immediately, without having been anticipated
+			\item Why expect a capable mind to be \textit{general-purpose} -- able to steer towards a \textit{wide variety} of goals, not just one fixed task?
+			\item Suppose you hold a terminal goal $X$, but your world model is \textbf{incomplete}: some variable $Y$ causally influences $X$, yet you are not (yet) aware of that pathway
+			\item As you learn and update your world model, you discover the path $Y\to X$ -- i.e.\ $Y$ is revealed to be an \textbf{instrumental subgoal} for $X$. Many variables may ``turn out'' this way
+			\item Now suppose the agent runs a \textbf{general-purpose search}: an internal algorithm that (1) takes \textit{any} goal description and (2) returns a plan to achieve it. Then the moment a new instrumental subgoal is discovered, the agent can optimise for it \textbf{on the fly} -- it need not have anticipated it
 		\end{itemize}
 		}
 	\end{block}
@@ -481,7 +481,7 @@
 			\item Even if you only want to predict the system's end state, it is useful to model the optimizers acting on it
 			\item Without an optimizer: you must know the initial condition in detail and integrate the dynamics forward, and prediction error grows over time
 			\item With an optimizer: the initial condition becomes irrelevant (it drives any starting state to its target), and the target itself is the prediction, robust to perturbations
-			\item So prediction alone makes optimizers worth identifying: whether a system is being steered to a narrow target is an objective feature, not observer-relative
+			\item Paying attention to optimizers is efficient in terms of the information you have to learn vs what you get to predict
 		\end{itemize}
 		}
 	\end{block}
