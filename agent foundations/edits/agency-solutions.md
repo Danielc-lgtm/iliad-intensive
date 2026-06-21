@@ -34,7 +34,7 @@ Convention: higher reward better; $r(\delta)$ linear in mixing weights; $R=\oper
 - **3(a)(ii)** Bayes-optimal under $\pi>0$ implies admissible: a dominating $\delta'$ would give $\mathrm{EU}(\delta',\pi)-\mathrm{EU}(\delta,\pi)\ge\pi_{i_0}(\cdots)>0$.
 - **3(b)** Face $\mathcal F$ tangent directions: $\mathcal F\subseteq r(a_{i_1})+H$ with $H=\operatorname{span}\{v_l\}$, $v_l=r(a_{i_l})-r(a_{i_1})$; any displacement between two points of $\mathcal F$ lies in $H$ (coefficients sum to zero), and every $h\in H$ is realized from a relative-interior point.
 - **3(c)(i)** $\pi\perp H$ makes $\mathrm{EU}(\cdot,\pi)$ constant $=c$ on $\mathcal F$.
-- **3(c)(ii)** Supporting-hyperplane assumption gives $\pi\cdot r(\delta')\le c$ for all $\delta'$, so every rule on $\mathcal F$ is Bayes-optimal under $\pi$. Conclusion: admissible $\Rightarrow$ on a face $\Rightarrow$ Bayes-optimal under positive $\pi$; converse is 3(a)(ii).
+- **3(c)(ii)** $\pi$ is the outward normal of the supporting hyperplane; $R$ sits on the inner side ($\pi\cdot x\le c$), touching it along $\mathcal F$. The step $r(\delta')-r(\delta)$ from a face point back into $R$ runs against the outward normal, so $\pi\cdot(r(\delta')-r(\delta))\le 0$, i.e. $\mathrm{EU}(\delta',\pi)\le\mathrm{EU}(\delta,\pi)$ for all $\delta'$; every face rule is Bayes-optimal. Conclusion: admissible $\Rightarrow$ on a face $\Rightarrow$ Bayes-optimal under positive $\pi$; converse is 3(a)(ii).
 
 ## Section 4: Exercise 4 -- The Do-Divergence Theorem
 

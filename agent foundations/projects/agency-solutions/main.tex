@@ -144,7 +144,11 @@ using $\sum_l(\mu_l'-\mu_l)=0$ to eliminate the $r(a_{i_1})$ term. Hence moving 
 
 \soln \emph{(i)} For $x,x'\in\mathcal F$ we have $x-x'\in H$ by 3(b), so $\pi\cdot(x-x')=0$. Thus $\pi\cdot\rd$ equals a common value $c$ for all $\delta$ with $\rd\in\mathcal F$.
 
-\emph{(ii)} Let $\rd\in\mathcal F$, so $\EU(\delta,\pi)=c$. For any $\delta'$, $r(\delta')\in R$, and the supporting assumption gives $\pi\cdot r(\delta')\le c$. Hence $\EU(\delta',\pi)\le c=\EU(\delta,\pi)$, so $\delta$ is Bayes-optimal under $\pi$.
+\emph{(ii)} Picture $\pi$ as the \emph{outward} normal of the supporting hyperplane $\{x:\pi\cdot x=c\}$: by assumption the whole risk set lies on the inner side, $\pi\cdot x\le c$ for all $x\in R$, touching the hyperplane exactly along the face $\mathcal F$. Fix any $\rd\in\mathcal F$ (so $\EU(\delta,\pi)=c$) and any other rule $\delta'$. The step from the face point $\rd$ to $r(\delta')\in R$ heads back into the risk set, i.e.\ against the outward normal, so its dot product with $\pi$ is non-positive:
+\[
+  \pi\cdot\big(r(\delta')-\rd\big)\le 0,\qquad\text{equivalently}\qquad \EU(\delta',\pi)\le\EU(\delta,\pi).
+\]
+Since this holds for every $\delta'$, each rule with $\rd\in\mathcal F$ maximizes expected utility, i.e.\ is Bayes-optimal under $\pi$.
 
 \emph{Conclusion.} If $\delta$ is admissible then $\rd\in F$ lies on some face $\mathcal F$; the prior $\pi$ built from $\mathcal F$ has all $\pi_i>0$ and, by (ii), makes $\delta$ Bayes-optimal. Conversely, by 3(a)(ii) every Bayes-optimal rule under a strictly positive prior is admissible. The two classes coincide. \qed
 
