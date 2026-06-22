@@ -113,3 +113,17 @@ Author follow-up: revert the previous commit (the recast of optimization as "ste
 2. **Section 9 clarity pass.** Rewrote all four subsections of Section 9 (from exogenous to endogenous knowledge; the three types sharpened; dissolving the subjectivity; back to optimizing systems) with shorter sentences and plainer wording. The structure, the Shannon-coding derivation, every equation, and all cross-references are unchanged; the diff against the previous version is confined to Section 9 (a single hunk). The Flint three-axes content in Section 9.4 was kept (consistent with the reverted base), only clarified.
 
 **Decision:**
+
+---
+
+## Choice #11: Agent Foundations daily-checkpoint quiz (Jotform)
+
+Built a multiple-choice "Daily Checkpoint" quiz, following the Template's Daily Checkpoint spec (`sources/Template.docx`) and the linked Google Form as the format/tone example. Live form: https://form.jotform.com/261724721333048 (Jotform personal workspace; no team workspace exists on the account). 13 single-answer questions, optional, ungraded, no name/email field. Grounded in `edits/agency-presentation.md` and the learning outcomes in `sources/Agent foundations doc.docx`. Full question text plus answer key recorded in `edits/daily-checkpoint-quiz.md`.
+
+Scope decisions (best guesses; change if you disagree):
+- Coverage: one or two questions per major learning outcome of the day (first-critical-try motivation, reflective stability, coherence and the complete-class theorem, instrumental convergence over resources, dualistic vs embedded agents, Vingean uncertainty, the Löbian obstacle, the proof-strength telomere, logical vs empirical uncertainty, logical induction, the Touchette-Lloyd bound, descriptive vs normative foundations). Decision-theory content was left out because it is its own day (those slides were moved out of this deck).
+- Length: 13 questions (the example had 5 multiple-choice). Chosen for fuller learning-outcome coverage; easy to trim.
+- Ungraded, with no correct answers shown in the form: matches the example ("you do not need to submit it, and it will not be graded"). The answer key lives in the repo instead.
+- No name/email field: matches the example, even though the Template notes the checkpoint doubles as a light attendance check. Add a name field if you want real attendance tracking.
+
+**Decision:**
