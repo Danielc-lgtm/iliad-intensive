@@ -4,6 +4,8 @@ Article-class lecture notes, fully pedagogical and self-contained. Project: `pro
 
 **This is V2:** same section structure, theorems, equations, and worked examples as V1, but the prose of every section (Introduction, toolkit, second law, three types, subjective entropy, algorithmic thermodynamics, embedded agency, both appendices) was rewritten in the crisp, intuition-first, signposted, example-led style of the new Section 3, made fully em-dash-free, and run through a critical-correctness pass. The one substantive content change versus V1 is the corrected prediction argument in §3.4 (see that bullet); a redundant footnote in §4.3 was also de-duplicated. V1 (`projects/optimization-thermodynamics/`) is the prior version, with the same §3.4 correction applied.
 
+**V2 editorial pass (style only, substance and structure unchanged):** a harshest-critic pass per `CLAUDE.md` removed residual LLM-prose tells, with no change to any claim, theorem, equation, example, or section ordering. Cut filler frames and inflated topic sentences ("worth flagging/stating/seeing/knowing/internalizing/spelling out", "deserves a careful telling", "most importantly for what follows", "Crucially", "each of independent interest", "it pays to see", "The real payoff", "the answer turns out to") in favor of direct statement. The document was already em-dash-free; this pass tightened the signposting prose around the existing content.
+
 **Title:** Optimization and Thermodynamics (Version 2, revised exposition)
 **Subtitle:** From convergent attractors to algorithmic entropy, and what physics charges an embedded agent for steering the world
 
