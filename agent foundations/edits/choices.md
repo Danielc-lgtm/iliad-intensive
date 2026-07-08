@@ -14,6 +14,17 @@ Format:
 
 (Choices appear below this line)
 
+## Choice #11: Thesis-register rewrite of optimization-thermodynamics V2 (2026-07 session)
+
+Author request: dramatically rewrite the prose of the optimization-and-thermodynamics notes so the style is indistinguishable from the author's MSc thesis (`sources/Chiang Sung En-Thesis.pdf`), holding logical structure invariant or improving it. Decisions made while implementing:
+
+1. **Em-dashes reinstated.** The thesis uses unspaced em-dashes sparingly (about one per page), so the CLAUDE.md "no em dashes" house rule is overridden for this document only, at matching frequency. *Flag if you want them stripped after all.*
+2. **Section titles renominalized.** Question- and slogan-form titles were recast as nominal thesis-style titles (e.g. "What is optimization?" -> "Characterizing optimization"; "The trouble with subjective entropy" -> "Limitations of subjective entropy"; "Maxwell's demon, exactly" -> "An exact analysis of Maxwell's demon"; "Takeaways" -> "Summary and conclusions"). All labels unchanged, so cross-references are unaffected.
+3. **Takeaways bullets became summary prose.** Section 9's bulleted takeaways were converted to flowing paragraphs in the register of the thesis's "Summary and conclusions", same claims in the same order. This is a prose-style change, not a structural one; say if you want the bullets back.
+4. **V1 untouched.** Only `projects/optimization-thermodynamics-v2/` was rewritten; V1 remains the prior register for comparison.
+
+**Decision:**
+
 ## Choice #1: Scope and depth decisions in the "Optimization and thermodynamics" lecture notes
 
 [RESOLVED by author request 2026-06: rewrite to be much more pedagogical and self-contained, no page limit, full prose (no telegraphic constructions), include all content including the generalized heat engine and Touchette-Lloyd integrated seamlessly. Implemented in the 34-page version; superseded decisions: the 15-page length, the omission of the EP-vs-Landauer decomposition, the omission of the Ebtekar-Hutter information engine, and the compressed treatments of the coin engine and Touchette-Lloyd.]
