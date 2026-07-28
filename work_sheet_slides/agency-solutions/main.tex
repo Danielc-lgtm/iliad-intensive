@@ -1,0 +1,219 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newcommand{\proves}{\vdash}
+\newcommand{\Halts}{\mathsf{Halts}}
+\newcommand{\PS}{\mathsf{ProofSeeker}}
+\newcommand{\FB}{\mathsf{FairBot}}
+\newcommand{\bx}{\Box}
+\newcommand{\rd}{r(\delta)}
+\newcommand{\DKL}{D_{\mathrm{KL}}}
+\DeclareMathOperator{\MI}{MI}
+\DeclareMathOperator{\EU}{EU}
+\newcommand{\doo}[1]{\mathrm{do}(#1)}
+
+\theoremstyle{plain}
+\newtheorem*{claim}{Claim}
+
+\newcommand{\soln}{\medskip\noindent\textit{Solution.}\ }
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\title{Agency Exercises (V2): Solutions}
+\author{Agent Foundations module \\ Iliad Intensive}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+Notation follows the exercise sheet: $L$ is a fixed consistent formal system, $L\proves\varphi$ means $\varphi$ is provable in $L$, $K$ is a fixed contradiction (so consistency is $L\nvdash K$), and $\bx P$ is the statement, internal to $L$, that ``$P$ is provable'', equivalently that $\PS(P)$ halts. The bridge: if a program halts then $L$ proves it halts; if $L\proves P$ then $\PS(P)$ halts.
+
+\section{Exercise 1: G\"odel's second incompleteness theorem}
+
+Recall $Z(A)$ searches for an $L$-proof of $\neg\Halts(A(A))$ and halts if it finds one, and
+\[
+  G \;:=\; \neg\Halts(Z(Z)).
+\]
+By construction $Z(Z)$ searches for an $L$-proof of $G$, so
+\begin{equation}\label{eq:selfref}
+  Z(Z)\text{ halts} \iff L\proves G. \tag{$\star$}
+\end{equation}
+
+\paragraph{Part 1(a).} $G$ is true (assuming $L$ consistent).
+
+\soln Two cases.
+\begin{itemize}[leftmargin=1.5em]
+\item \emph{$Z(Z)$ halts.} By \eqref{eq:selfref}, $L\proves G$, i.e.\ $L\proves\neg\Halts(Z(Z))$. But $Z(Z)$ actually halts, so by the bridge $L\proves\Halts(Z(Z))$. Then $L$ proves both $\Halts(Z(Z))$ and its negation, contradicting consistency.
+\item \emph{$Z(Z)$ runs forever.} Then $\neg\Halts(Z(Z))$, i.e.\ $G$, is true.
+\end{itemize}
+Consistency rules out the first case, so $Z(Z)$ runs forever and $G$ is true. \qed
+
+\paragraph{Part 1(b).} If $L\proves\neg\bx K$ (i.e.\ $L$ proves its own consistency) then $L$ is inconsistent.
+
+\soln The argument of 1(a) used only the consistency of $L$, and each step is a finite manipulation of programs and proofs that $L$ can formalize. Reading it inside $L$: ``$Z(Z)$ halts'' yields $\bx G$ (by construction) and $\bx\Halts(Z(Z))$ (the bridge), hence $\bx K$; contrapositively $L\proves \neg\bx K \to G$. If $L\proves\neg\bx K$, modus ponens gives
+\[
+  L\proves G,\qquad\text{i.e.}\qquad L\proves\neg\Halts(Z(Z)).
+\]
+But $L\proves G$ means $Z(Z)$'s search finds a proof of $G$, so $Z(Z)$ halts; by the bridge $L\proves\Halts(Z(Z))$. Now $L$ proves both $\Halts(Z(Z))$ and $\neg\Halts(Z(Z))$, so $L$ is inconsistent. \qed
+
+\paragraph{Part 1(c).} If $L\proves \bx P\to P$ for every $P$, then $L$ is inconsistent.
+
+\soln
+\emph{(i)} Fix $P$ with $L\proves\neg P$. The contrapositive of $\bx P\to P$ is $\neg P\to\neg\bx P$, so from $L\proves\bx P\to P$ we get $L\proves\neg P\to\neg\bx P$. With $L\proves\neg P$, modus ponens gives $L\proves\neg\bx P$.
+
+\emph{(ii)} Take $P=K$. Since $\neg K$ is a tautology, $L\proves\neg K$, so by (i) $L\proves\neg\bx K$. Thus $L$ proves its own consistency, and Part 1(b) makes $L$ inconsistent. \qed
+
+\section{Exercise 2: L\"ob's theorem}
+
+We use Necessitation (N) $L\proves\varphi\Rightarrow L\proves\bx\varphi$, Distribution (K) $L\proves\bx(\varphi\to\psi)\to(\bx\varphi\to\bx\psi)$, and the L\"ob condition (4) $L\proves\bx\varphi\to\bx\bx\varphi$.
+
+\paragraph{Part 2(a). Necessitation.} If $L\proves\varphi$ there is a concrete proof of $\varphi$; searching all strings, $\PS(\varphi)$ meets it and halts. ``$\PS(\varphi)$ halts'' is exactly $\bx\varphi$, and a halting run is finite, so by the bridge $L\proves\bx\varphi$. \qed
+
+\paragraph{Part 2(b). Distribution.} A proof of $\varphi\to\psi$ turns a proof of $\varphi$ into one of $\psi$ (concatenate the two proofs and apply modus ponens). So if $\PS(\varphi\to\psi)$ and $\PS(\varphi)$ both halt, their outputs combine into a proof of $\psi$, whence $\PS(\psi)$ halts. This combining is a finite procedure $L$ can carry out, so $L\proves\bx(\varphi\to\psi)\to(\bx\varphi\to\bx\psi)$. \qed
+
+\medskip
+The L\"ob sentence $\lambda$ satisfies $L\proves\lambda\leftrightarrow(\bx\lambda\to C)$.
+
+\paragraph{Part 2(c).} $L\proves\bx\lambda\to\bx C$.
+
+\soln From $L\proves\lambda\to(\bx\lambda\to C)$:
+\begin{align*}
+\text{(N):}\quad & L\proves \bx\!\big(\lambda\to(\bx\lambda\to C)\big),\\
+\text{(K):}\quad & L\proves \bx\lambda\to\bx(\bx\lambda\to C), \\
+\text{(K):}\quad & L\proves \bx(\bx\lambda\to C)\to(\bx\bx\lambda\to\bx C),
+\end{align*}
+and chaining the last two, $L\proves\bx\lambda\to(\bx\bx\lambda\to\bx C)$. By (4), $L\proves\bx\lambda\to\bx\bx\lambda$. Propositionally, from $\bx\lambda$ we obtain $\bx\bx\lambda$ and then $\bx C$, so $L\proves\bx\lambda\to\bx C$. \qed
+
+\paragraph{Part 2(d).} Assuming $L\proves\bx C\to C$, derive $L\proves C$.
+
+\soln Chaining $L\proves\bx\lambda\to\bx C$ (2(c)) with $L\proves\bx C\to C$ gives $L\proves\bx\lambda\to C$. The L\"ob equivalence gives the converse direction $L\proves(\bx\lambda\to C)\to\lambda$, so $L\proves\lambda$. By (N), $L\proves\bx\lambda$; with $L\proves\bx\lambda\to C$, modus ponens yields $L\proves C$. \qed
+
+\paragraph{Part 2(e). FairBot.} With $A:=$ ``$\FB_1(\FB_2)=C$'' and $B:=$ ``$\FB_2(\FB_1)=C$'', show $L\proves A\wedge B$.
+
+\soln From the source code, $\FB_1$ returns $C$ iff it finds an $L$-proof that its opponent $\FB_2$ returns $C$ against it, i.e.\ a proof of $B$; reading this off the code,
+\[
+  L\proves \bx B\to A,\qquad L\proves \bx A\to B .
+\]
+For any $\varphi$, $\bx(A\wedge B)\to\bx\varphi$ whenever $A\wedge B\to\varphi$ is a tautology: indeed (N) gives $\bx(A\wedge B\to\varphi)$ and (K) then gives $\bx(A\wedge B)\to\bx\varphi$. Applying this to $\varphi=A$ and $\varphi=B$,
+\[
+  L\proves \bx(A\wedge B)\to\bx A,\qquad L\proves \bx(A\wedge B)\to\bx B.
+\]
+Hence, assuming $\bx(A\wedge B)$: we get $\bx A$ and $\bx B$, then $B$ (from $\bx A\to B$) and $A$ (from $\bx B\to A$), so $A\wedge B$. Thus
+\[
+  L\proves \bx(A\wedge B)\to(A\wedge B),
+\]
+and L\"ob's theorem with $C:=A\wedge B$ gives $L\proves A\wedge B$. \qed
+
+\section{Exercise 3: The Complete Class Theorem}
+
+Higher reward is better; $\delta'$ \emph{dominates} $\delta$ if $r(\delta')\ge\rd$ coordinatewise with strict inequality in some coordinate. $\rd$ is linear in the mixing weights, $R=\operatorname{conv}\{r(a_1),\dots,r(a_k)\}$, and $\EU(\delta,\pi)=\pi\cdot\rd$.
+
+\paragraph{Part 3(a)(i).} An admissible $\delta=\sum_j\lambda_j a_j$ puts $\lambda_j=0$ on every non-Pareto-optimal (dominated) $a_j$.
+
+\soln Suppose $\lambda_j>0$ for a dominated $a_j$, and let $\delta'$ dominate it: $r(\delta')\ge r(a_j)$ with strict inequality in some coordinate $i_0$. Replace the weight on $a_j$ by $\delta'$, i.e.\ play $\delta'$ with the probability $\lambda_j$ formerly on $a_j$. This is a valid rule $\hat\delta$ with
+\[
+  r(\hat\delta)=\rd+\lambda_j\big(r(\delta')-r(a_j)\big)\ge\rd,
+\]
+and strict in coordinate $i_0$ (since $\lambda_j>0$). So $\hat\delta$ dominates $\delta$, contradicting admissibility. Hence $\lambda_j=0$, i.e.\ $F\subseteq\operatorname{conv}\{\text{Pareto-optimal pure actions}\}$. \qed
+
+\paragraph{Part 3(a)(ii).} Every Bayes-optimal rule under a prior $\pi$ with $\pi_i>0$ for all $i$ is admissible.
+
+\soln If $\delta'$ dominated such a $\delta$, then with $r(\delta')_{i_0}>\rd_{i_0}$,
+\[
+  \EU(\delta',\pi)-\EU(\delta,\pi)=\sum_i\pi_i\big(r(\delta')_i-\rd_i\big)\ge\pi_{i_0}\big(r(\delta')_{i_0}-\rd_{i_0}\big)>0,
+\]
+since every term is $\ge0$ and the $i_0$ term is $>0$. This contradicts Bayes-optimality, so $\delta$ is admissible. \qed
+
+\paragraph{Part 3(b).} For a face $\mathcal F=\{\sum_{l=1}^p\mu_l\,r(a_{i_l}):\mu_l\ge0,\ \sum_l\mu_l=1\}$ with $v_l:=r(a_{i_l})-r(a_{i_1})$ and $H=\operatorname{span}\{v_2,\dots,v_p\}$: $H$ is exactly the set of directions tangent to $\mathcal F$.
+
+\soln Any point of $\mathcal F$ equals $r(a_{i_1})+\sum_{l\ge2}\mu_l v_l$, so $\mathcal F\subseteq r(a_{i_1})+H$. Take $x,x+h\in\mathcal F$, say $x=\sum_l\mu_l r(a_{i_l})$ and $x+h=\sum_l\mu_l' r(a_{i_l})$ with $\sum_l\mu_l=\sum_l\mu_l'=1$. Then
+\[
+  h=\sum_l(\mu_l'-\mu_l)\,r(a_{i_l})=\sum_{l\ge2}(\mu_l'-\mu_l)\,v_l\in H,
+\]
+using $\sum_l(\mu_l'-\mu_l)=0$ to eliminate the $r(a_{i_1})$ term. Hence moving within $\mathcal F$ requires $h\in H$. Conversely, from any relative-interior point ($\mu_l>0$) every $h\in H$ is realized: $x+\varepsilon h\in\mathcal F$ for small $\varepsilon>0$. So the tangent directions of $\mathcal F$ are precisely $H$. \qed
+
+\paragraph{Part 3(c).} Let $\pi\perp H$ be normalized so $\pi_i>0$ and $\sum_i\pi_i=1$, and assume no point of $R$ scores strictly higher under $\pi$ than the points of $\mathcal F$.
+
+\soln \emph{(i)} For $x,x'\in\mathcal F$ we have $x-x'\in H$ by 3(b), so $\pi\cdot(x-x')=0$. Thus $\pi\cdot\rd$ equals a common value $c$ for all $\delta$ with $\rd\in\mathcal F$.
+
+\emph{(ii)} Picture $\pi$ as the \emph{outward} normal of the supporting hyperplane $\{x:\pi\cdot x=c\}$: by assumption the whole risk set lies on the inner side, $\pi\cdot x\le c$ for all $x\in R$, touching the hyperplane exactly along the face $\mathcal F$. Fix any $\rd\in\mathcal F$ (so $\EU(\delta,\pi)=c$) and any other rule $\delta'$. The step from the face point $\rd$ to $r(\delta')\in R$ heads back into the risk set, i.e.\ against the outward normal, so its dot product with $\pi$ is non-positive:
+\[
+  \pi\cdot\big(r(\delta')-\rd\big)\le 0,\qquad\text{equivalently}\qquad \EU(\delta',\pi)\le\EU(\delta,\pi).
+\]
+Since this holds for every $\delta'$, each rule with $\rd\in\mathcal F$ maximizes expected utility, i.e.\ is Bayes-optimal under $\pi$.
+
+\emph{Conclusion.} If $\delta$ is admissible then $\rd\in F$ lies on some face $\mathcal F$; the prior $\pi$ built from $\mathcal F$ has all $\pi_i>0$ and, by (ii), makes $\delta$ Bayes-optimal. Conversely, by 3(a)(ii) every Bayes-optimal rule under a strictly positive prior is admissible. The two classes coincide. \qed
+
+\section{Exercise 4: The Do-Divergence Theorem}
+
+Write $\Pr[X,A,O]=\Pr[X\mid A,O]\Pr[A\mid O]\Pr[O]$ and the blind baseline $\Pr[X,A,O\mid\doo{A}]=\Pr[X\mid A,O]\Pr[A]\Pr[O]$.
+
+\begin{claim}
+$\DKL\!\big(\Pr[X]\,\big\|\,\Pr[X\mid\doo{A}]\big)\le\MI(A;O)$.
+\end{claim}
+
+\soln Compute the divergence between the full joints. The factors $\Pr[X\mid A,O]$ and $\Pr[O]$ cancel in the log-ratio:
+\[
+  \DKL\!\big(\Pr[X,A,O]\,\big\|\,\Pr[X,A,O\mid\doo{A}]\big)
+  =\sum_{x,a,o}\Pr[x,a,o]\log\frac{\Pr[a\mid o]}{\Pr[a]}.
+\]
+The summand depends only on $a,o$; marginalizing $x$ and using $\Pr[a\mid o]/\Pr[a]=\Pr[a,o]/(\Pr[a]\Pr[o])$,
+\[
+  =\sum_{a,o}\Pr[a,o]\log\frac{\Pr[a,o]}{\Pr[a]\Pr[o]}=\MI(A;O).
+\]
+Marginalizing the two joints down to $X$ sends them to $\Pr[X]$ and $\Pr[X\mid\doo{A}]=\sum_{a,o}\Pr[X\mid a,o]\Pr[a]\Pr[o]$ respectively, so monotonicity of KL under marginalization gives
+\[
+  \DKL\!\big(\Pr[X]\,\big\|\,\Pr[X\mid\doo{A}]\big)\le\DKL\!\big(\Pr[X,A,O]\,\big\|\,\Pr[X,A,O\mid\doo{A}]\big)=\MI(A;O). \qedhere
+\]
+
+\section{Exercise 5: Channel Additivity}
+
+The channel factorizes as $P[Y\mid X]=P[Y_1\mid X_1]P[Y_2\mid X_2]$, and $P[Y,X]=P[Y\mid X]P[X]$.
+
+\paragraph{Part 5(a).} $\MI(X;Y)=\MI(X_1;Y_1)+\MI(X_2;Y_2)-\MI(Y_1;Y_2)$.
+
+\soln Using $P[x,y]=P[y\mid x]P[x]$ and the factorization,
+\[
+  \MI(X;Y)=\sum_{x,y}P[x,y]\log\frac{P[y\mid x]}{P[y]}
+  =\sum_{x,y}P[x,y]\log\frac{P[y_1\mid x_1]P[y_2\mid x_2]}{P[y_1,y_2]}.
+\]
+The three terms on the right are, respectively,
+\[
+  \MI(X_1;Y_1)=\sum P[x,y]\log\tfrac{P[y_1\mid x_1]}{P[y_1]},\quad
+  \MI(X_2;Y_2)=\sum P[x,y]\log\tfrac{P[y_2\mid x_2]}{P[y_2]},
+\]
+\[
+  \MI(Y_1;Y_2)=\sum P[x,y]\log\tfrac{P[y_1,y_2]}{P[y_1]P[y_2]},
+\]
+each written over the full joint (the first depends only on $x_1,y_1$, etc.). Then
+\[
+  \MI(X_1;Y_1)+\MI(X_2;Y_2)-\MI(Y_1;Y_2)
+  =\sum_{x,y}P[x,y]\log\frac{P[y_1\mid x_1]P[y_2\mid x_2]}{P[y_1,y_2]}=\MI(X;Y). \qed
+\]
+
+\paragraph{Part 5(b).} For $Q[X_1,X_2]:=P[X_1]P[X_2]$, $\MI_Q(X;Y)\ge\MI_P(X;Y)$.
+
+\soln $Q$ keeps the marginals $Q[X_i]=P[X_i]$ and the channel, so $\MI_Q(X_i;Y_i)=\MI_P(X_i;Y_i)$ for $i=1,2$ ($\MI(X_i;Y_i)$ depends only on $P[X_i]$ and $P[Y_i\mid X_i]$). Under $Q$ the inputs are independent, so the outputs are too:
+\[
+  Q[y_1,y_2]=\sum_{x_1,x_2}Q[x_1]Q[x_2]P[y_1\mid x_1]P[y_2\mid x_2]=Q[y_1]\,Q[y_2],
+\]
+hence $\MI_Q(Y_1;Y_2)=0$. Applying 5(a) under each distribution,
+\[
+  \MI_Q(X;Y)=\MI_P(X_1;Y_1)+\MI_P(X_2;Y_2)
+  =\MI_P(X;Y)+\MI_P(Y_1;Y_2)\ge\MI_P(X;Y),
+\]
+the last step using $\MI_P(Y_1;Y_2)\ge0$. \qed
+
+\paragraph{Part 5(c).} A throughput-maximizing input with $X_1\perp X_2$ always exists.
+
+\soln The input simplex is compact and $\MI(X;Y)$ continuous, so a maximizer $P^*$ exists. Let $Q^*:=P^*[X_1]P^*[X_2]$. By 5(b), $\MI_{Q^*}(X;Y)\ge\MI_{P^*}(X;Y)=\max$, so $Q^*$ is also a maximizer, and under $Q^*$ the inputs are independent. \qed
+
+\end{document}
